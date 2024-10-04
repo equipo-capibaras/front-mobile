@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -41,6 +42,7 @@ import com.misoux.abcall.ui.theme.linkText
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val context = LocalContext.current
     ABCallTheme {
         Surface(
             modifier = Modifier
@@ -63,7 +65,7 @@ fun LoginScreen(navController: NavController) {
                 )
 
                 Text(
-                    text = "Ingresa a tu cuenta",
+                    text = context.getString(R.string.login_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
@@ -74,7 +76,7 @@ fun LoginScreen(navController: NavController) {
                 CustomOutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Correo") },
+                    label = { Text(text = context.getString(R.string.login_email)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 24.dp)
@@ -84,7 +86,7 @@ fun LoginScreen(navController: NavController) {
                 CustomOutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Contraseña") },
+                    label = { Text(text = context.getString(R.string.login_password)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
@@ -98,7 +100,7 @@ fun LoginScreen(navController: NavController) {
                         .padding(vertical = 40.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(text = "Ingresar")
+                    Text(text = context.getString(R.string.login_button))
                 }
 
 
@@ -112,7 +114,7 @@ fun LoginScreen(navController: NavController) {
 
                     val annotatedString = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                            append("¿Todavía no tienes cuenta? ")
+                            append(context.getString(R.string.login_signup_question) + " ")
                         }
                         withStyle(
                             style = SpanStyle(
@@ -120,7 +122,7 @@ fun LoginScreen(navController: NavController) {
                                 fontWeight = linkText.fontWeight,
                             )
                         ) {
-                            append("Regístrate")
+                            append(context.getString(R.string.login_signup_action))
                         }
                     }
 

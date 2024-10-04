@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ABCall</string>
+    <string name="login_title">Entre na sua conta</string>
+    <string name="login_email">E-mail</string>
+    <string name="login_password">Senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_signup_question">Ainda não tem conta?</string>
+    <string name="login_signup_action">Cadastre-se</string>
+</resources>
