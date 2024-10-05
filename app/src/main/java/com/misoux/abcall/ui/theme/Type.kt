@@ -21,11 +21,13 @@ val Typography = Typography(
         fontFamily = FiraSans,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
+        letterSpacing = 0.15.sp
     ),
     titleLarge = TextStyle(
         fontFamily = FiraSans,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
+        letterSpacing = 0.4.sp,
     ),
     titleMedium = TextStyle(
         fontFamily = FiraSans,
