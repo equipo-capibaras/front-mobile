@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">ABCall</string>
+    <string name="login_title">Entre na sua conta</string>
+    <string name="form_email">E-mail</string>
+    <string name="form_password">Senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_signup_question">Ainda não tem conta?</string>
+    <string name="login_signup_action">Cadastre-se</string>
+    <string name="signup_title">Crie sua conta</string>
+    <string name="form_name">Nome</string>
+    <string name="form_company">De qual empresa você é cliente?</string>
+    <string name="form_confirm_password">Confirmar senha</string>
+    <string name="signup_button">Criar conta</string>
+    <string name="signup_login_question">Já tem uma conta?</string>
+    <string name="signup_login_action">Entrar</string>
+    <string name="form_required">Este campo é obrigatório</string>
+    <string name="form_invalid_email">E-mail inválido</string>
+    <string name="form_password_length">A senha deve ter pelo menos 8 caracteres</string>
+    <string name="form_confirm_password_invalid">As senhas não coincidem</string>
+</resources>
