@@ -1,4 +1,4 @@
-package com.misoux.abcall.ui.views
+package io.capibaras.abcall.ui.views
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -36,10 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.misoux.abcall.R
-import com.misoux.abcall.ui.components.CustomOutlinedTextField
-import com.misoux.abcall.ui.theme.ABCallTheme
-import com.misoux.abcall.ui.theme.linkText
+
+import io.capibaras.abcall.R
+import io.capibaras.abcall.ui.components.CustomOutlinedTextField
+import io.capibaras.abcall.ui.theme.ABCallTheme
+import io.capibaras.abcall.ui.theme.linkText
 
 @Composable
 fun LoginScreen(navController: NavController) {

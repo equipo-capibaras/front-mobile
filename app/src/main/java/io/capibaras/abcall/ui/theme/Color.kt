@@ -1,4 +1,4 @@
-package com.misoux.abcall.ui.theme
+package io.capibaras.abcall.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

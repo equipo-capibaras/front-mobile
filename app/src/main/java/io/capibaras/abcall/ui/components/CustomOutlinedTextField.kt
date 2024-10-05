@@ -1,4 +1,4 @@
-package com.misoux.abcall.ui.components
+package io.capibaras.abcall.ui.components
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -15,14 +15,14 @@ fun CustomOutlinedTextField(
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
-    supportingText: @Composable() (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = label,
-        colors = OutlinedTextFieldDefaults.colors( // Corregido con outlinedTextFieldColors
+        colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = MaterialTheme.colorScheme.onBackground,
             unfocusedLabelColor = MaterialTheme.colorScheme.onBackground
         ),

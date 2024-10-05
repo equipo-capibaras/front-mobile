@@ -1,9 +1,11 @@
-package com.misoux.abcall
+package io.capibaras.abcall
 
 import android.app.Application
-import com.misoux.abcall.di.appModule
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+
+import io.capibaras.abcall.di.appModule
 
 class App : Application() {
     override fun onCreate() {
@@ -11,6 +13,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
+            androidLogger()
             modules(appModule)
         }
     }

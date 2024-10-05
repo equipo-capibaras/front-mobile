@@ -1,13 +1,13 @@
-package com.misoux.abcall.ui.navigation
+package io.capibaras.abcall.ui.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.misoux.abcall.ui.views.LoginScreen
-import com.misoux.abcall.ui.views.SignUpScreen
 
+import io.capibaras.abcall.ui.views.LoginScreen
+import io.capibaras.abcall.ui.views.SignUpScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
