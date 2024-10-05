@@ -16,32 +16,29 @@ val FiraSans = FontFamily(
     Font(R.font.fira_sans_light_italic, FontWeight.Light, FontStyle.Italic)
 )
 
-// Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FiraSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        letterSpacing = 0.15.sp
     ),
     titleLarge = TextStyle(
         fontFamily = FiraSans,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp
+        fontSize = 24.sp,
+        letterSpacing = 0.4.sp,
     ),
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+    titleMedium = TextStyle(
+        fontFamily = FiraSans,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        letterSpacing = 0.4.sp,
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+)
+
+val linkText = TextStyle(
+    fontFamily = FiraSans,
+    fontWeight = FontWeight.Medium,
+    fontSize = 16.sp,
 )
