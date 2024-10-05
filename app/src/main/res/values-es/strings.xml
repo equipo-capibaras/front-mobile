@@ -13,4 +13,8 @@
     <string name="signup_button">Crear cuenta</string>
     <string name="signup_login_question">¿Ya tienes cuenta?</string>
     <string name="signup_login_action">Ingresa</string>
+    <string name="form_required">Este campo es obligatorio</string>
+    <string name="form_invalid_email">Correo no válido</string>
+    <string name="form_password_length">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="form_confirm_password_invalid">Las contraseñas no coinciden</string>
 </resources>

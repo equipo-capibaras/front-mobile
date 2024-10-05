@@ -1,5 +1,6 @@
 package com.misoux.abcall.ui.views
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,13 +47,13 @@ fun LoginScreen(navController: NavController) {
     ABCallTheme {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 32.dp),
+                .fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -73,28 +74,49 @@ fun LoginScreen(navController: NavController) {
                 )
 
                 var email by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+
+                var emailError by remember { mutableStateOf("") }
+                var passwordError by remember { mutableStateOf("") }
+
                 CustomOutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text(text = context.getString(R.string.form_email)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                        .padding(bottom = 8.dp),
+                    isError = emailError.isNotEmpty(),
+                    supportingText = { Text(emailError) }
                 )
 
-                var password by remember { mutableStateOf("") }
+
                 CustomOutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text(text = context.getString(R.string.form_password)) },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    visualTransformation = PasswordVisualTransformation()
+                        .fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = passwordError.isNotEmpty(),
+                    supportingText = { Text(passwordError) }
                 )
 
                 Button(
-                    onClick = { /* Acción de inicio de sesión */ },
+                    onClick = {
+                        val validationResults = validateFields(
+                            context = context,
+                            email = email,
+                            password = password,
+                        )
+
+                        emailError = validationResults["emailError"] ?: ""
+                        passwordError = validationResults["passwordError"] ?: ""
+
+                        if (validationResults.values.all { it.isEmpty() }) {
+                            /* TODO: Go to home page" */
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 40.dp),
@@ -138,6 +160,24 @@ fun LoginScreen(navController: NavController) {
             }
         }
     }
+}
+
+fun validateFields(
+    context: Context,
+    email: String,
+    password: String,
+): Map<String, String> {
+    val errors = mutableMapOf<String, String>()
+
+    if (email.isBlank()) {
+        errors["emailError"] = context.getString(R.string.form_required)
+    }
+
+    if (password.isBlank()) {
+        errors["passwordError"] = context.getString(R.string.form_required)
+    }
+
+    return errors
 }
 
 @Preview(showBackground = true)

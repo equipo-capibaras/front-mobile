@@ -1,5 +1,6 @@
 package com.misoux.abcall.ui.views
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -83,43 +84,56 @@ fun SignUpScreen(navController: NavController) {
                 )
 
                 var name by remember { mutableStateOf("") }
+                var email by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+                var confirmPassword by remember { mutableStateOf("") }
+                var selectedText by remember { mutableStateOf("") }
+
+                var nameError by remember { mutableStateOf("") }
+                var emailError by remember { mutableStateOf("") }
+                var passwordError by remember { mutableStateOf("") }
+                var confirmPasswordError by remember { mutableStateOf("") }
+                var companyError by remember { mutableStateOf("") }
+
+                // List of companies
+                val options = listOf("Claro", "Movistar", "Tigo")
+                val filteredOptions =
+                    options.filter { it.contains(selectedText, ignoreCase = true) }
+                var allowExpanded by remember { mutableStateOf(false) }
+                val expanded =
+                    selectedText.isNotEmpty() && allowExpanded && filteredOptions.isNotEmpty()
+
                 CustomOutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text(text = context.getString(R.string.form_name)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                        .padding(bottom = 8.dp),
+                    isError = nameError.isNotEmpty(),
+                    supportingText = { Text(nameError) }
                 )
 
-                var email by remember { mutableStateOf("") }
                 CustomOutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text(text = context.getString(R.string.form_email)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp)
+                        .padding(bottom = 8.dp),
+                    isError = emailError.isNotEmpty(),
+                    supportingText = { Text(emailError) }
                 )
-
-                val options = listOf("Claro", "Movistar", "Tigo")
-                var selectedText by remember { mutableStateOf("") }
-                val filteredOptions =
-                    options.filter { it.contains(selectedText, ignoreCase = true) }
-
-                val (allowExpanded, setExpanded) = remember { mutableStateOf(false) }
-                val expanded =
-                    selectedText.isNotEmpty() && allowExpanded && filteredOptions.isNotEmpty()
 
                 ExposedDropdownMenuBox(
                     expanded = expanded,
-                    onExpandedChange = setExpanded,
+                    onExpandedChange = { allowExpanded = it },
                 ) {
                     CustomOutlinedTextField(
                         modifier = Modifier
                             .menuAnchor(MenuAnchorType.PrimaryEditable)
                             .fillMaxWidth()
-                            .padding(bottom = 24.dp),
+                            .padding(bottom = 8.dp),
                         value = selectedText,
                         onValueChange = {
                             selectedText = it
@@ -131,18 +145,20 @@ fun SignUpScreen(navController: NavController) {
                                 modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable)
                             )
                         },
+                        isError = companyError.isNotEmpty(),
+                        supportingText = { Text(companyError) }
                     )
                     ExposedDropdownMenu(
                         modifier = Modifier.heightIn(max = 280.dp),
                         expanded = expanded,
-                        onDismissRequest = { setExpanded(false) },
+                        onDismissRequest = { allowExpanded = false },
                     ) {
                         filteredOptions.forEach { option ->
                             DropdownMenuItem(
                                 text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
                                 onClick = {
                                     selectedText = option
-                                    setExpanded(false)
+                                    allowExpanded = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                             )
@@ -150,31 +166,54 @@ fun SignUpScreen(navController: NavController) {
                     }
                 }
 
-
-                var password by remember { mutableStateOf("") }
                 CustomOutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text(text = context.getString(R.string.form_password)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    visualTransformation = PasswordVisualTransformation()
+                        .padding(bottom = 8.dp),
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = passwordError.isNotEmpty(),
+                    supportingText = { Text(passwordError) }
                 )
 
-                var confirmPassword by remember { mutableStateOf("") }
                 CustomOutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     label = { Text(text = context.getString(R.string.form_confirm_password)) },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    visualTransformation = PasswordVisualTransformation()
+                        .fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = confirmPasswordError.isNotEmpty(),
+                    supportingText = {
+                        if (confirmPasswordError.isNotEmpty()) {
+                            Text(confirmPasswordError)
+                        }
+                    }
                 )
 
                 Button(
-                    onClick = { /* Acción de inicio de sesión */ },
+                    onClick = {
+                        val validationResults = validateFields(
+                            context = context,
+                            name = name,
+                            email = email,
+                            company = selectedText,
+                            password = password,
+                            confirmPassword = confirmPassword
+                        )
+
+                        nameError = validationResults["nameError"] ?: ""
+                        emailError = validationResults["emailError"] ?: ""
+                        companyError = validationResults["companyError"] ?: ""
+                        passwordError = validationResults["passwordError"] ?: ""
+                        confirmPasswordError = validationResults["confirmPasswordError"] ?: ""
+
+                        if (validationResults.values.all { it.isEmpty() }) {
+                            /* TODO: Go to home page" */
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 40.dp),
@@ -218,6 +257,45 @@ fun SignUpScreen(navController: NavController) {
             }
         }
     }
+}
+
+fun validateFields(
+    context: Context,
+    name: String,
+    email: String,
+    company: String,
+    password: String,
+    confirmPassword: String
+): Map<String, String> {
+    val errors = mutableMapOf<String, String>()
+
+    if (name.isBlank()) {
+        errors["nameError"] = context.getString(R.string.form_required)
+    }
+
+    if (email.isBlank()) {
+        errors["emailError"] = context.getString(R.string.form_required)
+    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        errors["emailError"] = context.getString(R.string.form_invalid_email)
+    }
+
+    if (company.isBlank()) {
+        errors["companyError"] = context.getString(R.string.form_required)
+    }
+
+    if (password.isBlank()) {
+        errors["passwordError"] = context.getString(R.string.form_required)
+    } else if (password.length < 8) {
+        errors["passwordError"] = context.getString(R.string.form_password_length)
+    }
+
+    if (confirmPassword.isBlank()) {
+        errors["confirmPasswordError"] = context.getString(R.string.form_required)
+    } else if (confirmPassword != password) {
+        errors["confirmPasswordError"] = context.getString(R.string.form_confirm_password_invalid)
+    }
+
+    return errors
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

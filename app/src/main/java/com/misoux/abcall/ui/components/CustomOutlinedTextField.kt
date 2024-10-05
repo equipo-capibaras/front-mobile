@@ -14,7 +14,9 @@ fun CustomOutlinedTextField(
     label: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null,
+    supportingText: @Composable() (() -> Unit)? = null,
+    isError: Boolean = false,
 ) {
     OutlinedTextField(
         value = value,
@@ -26,6 +28,8 @@ fun CustomOutlinedTextField(
         ),
         modifier = modifier,
         visualTransformation = visualTransformation,
-        trailingIcon = trailingIcon
+        trailingIcon = trailingIcon,
+        isError = isError,
+        supportingText = supportingText
     )
 }
