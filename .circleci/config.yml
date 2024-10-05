@@ -1,0 +1,97 @@
+version: 2.1
+orbs:
+  android: circleci/android@3.0.0
+
+jobs:
+  test:
+    executor:
+      name: android/android_machine
+      resource_class: large
+      tag: 2024.07.1
+
+    steps:
+      - checkout
+      - android/accept_licenses
+      - run:
+          name: "Create AVDs"
+          command: |
+            echo $$ > /tmp/sdkmanager.pid
+            sdkmanager "system-images;android-26;google_apis;x86_64"
+            sdkmanager "system-images;android-35;google_apis;x86_64"
+            echo no | avdmanager create avd -n testavd-26 -k "system-images;android-26;google_apis;x86_64" --device "pixel_7"
+            echo no | avdmanager create avd -n testavd-35 -k "system-images;android-35;google_apis;x86_64" --device "pixel_7"
+            touch /tmp/avd-setup-done
+          background: true
+      - run:
+          name: "Run unit tests"
+          command: ./gradlew lint testDebug --continue
+      - run:
+          name: "Generate Code Coverage Report for unit tests"
+          command: ./gradlew codeCoverageReportDebug
+      - run:
+          name: "Run SonarCloud Scan"
+          command: |
+            API_URL="https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls?head=${CIRCLE_PROJECT_USERNAME}:${CIRCLE_BRANCH}"
+
+            RESPONSE=$(curl -s -H "Accept: application/vnd.github+json" "${API_URL}")
+
+            PR_COUNT=$(echo "${RESPONSE}" | jq '. | length')
+
+            if [[ "${PR_COUNT}" -eq 0 ]]; then
+              echo "No pull requests found for branch '${CIRCLE_BRANCH}'. Skipping pull request analysis."
+            elif [[ "${PR_COUNT}" -eq 1 ]]; then
+              PR_NUMBER=$(echo "${RESPONSE}" | jq -r '.[0].number')
+              PR_BASE_BRANCH=$(echo "${RESPONSE}" | jq -r '.[0].base.ref')
+              echo "Pull request number for branch '${CIRCLE_BRANCH}': ${PR_NUMBER}"
+              export SONARQUBE_SCANNER_PARAMS="{\"sonar.pullrequest.key\":\"${PR_NUMBER}\",\"sonar.pullrequest.branch\":\"${CIRCLE_BRANCH}\",\"sonar.pullrequest.base\":\"${PR_BASE_BRANCH}\"}"
+            else
+              echo "Warning: ${PR_COUNT} pull requests found for branch '${CIRCLE_BRANCH}'. Skipping pull request analysis."
+            fi
+            ./gradlew sonar --info
+          when: always
+      - run:
+          name: "Wait for AVDs to be ready"
+          command: |
+            count=0
+            while [ ! -f /tmp/avd-setup-done ] && [ $count -lt 10 ]; do
+              sleep 5
+              count=$((count + 1))
+            done
+
+            if [ ! -f /tmp/avd-setup-done ]; then
+              echo "Failed to install avd"
+              exit 1
+            fi
+      - android/start_emulator:
+          avd_name: testavd-35
+          restore_gradle_cache_post_emulator_launch: false
+      - android/run_tests
+      - android/kill_emulators
+      - android/start_emulator:
+          avd_name: testavd-26
+          restore_gradle_cache_post_emulator_launch: false
+      - android/run_tests
+      - android/kill_emulators
+      - run:
+          name: "Build APK"
+          command: |
+            echo "$KEY_FILE" | base64 -d > /tmp/app.jks
+            ./gradlew assembleRelease -Pandroid.injected.signing.store.file=/tmp/app.jks -Pandroid.injected.signing.store.password=$STORE_PASSWORD -Pandroid.injected.signing.key.alias=$KEY_ALIAS -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+            mkdir -p ~/artifacts/
+            cp ./app/build/outputs/apk/release/app-release.apk ~/artifacts/ABCall.apk
+      - store_artifacts:
+          path: ~/artifacts
+      - run:
+          name: "Save test results"
+          command: |
+            mkdir -p ~/test-results/junit/;
+            find . -type f -regex "./app/build/test-results/testDebugUnitTest/.*xml" -exec cp {} ~/test-results/junit/ \;
+            find . -type f -regex "./app/build/outputs/androidTest-results/connected/debug/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+
+workflows:
+  ci:
+    jobs:
+      - test

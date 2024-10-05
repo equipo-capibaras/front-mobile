@@ -1,4 +1,5 @@
 [versions]
+sonarqube = "5.1.0.4882"
 agp = "8.7.0"
 kotlin = "2.0.20"
 coreKtx = "1.13.1"
@@ -36,3 +37,4 @@ koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", versio
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }

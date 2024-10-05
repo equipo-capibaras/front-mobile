@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.sonarqube)
 }
 
 android {
@@ -26,6 +27,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -37,6 +41,21 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+task<JacocoReport>("codeCoverageReportDebug") {
+    group = "Verification"
+    description = "Generate Jacoco coverage report for the debug build."
+
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+
+    sourceDirectories.setFrom("${project.projectDir}/src/main/java")
+    classDirectories.setFrom("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug")
+    executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
 
 dependencies {
@@ -63,4 +82,17 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+sonar {
+    properties {
+        property("sonar.projectName", "front-mobile")
+        property("sonar.projectVersion", "1.0")
+
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.organization", "equipo-capibaras")
+        property("sonar.projectKey", "equipo-capibaras_front-mobile")
+        property("sonar.gradle.skipCompile", "equipo-capibaras_front-mobile")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml")
+    }
 }
