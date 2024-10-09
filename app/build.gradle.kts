@@ -41,6 +41,15 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        )
+    }
 }
 
 task<JacocoReport>("codeCoverageReportDebug") {
@@ -54,7 +63,12 @@ task<JacocoReport>("codeCoverageReportDebug") {
     }
 
     sourceDirectories.setFrom("${project.projectDir}/src/main/java")
-    classDirectories.setFrom("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug")
+    classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude("**/ui/**")         // Excluir todas las clases relacionadas con la UI
+        exclude("**/di/**")         // Excluir inyección de dependencias
+        exclude("**/navigation/**") // Excluir las clases de navegación
+        include("**/viewmodels/**") // Incluir solo los ViewModel
+    })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
 
