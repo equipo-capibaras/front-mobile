@@ -10,9 +10,7 @@ import io.capibaras.abcall.R
 
 class SignUpViewModel(
     private val isEmailValid: (String) -> Boolean = { email ->
-        Patterns.EMAIL_ADDRESS.matcher(
-            email
-        ).matches()
+        Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 ) : ViewModel() {
     var name by mutableStateOf("")
@@ -27,52 +25,72 @@ class SignUpViewModel(
     var confirmPasswordError by mutableStateOf("")
     var companyError by mutableStateOf("")
 
+    private fun validateField(
+        value: String,
+        setError: (String) -> Unit,
+        emptyErrorMessage: String,
+        invalidErrorMessage: String? = null,
+        additionalCheck: ((String) -> Boolean)? = null
+    ): Boolean {
+        return when {
+            value.isBlank() && emptyErrorMessage != null -> {
+                setError(emptyErrorMessage)
+                false
+            }
+
+            additionalCheck != null && !additionalCheck(value) -> {
+                invalidErrorMessage?.let { setError(it) }
+                false
+            }
+
+            else -> {
+                setError("")
+                true
+            }
+        }
+    }
+
     fun validateFields(context: Context): Boolean {
         var isValid = true
 
-        if (name.isBlank()) {
-            nameError = context.getString(R.string.form_required)
-            isValid = false
-        } else {
-            nameError = ""
-        }
+        isValid = validateField(
+            name,
+            { nameError = it },
+            context.getString(R.string.form_required)
+        ) && isValid
 
-        if (email.isBlank()) {
-            emailError = context.getString(R.string.form_required)
-            isValid = false
-        } else if (!isEmailValid(email)) {
-            emailError = context.getString(R.string.form_invalid_email)
-            isValid = false
-        } else {
-            emailError = ""
-        }
+        isValid = validateField(
+            email,
+            { emailError = it },
+            context.getString(R.string.form_required),
+            context.getString(R.string.form_invalid_email)
+        ) {
+            isEmailValid(it)
+        } && isValid
 
-        if (selectedText.isBlank()) {
-            companyError = context.getString(R.string.form_required)
-            isValid = false
-        } else {
-            companyError = ""
-        }
+        isValid = validateField(
+            selectedText,
+            { companyError = it },
+            context.getString(R.string.form_required)
+        ) && isValid
 
-        if (password.isBlank()) {
-            passwordError = context.getString(R.string.form_required)
-            isValid = false
-        } else if (password.length < 8) {
-            passwordError = context.getString(R.string.form_password_length)
-            isValid = false
-        } else {
-            passwordError = ""
-        }
+        isValid = validateField(
+            password,
+            { passwordError = it },
+            context.getString(R.string.form_required),
+            context.getString(R.string.form_password_length)
+        ) {
+            it.length >= 8
+        } && isValid
 
-        if (confirmPassword.isBlank()) {
-            confirmPasswordError = context.getString(R.string.form_required)
-            isValid = false
-        } else if (confirmPassword != password) {
-            confirmPasswordError = context.getString(R.string.form_confirm_password_invalid)
-            isValid = false
-        } else {
-            confirmPasswordError = ""
-        }
+        isValid = validateField(
+            confirmPassword,
+            { confirmPasswordError = it },
+            context.getString(R.string.form_required),
+            context.getString(R.string.form_confirm_password_invalid)
+        ) {
+            it == password
+        } && isValid
 
         return isValid
     }
