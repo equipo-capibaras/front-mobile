@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.theme.ABCallTheme
@@ -46,118 +44,112 @@ import io.capibaras.abcall.ui.theme.linkText
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     ABCallTheme {
-        Surface(
+        Column(
             modifier = Modifier
-                .fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column(
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo de ABCall",
+                modifier = Modifier
+                    .width(184.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Text(
+                text = context.getString(R.string.login_title),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
+            )
+
+            var email by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
+
+            var emailError by remember { mutableStateOf("") }
+            var passwordError by remember { mutableStateOf("") }
+
+            CustomOutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text(text = context.getString(R.string.form_email)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                isError = emailError.isNotEmpty(),
+                supportingText = { Text(emailError) }
+            )
+
+
+            CustomOutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text(text = context.getString(R.string.form_password)) },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                isError = passwordError.isNotEmpty(),
+                supportingText = { Text(passwordError) }
+            )
+
+            Button(
+                onClick = {
+                    val validationResults = validateFields(
+                        context = context,
+                        email = email,
+                        password = password,
+                    )
+
+                    emailError = validationResults["emailError"] ?: ""
+                    passwordError = validationResults["passwordError"] ?: ""
+
+                    if (validationResults.values.all { it.isEmpty() }) {
+                        /* TODO: Go to home page" */
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 40.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text(text = context.getString(R.string.login_button))
+            }
+
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                    .padding(top = 12.dp),
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo de ABCall",
-                    modifier = Modifier
-                        .width(184.dp),
-                    contentScale = ContentScale.Crop
-                )
+
+                val annotatedString = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                        append(context.getString(R.string.login_signup_question) + " ")
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            color = linkText.color,
+                            fontWeight = linkText.fontWeight,
+                        )
+                    ) {
+                        append(context.getString(R.string.login_signup_action))
+                    }
+                }
 
                 Text(
-                    text = context.getString(R.string.login_title),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
-                )
-
-                var email by remember { mutableStateOf("") }
-                var password by remember { mutableStateOf("") }
-
-                var emailError by remember { mutableStateOf("") }
-                var passwordError by remember { mutableStateOf("") }
-
-                CustomOutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(text = context.getString(R.string.form_email)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    isError = emailError.isNotEmpty(),
-                    supportingText = { Text(emailError) }
-                )
-
-
-                CustomOutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(text = context.getString(R.string.form_password)) },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    isError = passwordError.isNotEmpty(),
-                    supportingText = { Text(passwordError) }
-                )
-
-                Button(
-                    onClick = {
-                        val validationResults = validateFields(
-                            context = context,
-                            email = email,
-                            password = password,
-                        )
-
-                        emailError = validationResults["emailError"] ?: ""
-                        passwordError = validationResults["passwordError"] ?: ""
-
-                        if (validationResults.values.all { it.isEmpty() }) {
-                            /* TODO: Go to home page" */
-                        }
+                    text = annotatedString,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable {
+                        navController.navigate("signup")
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 40.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text(text = context.getString(R.string.login_button))
-                }
-
-
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 12.dp),
-                ) {
-
-                    val annotatedString = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                            append(context.getString(R.string.login_signup_question) + " ")
-                        }
-                        withStyle(
-                            style = SpanStyle(
-                                color = linkText.color,
-                                fontWeight = linkText.fontWeight,
-                            )
-                        ) {
-                            append(context.getString(R.string.login_signup_action))
-                        }
-                    }
-
-                    Text(
-                        text = annotatedString,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.clickable {
-                            navController.navigate("signup")
-                        },
-                        textAlign = TextAlign.Center
-                    )
-                }
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }

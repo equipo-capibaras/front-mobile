@@ -93,6 +93,9 @@ sonar {
         property("sonar.organization", "equipo-capibaras")
         property("sonar.projectKey", "equipo-capibaras_front-mobile")
         property("sonar.gradle.skipCompile", "equipo-capibaras_front-mobile")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
+        )
     }
 }
