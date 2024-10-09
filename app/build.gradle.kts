@@ -32,14 +32,23 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
+    }
+
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        )
     }
 }
 
@@ -54,7 +63,12 @@ task<JacocoReport>("codeCoverageReportDebug") {
     }
 
     sourceDirectories.setFrom("${project.projectDir}/src/main/java")
-    classDirectories.setFrom("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug")
+    classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude("**/ui/**")         // Excluir todas las clases relacionadas con la UI
+        exclude("**/di/**")         // Excluir inyección de dependencias
+        exclude("**/navigation/**") // Excluir las clases de navegación
+        include("**/viewmodels/**") // Incluir solo los ViewModel
+    })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
 
@@ -74,14 +88,19 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.mockk)
+
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.mockk.android)
+
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.mockk.agent)
 }
 
 sonar {
@@ -93,6 +112,10 @@ sonar {
         property("sonar.organization", "equipo-capibaras")
         property("sonar.projectKey", "equipo-capibaras_front-mobile")
         property("sonar.gradle.skipCompile", "equipo-capibaras_front-mobile")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
+        )
+        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**")
     }
 }
