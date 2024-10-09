@@ -102,54 +102,12 @@ fun SignUpScreen(navController: NavController) {
                 supportingText = { Text(viewModel.emailError) }
             )
 
-            val options = listOf("Claro", "Movistar", "Tigo")
-            val filteredOptions =
-                options.filter { it.contains(viewModel.selectedText, ignoreCase = true) }
-            var allowExpanded by remember { mutableStateOf(false) }
-            val expanded =
-                viewModel.selectedText.isNotEmpty() && allowExpanded && filteredOptions.isNotEmpty()
-
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { allowExpanded = it },
-            ) {
-                CustomOutlinedTextField(
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryEditable)
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    value = viewModel.selectedText,
-                    onValueChange = {
-                        viewModel.selectedText = it
-                    },
-                    label = { Text(context.getString(R.string.form_company)) },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded,
-                            modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable)
-                        )
-                    },
-                    isError = viewModel.companyError.isNotEmpty(),
-                    supportingText = { Text(viewModel.companyError) }
-                )
-                ExposedDropdownMenu(
-                    modifier = Modifier.heightIn(max = 280.dp),
-                    expanded = expanded,
-                    onDismissRequest = { allowExpanded = false },
-                ) {
-                    filteredOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
-                            onClick = {
-                                viewModel.selectedText = option
-                                allowExpanded = false
-                            },
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                        )
-                    }
-                }
-            }
+            CompanyDropdown(
+                selectedText = viewModel.selectedText,
+                onValueChange = { viewModel.selectedText = it },
+                companyError = viewModel.companyError,
+                options = listOf("Claro", "Movistar", "Tigo")
+            )
 
             CustomOutlinedTextField(
                 value = viewModel.password,
@@ -229,6 +187,60 @@ fun SignUpScreen(navController: NavController) {
         }
     }
 }
+
+@ExperimentalMaterial3Api
+@Composable
+fun CompanyDropdown(
+    selectedText: String,
+    onValueChange: (String) -> Unit,
+    companyError: String,
+    options: List<String>
+) {
+    var allowExpanded by remember { mutableStateOf(false) }
+    val filteredOptions = options.filter { it.contains(selectedText, ignoreCase = true) }
+    val expanded = selectedText.isNotEmpty() && allowExpanded && filteredOptions.isNotEmpty()
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { allowExpanded = it },
+    ) {
+        CustomOutlinedTextField(
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryEditable)
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            value = selectedText,
+            onValueChange = onValueChange,
+            label = { Text("De qué empresa eres cliente?") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded,
+                    modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable)
+                )
+            },
+            isError = companyError.isNotEmpty(),
+            supportingText = { Text(companyError) }
+        )
+
+        ExposedDropdownMenu(
+            modifier = Modifier.heightIn(max = 280.dp),
+            expanded = expanded,
+            onDismissRequest = { allowExpanded = false },
+        ) {
+            filteredOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                    onClick = {
+                        onValueChange(option)
+                        allowExpanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
