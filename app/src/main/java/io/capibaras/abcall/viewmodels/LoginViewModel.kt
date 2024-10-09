@@ -1,11 +1,9 @@
 package io.capibaras.abcall.viewmodels
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import io.capibaras.abcall.R
 
 class LoginViewModel : ViewModel() {
     var email by mutableStateOf("")
@@ -32,19 +30,20 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun validateFields(context: Context): Boolean {
+    fun validateFields(): Boolean {
         var isValid = true
+        var requiredMsg = "Este campo es obligatorio"
 
         isValid = validateField(
             email,
             { emailError = it },
-            context.getString(R.string.form_required)
+            requiredMsg
         ) && isValid
 
         isValid = validateField(
             password,
             { passwordError = it },
-            context.getString(R.string.form_required)
+            requiredMsg
         ) && isValid
 
         return isValid
