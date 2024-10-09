@@ -18,7 +18,7 @@ class SignUpViewModelTest {
     @Before
     fun setUp() {
         mockContext = mockk(relaxed = true)
-        viewModel = SignUpViewModel(isEmailValid = { email -> email.contains("@") })
+        viewModel = SignUpViewModel()
     }
 
     @Test
