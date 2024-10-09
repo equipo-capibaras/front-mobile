@@ -1,6 +1,5 @@
 package io.capibaras.abcall.ui.views
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +14,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -39,10 +34,13 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
+import io.capibaras.abcall.viewmodels.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: LoginViewModel = koinViewModel()
     ABCallTheme {
         Column(
             modifier = Modifier
@@ -67,47 +65,34 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
             )
 
-            var email by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
-
-            var emailError by remember { mutableStateOf("") }
-            var passwordError by remember { mutableStateOf("") }
-
             CustomOutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = viewModel.email,
+                onValueChange = { viewModel.email = it },
                 label = { Text(text = context.getString(R.string.form_email)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                isError = emailError.isNotEmpty(),
-                supportingText = { Text(emailError) }
+                isError = viewModel.emailError.isNotEmpty(),
+                supportingText = { Text(viewModel.emailError) }
             )
 
 
             CustomOutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = viewModel.password,
+                onValueChange = { viewModel.password = it },
                 label = { Text(text = context.getString(R.string.form_password)) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
-                isError = passwordError.isNotEmpty(),
-                supportingText = { Text(passwordError) }
+                isError = viewModel.passwordError.isNotEmpty(),
+                supportingText = { Text(viewModel.passwordError) }
             )
 
             Button(
                 onClick = {
-                    val validationResults = validateFields(
-                        context = context,
-                        email = email,
-                        password = password,
-                    )
+                    val isValid = viewModel.validateFields(context)
 
-                    emailError = validationResults["emailError"] ?: ""
-                    passwordError = validationResults["passwordError"] ?: ""
-
-                    if (validationResults.values.all { it.isEmpty() }) {
+                    if (isValid) {
                         /* TODO: Go to home page" */
                     }
                 },
@@ -153,24 +138,6 @@ fun LoginScreen(navController: NavController) {
             }
         }
     }
-}
-
-fun validateFields(
-    context: Context,
-    email: String,
-    password: String,
-): Map<String, String> {
-    val errors = mutableMapOf<String, String>()
-
-    if (email.isBlank()) {
-        errors["emailError"] = context.getString(R.string.form_required)
-    }
-
-    if (password.isBlank()) {
-        errors["passwordError"] = context.getString(R.string.form_required)
-    }
-
-    return errors
 }
 
 @Preview(showBackground = true)
