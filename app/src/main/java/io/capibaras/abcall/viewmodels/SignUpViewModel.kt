@@ -33,7 +33,7 @@ class SignUpViewModel(
         additionalCheck: ((String) -> Boolean)? = null
     ): Boolean {
         return when {
-            value.isBlank() && emptyErrorMessage != null -> {
+            value.isBlank() -> {
                 setError(emptyErrorMessage)
                 false
             }

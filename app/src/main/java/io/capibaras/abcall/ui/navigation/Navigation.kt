@@ -1,6 +1,7 @@
 package io.capibaras.abcall.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -23,8 +24,12 @@ fun Navigation() {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-    ) {
-        NavHost(navController = navController, startDestination = "login") {
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = "login",
+            modifier = Modifier.padding(paddingValues)
+        ) {
             composable("login") {
                 LoginScreen(navController)
             }
