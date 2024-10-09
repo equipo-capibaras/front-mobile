@@ -49,11 +49,14 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
+import io.capibaras.abcall.viewmodels.SignUpViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
 @Composable
 fun SignUpScreen(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: SignUpViewModel = koinViewModel()
     ABCallTheme {
         Surface(
             modifier = Modifier
