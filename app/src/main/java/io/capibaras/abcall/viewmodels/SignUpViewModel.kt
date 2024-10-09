@@ -1,12 +1,10 @@
 package io.capibaras.abcall.viewmodels
 
-import android.content.Context
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import io.capibaras.abcall.R
 
 class SignUpViewModel : ViewModel() {
     var name by mutableStateOf("")
@@ -46,20 +44,24 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    fun validateFields(context: Context): Boolean {
+    fun validateFields(): Boolean {
         var isValid = true
+        var requiredMsg = "Este campo es obligatorio"
+        var invalidEmailMsg = "Correo no válido"
+        var invalidPasswordMsg = "La contraseña debe tener al menos 8 caracteres"
+        var invalidConfirmPasswordMsg = "Las contraseñas no coinciden"
 
         isValid = validateField(
             name,
             { nameError = it },
-            context.getString(R.string.form_required)
+            requiredMsg
         ) && isValid
 
         isValid = validateField(
             email,
             { emailError = it },
-            context.getString(R.string.form_required),
-            context.getString(R.string.form_invalid_email)
+            requiredMsg,
+            invalidEmailMsg
         ) {
             Patterns.EMAIL_ADDRESS.matcher(it).matches()
         } && isValid
@@ -67,14 +69,14 @@ class SignUpViewModel : ViewModel() {
         isValid = validateField(
             selectedText,
             { companyError = it },
-            context.getString(R.string.form_required)
+            requiredMsg
         ) && isValid
 
         isValid = validateField(
             password,
             { passwordError = it },
-            context.getString(R.string.form_required),
-            context.getString(R.string.form_password_length)
+            requiredMsg,
+            invalidPasswordMsg
         ) {
             it.length >= 8
         } && isValid
@@ -82,8 +84,8 @@ class SignUpViewModel : ViewModel() {
         isValid = validateField(
             confirmPassword,
             { confirmPasswordError = it },
-            context.getString(R.string.form_required),
-            context.getString(R.string.form_confirm_password_invalid)
+            requiredMsg,
+            invalidConfirmPasswordMsg
         ) {
             it == password
         } && isValid

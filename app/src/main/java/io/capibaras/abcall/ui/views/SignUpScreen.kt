@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -73,7 +74,7 @@ fun SignUpScreen(navController: NavController) {
             )
 
             Text(
-                text = context.getString(R.string.signup_title),
+                text = stringResource(R.string.signup_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
@@ -83,7 +84,7 @@ fun SignUpScreen(navController: NavController) {
             CustomOutlinedTextField(
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                label = { Text(text = context.getString(R.string.form_name)) },
+                label = { Text(text = stringResource(R.string.form_name)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
@@ -94,7 +95,7 @@ fun SignUpScreen(navController: NavController) {
             CustomOutlinedTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.email = it },
-                label = { Text(text = context.getString(R.string.form_email)) },
+                label = { Text(text = stringResource(R.string.form_email)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
@@ -112,7 +113,7 @@ fun SignUpScreen(navController: NavController) {
             CustomOutlinedTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
-                label = { Text(text = context.getString(R.string.form_password)) },
+                label = { Text(text = stringResource(R.string.form_password)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
@@ -124,7 +125,7 @@ fun SignUpScreen(navController: NavController) {
             CustomOutlinedTextField(
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.confirmPassword = it },
-                label = { Text(text = context.getString(R.string.form_confirm_password)) },
+                label = { Text(text = stringResource(R.string.form_confirm_password)) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
@@ -138,7 +139,7 @@ fun SignUpScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    val isValid = viewModel.validateFields(context)
+                    val isValid = viewModel.validateFields()
 
                     if (isValid) {
                         /* TODO: Go to home page" */
@@ -149,7 +150,7 @@ fun SignUpScreen(navController: NavController) {
                     .padding(vertical = 40.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = context.getString(R.string.signup_button))
+                Text(text = stringResource(R.string.signup_button))
             }
 
 
@@ -163,7 +164,7 @@ fun SignUpScreen(navController: NavController) {
 
                 val annotatedString = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                        append(context.getString(R.string.signup_login_question) + " ")
+                        append(stringResource(R.string.signup_login_question) + " ")
                     }
                     withStyle(
                         style = SpanStyle(
@@ -171,7 +172,7 @@ fun SignUpScreen(navController: NavController) {
                             fontWeight = linkText.fontWeight,
                         )
                     ) {
-                        append(context.getString(R.string.signup_login_action))
+                        append(stringResource(R.string.signup_login_action))
                     }
                 }
 

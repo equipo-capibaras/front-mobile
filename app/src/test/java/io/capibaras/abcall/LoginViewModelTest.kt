@@ -1,9 +1,6 @@
 package io.capibaras.abcall
 
-import android.content.Context
 import io.capibaras.abcall.viewmodels.LoginViewModel
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -13,33 +10,28 @@ import org.junit.Test
 class LoginViewModelTest {
 
     private lateinit var viewModel: LoginViewModel
-    private lateinit var mockContext: Context
 
     @Before
     fun setUp() {
-        mockContext = mockk(relaxed = true)
         viewModel = LoginViewModel()
     }
 
     @Test
     fun `test empty fields return false`() {
-        every { mockContext.getString(R.string.form_required) } returns "Campo requerido"
-
-        val isValid = viewModel.validateFields(mockContext)
+        val isValid = viewModel.validateFields()
 
         assertFalse(isValid)
-        assertEquals("Campo requerido", viewModel.emailError)
-        assertEquals("Campo requerido", viewModel.passwordError)
+        assertEquals("Este campo es obligatorio", viewModel.emailError)
+        assertEquals("Este campo es obligatorio", viewModel.passwordError)
     }
 
     @Test
     fun `test valid fields return true`() {
-        every { mockContext.getString(R.string.form_required) } returns "Campo requerido"
 
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
 
-        val isValid = viewModel.validateFields(mockContext)
+        val isValid = viewModel.validateFields()
 
         assertTrue(isValid)
         assertEquals("", viewModel.emailError)

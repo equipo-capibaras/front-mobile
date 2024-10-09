@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +39,6 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    val context = LocalContext.current
     val viewModel: LoginViewModel = koinViewModel()
     ABCallTheme {
         Column(
@@ -58,7 +57,7 @@ fun LoginScreen(navController: NavController) {
             )
 
             Text(
-                text = context.getString(R.string.login_title),
+                text = stringResource(R.string.login_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
@@ -68,7 +67,7 @@ fun LoginScreen(navController: NavController) {
             CustomOutlinedTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.email = it },
-                label = { Text(text = context.getString(R.string.form_email)) },
+                label = { Text(text = stringResource(R.string.form_email)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
@@ -80,7 +79,7 @@ fun LoginScreen(navController: NavController) {
             CustomOutlinedTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
-                label = { Text(text = context.getString(R.string.form_password)) },
+                label = { Text(text = stringResource(R.string.form_password)) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
@@ -90,7 +89,8 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    val isValid = viewModel.validateFields(context)
+                    val isValid =
+                        viewModel.validateFields()
 
                     if (isValid) {
                         /* TODO: Go to home page" */
@@ -101,7 +101,7 @@ fun LoginScreen(navController: NavController) {
                     .padding(vertical = 40.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = context.getString(R.string.login_button))
+                Text(text = stringResource(R.string.login_button))
             }
 
 
@@ -115,7 +115,7 @@ fun LoginScreen(navController: NavController) {
 
                 val annotatedString = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                        append(context.getString(R.string.login_signup_question) + " ")
+                        append(stringResource(R.string.login_signup_question) + " ")
                     }
                     withStyle(
                         style = SpanStyle(
@@ -123,7 +123,7 @@ fun LoginScreen(navController: NavController) {
                             fontWeight = linkText.fontWeight,
                         )
                     ) {
-                        append(context.getString(R.string.login_signup_action))
+                        append(stringResource(R.string.login_signup_action))
                     }
                 }
 

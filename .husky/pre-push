@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! command -v ./gradlew &> /dev/null; then
+if [ ! -x ./gradlew ]; then
   echo "❌ gradlew not found. Ensure you're in the correct directory."
   exit 1
 fi
@@ -9,7 +9,7 @@ fi
 ./gradlew lint --continue
 lint_status=$?
 
-if [ $lint_status -ne 0 ]; then
+if [ "$lint_status" -ne 0 ]; then
   echo "❌ Linting failed."
   exit 1
 else
@@ -20,7 +20,7 @@ fi
 ./gradlew testDebug --continue
 test_status=$?
 
-if [ $test_status -ne 0 ]; then
+if [ "$test_status" -ne 0 ]; then
   echo "❌ Tests failed."
   exit 1
 else
@@ -32,7 +32,7 @@ fi
 ./gradlew codeCoverageReportDebug
 coverage_status=$?
 
-if [ $coverage_status -ne 0 ]; then
+if [ "$coverage_status" -ne 0 ]; then
   echo "❌ Coverage report generation failed."
   exit 1
 fi
@@ -42,14 +42,14 @@ coverage_file="./app/build/reports/jacoco/codeCoverageReportDebug/html/index.htm
 
 if [ -f "$coverage_file" ]; then
   echo "Coverage report found: $coverage_file"
-  coverage_percentage=$(grep -oP '(?<=<td class="ctr2">)[^%]+' "$coverage_file" | head -n 1)
+  coverage_percentage=$(grep -oE '<td class="ctr2">[^%]+' "$coverage_file" | sed -E 's/.*<td class="ctr2">([^%]+).*/\1/' | head -n 1)
 
   if [ -z "$coverage_percentage" ]; then
     echo "❌ Error: Coverage percentage value is empty or not found."
     exit 1
   fi
 
-  if [ "$coverage_percentage" -lt "$coverage_threshold" ]; then
+  if (( $(echo "$coverage_percentage < $coverage_threshold" | bc -l) )); then
     echo "❌ Insufficient test coverage: $coverage_percentage% (minimum $coverage_threshold%)"
     exit 1
   else
