@@ -1,13 +1,20 @@
 package io.capibaras.abcall.viewmodels
 
 import android.content.Context
+import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import io.capibaras.abcall.R
 
-class SignUpViewModel : ViewModel() {
+class SignUpViewModel(
+    private val isEmailValid: (String) -> Boolean = { email ->
+        Patterns.EMAIL_ADDRESS.matcher(
+            email
+        ).matches()
+    }
+) : ViewModel() {
     var name by mutableStateOf("")
     var email by mutableStateOf("")
     var password by mutableStateOf("")
@@ -33,7 +40,7 @@ class SignUpViewModel : ViewModel() {
         if (email.isBlank()) {
             emailError = context.getString(R.string.form_required)
             isValid = false
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        } else if (!isEmailValid(email)) {
             emailError = context.getString(R.string.form_invalid_email)
             isValid = false
         } else {
