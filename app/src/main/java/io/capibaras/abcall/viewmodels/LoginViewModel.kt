@@ -30,9 +30,8 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun validateFields(): Boolean {
+    fun validateFields(requiredMsg: String): Boolean {
         var isValid = true
-        var requiredMsg = "Este campo es obligatorio"
 
         isValid = validateField(
             email,

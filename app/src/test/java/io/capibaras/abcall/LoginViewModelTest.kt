@@ -11,6 +11,8 @@ class LoginViewModelTest {
 
     private lateinit var viewModel: LoginViewModel
 
+    private val requiredMsg = "Este campo es obligatorio"
+
     @Before
     fun setUp() {
         viewModel = LoginViewModel()
@@ -18,7 +20,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test empty fields return false`() {
-        val isValid = viewModel.validateFields()
+        val isValid = viewModel.validateFields(requiredMsg)
 
         assertFalse(isValid)
         assertEquals("Este campo es obligatorio", viewModel.emailError)
@@ -31,7 +33,7 @@ class LoginViewModelTest {
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
 
-        val isValid = viewModel.validateFields()
+        val isValid = viewModel.validateFields(requiredMsg)
 
         assertTrue(isValid)
         assertEquals("", viewModel.emailError)

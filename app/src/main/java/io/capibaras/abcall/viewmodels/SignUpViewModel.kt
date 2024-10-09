@@ -44,12 +44,13 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    fun validateFields(): Boolean {
+    fun validateFields(
+        requiredMsg: String,
+        invalidEmailMsg: String,
+        invalidPasswordMsg: String,
+        invalidConfirmPasswordMsg: String
+    ): Boolean {
         var isValid = true
-        var requiredMsg = "Este campo es obligatorio"
-        var invalidEmailMsg = "Correo no válido"
-        var invalidPasswordMsg = "La contraseña debe tener al menos 8 caracteres"
-        var invalidConfirmPasswordMsg = "Las contraseñas no coinciden"
 
         isValid = validateField(
             name,

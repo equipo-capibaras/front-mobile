@@ -139,7 +139,12 @@ fun SignUpScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    val isValid = viewModel.validateFields()
+                    val isValid = viewModel.validateFields(
+                        context.getString(R.string.form_required),
+                        context.getString(R.string.form_invalid_email),
+                        context.getString(R.string.form_password_length),
+                        context.getString(R.string.form_confirm_password_invalid)
+                    )
 
                     if (isValid) {
                         /* TODO: Go to home page" */

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -39,6 +40,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val context = LocalContext.current
     val viewModel: LoginViewModel = koinViewModel()
     ABCallTheme {
         Column(
@@ -90,7 +92,7 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     val isValid =
-                        viewModel.validateFields()
+                        viewModel.validateFields(context.getString(R.string.form_required))
 
                     if (isValid) {
                         /* TODO: Go to home page" */
