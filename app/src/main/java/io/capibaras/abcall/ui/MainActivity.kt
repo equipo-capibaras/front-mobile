@@ -1,4 +1,4 @@
-package io.capibaras.abcall
+package io.capibaras.abcall.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

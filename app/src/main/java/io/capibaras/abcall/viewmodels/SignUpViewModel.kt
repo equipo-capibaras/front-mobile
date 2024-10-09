@@ -8,11 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import io.capibaras.abcall.R
 
-class SignUpViewModel(
-    private val isEmailValid: (String) -> Boolean = { email ->
-        Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-) : ViewModel() {
+class SignUpViewModel() : ViewModel() {
     var name by mutableStateOf("")
     var email by mutableStateOf("")
     var password by mutableStateOf("")
@@ -65,7 +61,7 @@ class SignUpViewModel(
             context.getString(R.string.form_required),
             context.getString(R.string.form_invalid_email)
         ) {
-            isEmailValid(it)
+            Patterns.EMAIL_ADDRESS.matcher(it).matches()
         } && isValid
 
         isValid = validateField(
