@@ -22,7 +22,7 @@ class LoginViewModel(
     var email by mutableStateOf("")
     var password by mutableStateOf("")
 
-    var isLoading: Boolean = false
+    var isLoading by mutableStateOf(false)
 
     var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
