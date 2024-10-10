@@ -85,7 +85,7 @@ fun Navigation() {
                 SignUpScreen(navController)
             }
             composable("home") {
-                HomeScreen(navController)
+                HomeScreen()
             }
         }
     }

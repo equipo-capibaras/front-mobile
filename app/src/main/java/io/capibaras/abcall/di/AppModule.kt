@@ -14,7 +14,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 val appModule = module {
-
     single {
         GsonBuilder().create()
     }
