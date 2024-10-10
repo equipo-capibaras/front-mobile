@@ -24,7 +24,7 @@ import io.capibaras.abcall.ui.views.SignUpScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Navigation() {
+fun Navigation(isUserLoggedIn: Boolean) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -55,7 +55,7 @@ fun Navigation() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "login",
+            startDestination = if (isUserLoggedIn) "home" else "login",
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("login") {
