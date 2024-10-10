@@ -17,4 +17,7 @@
     <string name="form_invalid_email">Correo no válido</string>
     <string name="form_password_length">La contraseña debe tener al menos 8 caracteres</string>
     <string name="form_confirm_password_invalid">Las contraseñas no coinciden</string>
+    <string name="error_incorrect_credentials">Usuario o contraseña incorrectos</string>
+    <string name="error_authenticate">Error al autenticar</string>
+    <string name="error_network">Error de red</string>
 </resources>
