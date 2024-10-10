@@ -29,13 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +43,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
+import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -54,7 +53,6 @@ import org.koin.androidx.compose.koinViewModel
 @ExperimentalMaterial3Api
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = koinViewModel()) {
-    val context = LocalContext.current
     val nameValidationState = viewModel.nameValidationState
     val emailValidationState = viewModel.emailValidationState
     val companyValidationState = viewModel.companyValidationState
@@ -86,34 +84,20 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = koin
                 modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                label = { Text(text = stringResource(R.string.form_name)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                isError = nameValidationState is ValidationUIState.Error,
-                supportingText = {
-                    if (nameValidationState is ValidationUIState.Error) {
-                        Text(stringResource(nameValidationState.resourceId))
-                    }
-                }
+                validationState = nameValidationState,
+                labelRes = R.string.form_name,
+                isPassword = false
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.email = it },
-                label = { Text(text = stringResource(R.string.form_email)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                isError = emailValidationState is ValidationUIState.Error,
-                supportingText = {
-                    if (emailValidationState is ValidationUIState.Error) {
-                        Text(stringResource(emailValidationState.resourceId))
-                    }
-                }
+                validationState = emailValidationState,
+                labelRes = R.string.form_email,
+                isPassword = false
             )
 
             CompanyDropdown(
@@ -123,35 +107,20 @@ fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = koin
                 options = listOf("Claro", "Movistar", "Tigo")
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
-                label = { Text(text = stringResource(R.string.form_password)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                visualTransformation = PasswordVisualTransformation(),
-                isError = passwordValidationState is ValidationUIState.Error,
-                supportingText = {
-                    if (passwordValidationState is ValidationUIState.Error) {
-                        Text(stringResource(passwordValidationState.resourceId))
-                    }
-                }
+                validationState = passwordValidationState,
+                labelRes = R.string.form_password,
+                isPassword = true
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.confirmPassword = it },
-                label = { Text(text = stringResource(R.string.form_confirm_password)) },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                isError = confirmPasswordValidationState is ValidationUIState.Error,
-                supportingText = {
-                    if (confirmPasswordValidationState is ValidationUIState.Error) {
-                        Text(stringResource(confirmPasswordValidationState.resourceId))
-                    }
-                }
+                validationState = confirmPasswordValidationState,
+                labelRes = R.string.form_confirm_password,
+                isPassword = true
             )
 
             Button(
@@ -262,7 +231,6 @@ fun CompanyDropdown(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)

@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,13 +34,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
-import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.CustomSnackbarVisuals
+import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.SnackbarState
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -55,23 +53,11 @@ fun LoginScreen(
     val emailValidationState = viewModel.emailValidationState
     val passwordValidationState = viewModel.passwordValidationState
 
-    when (val errorUIState = viewModel.errorUIState) {
-        is ErrorUIState.Error -> {
-            val errorMessage = stringResource(errorUIState.resourceId)
-            LaunchedEffect(errorMessage) {
-                snackbarHostState.showSnackbar(
-                    CustomSnackbarVisuals(
-                        message = errorMessage,
-                        state = SnackbarState.ERROR
-                    )
-                )
-                viewModel.clearErrorUIState()
-            }
-
-        }
-
-        ErrorUIState.NoError -> {}
-    }
+    HandleErrorState(
+        errorUIState = viewModel.errorUIState,
+        snackbarHostState = snackbarHostState,
+        onClearError = { viewModel.clearErrorUIState() }
+    )
 
     ABCallTheme {
         Box(
@@ -102,35 +88,20 @@ fun LoginScreen(
                     modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
                 )
 
-                CustomOutlinedTextField(
+                DefaultTextField(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
-                    label = { Text(text = stringResource(R.string.form_email)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    isError = emailValidationState is ValidationUIState.Error,
-                    supportingText = {
-                        if (emailValidationState is ValidationUIState.Error) {
-                            Text(stringResource(emailValidationState.resourceId))
-                        }
-                    }
+                    validationState = emailValidationState,
+                    labelRes = R.string.form_email,
+                    isPassword = false
                 )
 
-
-                CustomOutlinedTextField(
+                DefaultTextField(
                     value = viewModel.password,
                     onValueChange = { viewModel.password = it },
-                    label = { Text(text = stringResource(R.string.form_password)) },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    isError = passwordValidationState is ValidationUIState.Error,
-                    supportingText = {
-                        if (passwordValidationState is ValidationUIState.Error) {
-                            Text(stringResource(passwordValidationState.resourceId))
-                        }
-                    }
+                    validationState = passwordValidationState,
+                    labelRes = R.string.form_password,
+                    isPassword = true
                 )
 
                 Button(
@@ -188,6 +159,27 @@ fun LoginScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun HandleErrorState(
+    errorUIState: ErrorUIState,
+    snackbarHostState: SnackbarHostState,
+    onClearError: () -> Unit
+) {
+    if (errorUIState is ErrorUIState.Error) {
+        val errorMessage = stringResource(errorUIState.resourceId)
+        LaunchedEffect(errorMessage) {
+            snackbarHostState.showSnackbar(
+                CustomSnackbarVisuals(
+                    message = errorMessage,
+                    state = SnackbarState.ERROR
+                )
+            )
+            onClearError()
         }
     }
 }
