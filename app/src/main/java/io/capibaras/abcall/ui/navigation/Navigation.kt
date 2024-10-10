@@ -17,7 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.ui.components.CustomSnackbarVisuals
 import io.capibaras.abcall.ui.components.SnackbarState
-import io.capibaras.abcall.ui.theme.LocalCustomColors
+import io.capibaras.abcall.ui.components.getSnackbarColors
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
@@ -33,37 +33,17 @@ fun Navigation() {
             SnackbarHost(
                 hostState = snackbarHostState,
                 snackbar = { snackbarData ->
-                    val customColors = LocalCustomColors.current
-
                     val snackbarState =
                         (snackbarData.visuals as? CustomSnackbarVisuals)?.state
                             ?: SnackbarState.SUCCESS
 
-                    android.util.Log.d("snackbarState", snackbarState.toString())
-
-                    val backgroundColor = when (snackbarState) {
-                        SnackbarState.ERROR -> MaterialTheme.colorScheme.error
-                        SnackbarState.SUCCESS -> customColors.success
-                        SnackbarState.INFO -> MaterialTheme.colorScheme.primary
-                    }
-
-                    val contentColor = when (snackbarState) {
-                        SnackbarState.ERROR -> MaterialTheme.colorScheme.onError
-                        SnackbarState.SUCCESS -> customColors.onSuccess
-                        SnackbarState.INFO -> MaterialTheme.colorScheme.onPrimary
-                    }
-
-                    val dismissActionColor = when (snackbarState) {
-                        SnackbarState.ERROR -> MaterialTheme.colorScheme.onError
-                        SnackbarState.SUCCESS -> customColors.onSuccess
-                        SnackbarState.INFO -> MaterialTheme.colorScheme.onPrimary
-                    }
+                    val (backgroundColor, contentColor) = getSnackbarColors(snackbarState)
 
                     Snackbar(
                         snackbarData = snackbarData,
                         containerColor = backgroundColor,
                         contentColor = contentColor,
-                        dismissActionContentColor = dismissActionColor
+                        dismissActionContentColor = contentColor
                     )
                 }
             )

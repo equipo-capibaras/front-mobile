@@ -16,10 +16,6 @@ class TokenManager(context: Context) {
     )
 
     fun saveAuthToken(token: String) {
-        android.util.Log.e(
-            "Token",
-            token
-        )
         sharedPreferences.edit().putString("auth_token", token).apply()
     }
 

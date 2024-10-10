@@ -111,8 +111,7 @@ fun LoginScreen(
 
                         if (isValid) {
                             viewModel.loginUser(
-                                onSuccess = { token ->
-                                    android.util.Log.d("LoginScreen", "Token: $token")
+                                onSuccess = { _ ->
                                     navController.navigate("home")
                                 }
                             )
