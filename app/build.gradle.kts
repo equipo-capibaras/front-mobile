@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.gson)
     implementation(libs.security.crypto)
+    implementation(libs.core.splashscreen)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
