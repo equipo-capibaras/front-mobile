@@ -8,6 +8,7 @@ import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -101,6 +102,8 @@ class LoginViewModelTest {
         }
 
         advanceUntilIdle()
+
+        coVerify(exactly = 1) { tokenManager.saveAuthToken("fake-token") }
 
         assertEquals("fake-token", resultToken)
         assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
