@@ -5,6 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import io.capibaras.abcall.R
+import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 
 class SignUpViewModel : ViewModel() {
     var name by mutableStateOf("")
@@ -13,83 +16,82 @@ class SignUpViewModel : ViewModel() {
     var confirmPassword by mutableStateOf("")
     var selectedText by mutableStateOf("")
 
-    var nameError by mutableStateOf("")
-    var emailError by mutableStateOf("")
-    var passwordError by mutableStateOf("")
-    var confirmPasswordError by mutableStateOf("")
-    var companyError by mutableStateOf("")
+    var isLoading: Boolean = false
+
+    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
+        private set
+    var nameValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
+        private set
+    var companyValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
+        private set
+    var emailValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
+        private set
+    var passwordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
+        private set
+    var confirmPasswordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
+        private set
 
     private fun validateField(
         value: String,
-        setError: (String) -> Unit,
-        emptyErrorMessage: String,
-        invalidErrorMessage: String? = null,
-        additionalCheck: ((String) -> Boolean)? = null
+        validationStateSetter: (ValidationUIState) -> Unit,
+        additionalCheck: ((String) -> Boolean)? = null,
+        invalidErrorMessage: Int? = null
     ): Boolean {
         return when {
             value.isBlank() -> {
-                setError(emptyErrorMessage)
+                validationStateSetter(ValidationUIState.Error(R.string.form_required))
                 false
             }
 
-            additionalCheck != null && !additionalCheck(value) -> {
-                invalidErrorMessage?.let { setError(it) }
+            additionalCheck != null && !additionalCheck(value) && invalidErrorMessage != null -> {
+                validationStateSetter(
+                    ValidationUIState.Error(
+                        invalidErrorMessage
+                    )
+                )
                 false
             }
 
             else -> {
-                setError("")
+                validationStateSetter(ValidationUIState.NoError)
                 true
             }
         }
     }
 
-    fun validateFields(
-        requiredMsg: String,
-        invalidEmailMsg: String,
-        invalidPasswordMsg: String,
-        invalidConfirmPasswordMsg: String
-    ): Boolean {
+    fun validateFields(): Boolean {
         var isValid = true
 
         isValid = validateField(
             name,
-            { nameError = it },
-            requiredMsg
+            { nameValidationState = it },
         ) && isValid
 
         isValid = validateField(
             email,
-            { emailError = it },
-            requiredMsg,
-            invalidEmailMsg
-        ) {
-            Patterns.EMAIL_ADDRESS.matcher(it).matches()
-        } && isValid
+            { emailValidationState = it },
+            additionalCheck = { Patterns.EMAIL_ADDRESS.matcher(it).matches() },
+            invalidErrorMessage = R.string.form_invalid_email
+        ) && isValid
 
         isValid = validateField(
             selectedText,
-            { companyError = it },
-            requiredMsg
+            { companyValidationState = it },
         ) && isValid
 
         isValid = validateField(
             password,
-            { passwordError = it },
-            requiredMsg,
-            invalidPasswordMsg
-        ) {
-            it.length >= 8
-        } && isValid
+            { passwordValidationState = it },
+            additionalCheck = { it.length >= 8 },
+            invalidErrorMessage = R.string.form_password_length
+        ) && isValid
 
         isValid = validateField(
             confirmPassword,
-            { confirmPasswordError = it },
-            requiredMsg,
-            invalidConfirmPasswordMsg
-        ) {
-            it == password
-        } && isValid
+            { confirmPasswordValidationState = it },
+            additionalCheck = { it == password },
+            invalidErrorMessage = R.string.form_confirm_password_invalid
+        ) && isValid
 
         return isValid
     }
