@@ -26,9 +26,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://capibaras.io/api/v1/\"")
         }
         debug {
             enableUnitTestCoverage = true
+            buildConfigField("String", "BASE_URL", "\"https://dev.capibaras.io/api/v1/\"")
         }
     }
     compileOptions {
@@ -40,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -84,11 +87,16 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.gson)
+    implementation(libs.security.crypto)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 
 
     androidTestImplementation(libs.androidx.junit)

@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -33,15 +36,43 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
+import io.capibaras.abcall.ui.components.CustomSnackbarVisuals
+import io.capibaras.abcall.ui.components.SnackbarState
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
+import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
-    val context = LocalContext.current
-    val viewModel: LoginViewModel = koinViewModel()
+fun LoginScreen(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    viewModel: LoginViewModel = koinViewModel()
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val emailValidationState = viewModel.emailValidationState
+    val passwordValidationState = viewModel.passwordValidationState
+
+    when (val errorUIState = viewModel.errorUIState) {
+        is ErrorUIState.Error -> {
+            val errorMessage = stringResource(errorUIState.resourceId)
+            LaunchedEffect(errorMessage) {
+                snackbarHostState.showSnackbar(
+                    CustomSnackbarVisuals(
+                        message = errorMessage,
+                        state = SnackbarState.ERROR
+                    )
+                )
+                viewModel.clearErrorUIState()
+            }
+
+        }
+
+        ErrorUIState.NoError -> {}
+    }
+
     ABCallTheme {
         Column(
             modifier = Modifier
@@ -73,8 +104,12 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                isError = viewModel.emailError.isNotEmpty(),
-                supportingText = { Text(viewModel.emailError) }
+                isError = emailValidationState is ValidationUIState.Error,
+                supportingText = {
+                    if (emailValidationState is ValidationUIState.Error) {
+                        Text(stringResource(emailValidationState.resourceId))
+                    }
+                }
             )
 
 
@@ -85,17 +120,28 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
-                isError = viewModel.passwordError.isNotEmpty(),
-                supportingText = { Text(viewModel.passwordError) }
+                isError = passwordValidationState is ValidationUIState.Error,
+                supportingText = {
+                    if (passwordValidationState is ValidationUIState.Error) {
+                        Text(stringResource(passwordValidationState.resourceId))
+                    }
+                }
             )
 
             Button(
                 onClick = {
                     val isValid =
-                        viewModel.validateFields(context.getString(R.string.form_required))
+                        viewModel.validateFields()
 
                     if (isValid) {
-                        /* TODO: Go to home page" */
+                        viewModel.loginUser(
+                            onSuccess = { token ->
+                                android.util.Log.d("LoginScreen", "Token: $token")
+                                navController.navigate("home")
+                            }
+                        )
+                    } else {
+
                     }
                 },
                 modifier = Modifier
@@ -146,7 +192,8 @@ fun LoginScreen(navController: NavController) {
 @Composable
 fun LoginScreenPreview() {
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
     ABCallTheme {
-        LoginScreen(navController)
+        LoginScreen(navController, snackbarHostState)
     }
 }
