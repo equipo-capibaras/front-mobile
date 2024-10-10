@@ -63,11 +63,13 @@ jobs:
               exit 1
             fi
       - android/start_emulator:
+          startup_timeout: 300
           avd_name: testavd-35
           restore_gradle_cache_post_emulator_launch: false
       - android/run_tests
       - android/kill_emulators
       - android/start_emulator:
+          startup_timeout: 300
           avd_name: testavd-26
           restore_gradle_cache_post_emulator_launch: false
       - android/run_tests
