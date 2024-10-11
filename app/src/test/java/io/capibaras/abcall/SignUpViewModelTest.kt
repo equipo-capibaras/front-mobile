@@ -1,5 +1,6 @@
 package io.capibaras.abcall
 
+import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -11,10 +12,6 @@ class SignUpViewModelTest {
 
     private lateinit var viewModel: SignUpViewModel
 
-    private val requiredMsg = "Este campo es obligatorio"
-    private val invalidEmailMsg = "Correo no válido"
-    private val invalidPasswordMsg = "La contraseña debe tener al menos 8 caracteres"
-    private val invalidConfirmPasswordMsg = "Las contraseñas no coinciden"
 
     @Before
     fun setUp() {
@@ -23,34 +20,42 @@ class SignUpViewModelTest {
 
     @Test
     fun `test empty fields return false`() {
-        val isValid = viewModel.validateFields(
-            requiredMsg,
-            invalidEmailMsg,
-            invalidPasswordMsg,
-            invalidConfirmPasswordMsg
-        )
+        val isValid = viewModel.validateFields()
 
         assertFalse(isValid)
-        assertEquals("Este campo es obligatorio", viewModel.nameError)
-        assertEquals("Este campo es obligatorio", viewModel.emailError)
-        assertEquals("Este campo es obligatorio", viewModel.companyError)
-        assertEquals("Este campo es obligatorio", viewModel.passwordError)
-        assertEquals("Este campo es obligatorio", viewModel.confirmPasswordError)
+        assertEquals(
+            ValidationUIState.Error(R.string.form_required),
+            viewModel.nameValidationState
+        )
+        assertEquals(
+            ValidationUIState.Error(R.string.form_required),
+            viewModel.emailValidationState
+        )
+        assertEquals(
+            ValidationUIState.Error(R.string.form_required),
+            viewModel.companyValidationState
+        )
+        assertEquals(
+            ValidationUIState.Error(R.string.form_required),
+            viewModel.passwordValidationState
+        )
+        assertEquals(
+            ValidationUIState.Error(R.string.form_required),
+            viewModel.confirmPasswordValidationState
+        )
     }
 
     @Test
     fun `test invalid email returns false`() {
         viewModel.email = "invalid-email"
 
-        val isValid = viewModel.validateFields(
-            requiredMsg,
-            invalidEmailMsg,
-            invalidPasswordMsg,
-            invalidConfirmPasswordMsg
-        )
+        val isValid = viewModel.validateFields()
 
         assertFalse(isValid)
-        assertEquals("Correo no válido", viewModel.emailError)
+        assertEquals(
+            ValidationUIState.Error(R.string.form_invalid_email),
+            viewModel.emailValidationState
+        )
     }
 
     @Test
@@ -58,15 +63,13 @@ class SignUpViewModelTest {
         viewModel.password = "short"
         viewModel.confirmPassword = "short"
 
-        val isValid = viewModel.validateFields(
-            requiredMsg,
-            invalidEmailMsg,
-            invalidPasswordMsg,
-            invalidConfirmPasswordMsg
-        )
+        val isValid = viewModel.validateFields()
 
         assertFalse(isValid)
-        assertEquals("La contraseña debe tener al menos 8 caracteres", viewModel.passwordError)
+        assertEquals(
+            ValidationUIState.Error(R.string.form_password_length),
+            viewModel.passwordValidationState
+        )
     }
 
     @Test
@@ -74,15 +77,13 @@ class SignUpViewModelTest {
         viewModel.password = "password123"
         viewModel.confirmPassword = "password456"
 
-        val isValid = viewModel.validateFields(
-            requiredMsg,
-            invalidEmailMsg,
-            invalidPasswordMsg,
-            invalidConfirmPasswordMsg
-        )
+        val isValid = viewModel.validateFields()
 
         assertFalse(isValid)
-        assertEquals("Las contraseñas no coinciden", viewModel.confirmPasswordError)
+        assertEquals(
+            ValidationUIState.Error(R.string.form_confirm_password_invalid),
+            viewModel.confirmPasswordValidationState
+        )
     }
 
 
@@ -94,18 +95,13 @@ class SignUpViewModelTest {
         viewModel.confirmPassword = "password123"
         viewModel.selectedText = "Empresa XYZ"
 
-        val isValid = viewModel.validateFields(
-            requiredMsg,
-            invalidEmailMsg,
-            invalidPasswordMsg,
-            invalidConfirmPasswordMsg
-        )
+        val isValid = viewModel.validateFields()
 
         assertTrue(isValid)
-        assertEquals("", viewModel.nameError)
-        assertEquals("", viewModel.emailError)
-        assertEquals("", viewModel.companyError)
-        assertEquals("", viewModel.passwordError)
-        assertEquals("", viewModel.confirmPasswordError)
+        assertEquals(ValidationUIState.NoError, viewModel.nameValidationState)
+        assertEquals(ValidationUIState.NoError, viewModel.emailValidationState)
+        assertEquals(ValidationUIState.NoError, viewModel.companyValidationState)
+        assertEquals(ValidationUIState.NoError, viewModel.passwordValidationState)
+        assertEquals(ValidationUIState.NoError, viewModel.confirmPasswordValidationState)
     }
 }

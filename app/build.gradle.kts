@@ -26,9 +26,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://capibaras.io/api/v1/\"")
         }
         debug {
             enableUnitTestCoverage = true
+            buildConfigField("String", "BASE_URL", "\"https://dev.capibaras.io/api/v1/\"")
         }
     }
     compileOptions {
@@ -40,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -64,10 +67,10 @@ task<JacocoReport>("codeCoverageReportDebug") {
 
     sourceDirectories.setFrom("${project.projectDir}/src/main/java")
     classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude("**/ui/**")         // Excluir todas las clases relacionadas con la UI
-        exclude("**/di/**")         // Excluir inyección de dependencias
-        exclude("**/navigation/**") // Excluir las clases de navegación
-        include("**/viewmodels/**") // Incluir solo los ViewModel
+        exclude("**/ui/**")
+        exclude("**/di/**")
+        exclude("**/navigation/**")
+        include("**/viewmodels/**")
     })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
@@ -84,11 +87,17 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.gson)
+    implementation(libs.security.crypto)
+    implementation(libs.core.splashscreen)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 
 
     androidTestImplementation(libs.androidx.junit)

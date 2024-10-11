@@ -29,13 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,18 +43,23 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
+import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
+import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
 @Composable
-fun SignUpScreen(navController: NavController) {
-    val context = LocalContext.current
-    val viewModel: SignUpViewModel = koinViewModel()
-    ABCallTheme {
+fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = koinViewModel()) {
+    val nameValidationState = viewModel.nameValidationState
+    val emailValidationState = viewModel.emailValidationState
+    val companyValidationState = viewModel.companyValidationState
+    val passwordValidationState = viewModel.passwordValidationState
+    val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
+    ABCallTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,70 +84,48 @@ fun SignUpScreen(navController: NavController) {
                 modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.name,
                 onValueChange = { viewModel.name = it },
-                label = { Text(text = stringResource(R.string.form_name)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                isError = viewModel.nameError.isNotEmpty(),
-                supportingText = { Text(viewModel.nameError) }
+                validationState = nameValidationState,
+                labelRes = R.string.form_name,
+                isPassword = false
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.email,
                 onValueChange = { viewModel.email = it },
-                label = { Text(text = stringResource(R.string.form_email)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                isError = viewModel.emailError.isNotEmpty(),
-                supportingText = { Text(viewModel.emailError) }
+                validationState = emailValidationState,
+                labelRes = R.string.form_email,
+                isPassword = false
             )
 
             CompanyDropdown(
                 selectedText = viewModel.selectedText,
                 onValueChange = { viewModel.selectedText = it },
-                companyError = viewModel.companyError,
+                companyValidationState = companyValidationState,
                 options = listOf("Claro", "Movistar", "Tigo")
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.password,
                 onValueChange = { viewModel.password = it },
-                label = { Text(text = stringResource(R.string.form_password)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                visualTransformation = PasswordVisualTransformation(),
-                isError = viewModel.passwordError.isNotEmpty(),
-                supportingText = { Text(viewModel.passwordError) }
+                validationState = passwordValidationState,
+                labelRes = R.string.form_password,
+                isPassword = true
             )
 
-            CustomOutlinedTextField(
+            DefaultTextField(
                 value = viewModel.confirmPassword,
                 onValueChange = { viewModel.confirmPassword = it },
-                label = { Text(text = stringResource(R.string.form_confirm_password)) },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                isError = viewModel.confirmPasswordError.isNotEmpty(),
-                supportingText = {
-                    if (viewModel.confirmPasswordError.isNotEmpty()) {
-                        Text(viewModel.confirmPasswordError)
-                    }
-                }
+                validationState = confirmPasswordValidationState,
+                labelRes = R.string.form_confirm_password,
+                isPassword = true
             )
 
             Button(
                 onClick = {
-                    val isValid = viewModel.validateFields(
-                        context.getString(R.string.form_required),
-                        context.getString(R.string.form_invalid_email),
-                        context.getString(R.string.form_password_length),
-                        context.getString(R.string.form_confirm_password_invalid)
-                    )
+                    val isValid = viewModel.validateFields()
 
                     if (isValid) {
                         /* TODO: Go to home page" */
@@ -199,7 +180,7 @@ fun SignUpScreen(navController: NavController) {
 fun CompanyDropdown(
     selectedText: String,
     onValueChange: (String) -> Unit,
-    companyError: String,
+    companyValidationState: ValidationUIState,
     options: List<String>
 ) {
     var allowExpanded by remember { mutableStateOf(false) }
@@ -224,8 +205,12 @@ fun CompanyDropdown(
                     modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable)
                 )
             },
-            isError = companyError.isNotEmpty(),
-            supportingText = { Text(companyError) }
+            isError = companyValidationState is ValidationUIState.Error,
+            supportingText = {
+                if (companyValidationState is ValidationUIState.Error) {
+                    Text(stringResource(companyValidationState.resourceId))
+                }
+            }
         )
 
         ExposedDropdownMenu(
@@ -246,7 +231,6 @@ fun CompanyDropdown(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)

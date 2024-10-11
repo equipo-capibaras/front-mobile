@@ -12,6 +12,11 @@ composeBom = "2024.09.03"
 navigation = "2.8.2"
 koin = "4.0.0"
 mockk = "1.13.13"
+retrofit = "2.11.0"
+gson = "2.11.0"
+security-crypto = "1.0.0"
+kotlinx-coroutines = "1.9.0"
+core-splashscreen = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +41,12 @@ koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", versio
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
