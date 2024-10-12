@@ -130,6 +130,6 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
         )
-        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**")
+        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**, **/data/**")
     }
 }

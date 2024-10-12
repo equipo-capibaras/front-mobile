@@ -1,7 +1,8 @@
 package io.capibaras.abcall.di
 
-import android.content.Context
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.gson.GsonBuilder
 import io.capibaras.abcall.BuildConfig
 import io.capibaras.abcall.data.TokenManager
@@ -24,7 +25,14 @@ val appModule = module {
     single { ABCallDB.getDatabase(androidContext()) }
 
     single<SharedPreferences> {
-        androidContext().getSharedPreferences("abcall_prefs", Context.MODE_PRIVATE)
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        EncryptedSharedPreferences.create(
+            "abcall_prefs",
+            masterKeyAlias,
+            androidContext(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     single {
