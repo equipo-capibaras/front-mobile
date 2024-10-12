@@ -14,7 +14,7 @@ val LightCustomColors = CustomColors(
 )
 
 val DarkCustomColors = CustomColors(
-    success = Color(0xFF90FF93),
+    success = Color(0xFFADD5AD),
     onSuccess = Color(0xFF0A500C)
 )
 
