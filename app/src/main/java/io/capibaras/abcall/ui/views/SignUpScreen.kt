@@ -118,7 +118,7 @@ fun SignUpScreen(
             selectedText = viewModel.company,
             onValueChange = { viewModel.company = it },
             companyValidationState = companyValidationState,
-            options = companies.value
+            options = companies
         )
 
         DefaultTextField(

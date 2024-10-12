@@ -20,9 +20,10 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
     var confirmPassword by mutableStateOf("")
     var company by mutableStateOf("")
 
-    var companies = mutableStateOf<List<String>>(emptyList())
+    var companies by mutableStateOf<List<String>>(emptyList())
         private set
     var isLoading by mutableStateOf(false)
+        private set
     var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
     var nameValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
@@ -110,11 +111,11 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
             isLoading = true
             try {
                 val companyList = companyRepository.getCompanies(forceUpdate)
-                companies.value = companyList.map { it.name }
+                companies = companyList.map { it.name }
+            } catch (e: IOException) {
+                errorUIState = ErrorUIState.Error(R.string.error_network)
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(
-                    if (e is IOException) R.string.error_network else R.string.error_get_companies
-                )
+                errorUIState = ErrorUIState.Error(R.string.error_get_companies)
             } finally {
                 isLoading = false
             }

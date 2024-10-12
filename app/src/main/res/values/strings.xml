@@ -20,6 +20,6 @@
     <string name="error_incorrect_credentials">Usuario o contraseña incorrectos</string>
     <string name="error_authenticate">Error al autenticar</string>
     <string name="error_network">Error de red</string>
-    <string name="unknow_error">Error desconocido</string>
+    <string name="unknown_error">Error desconocido</string>
     <string name="error_get_companies">Error al cargar las empresas</string>
 </resources>

@@ -88,10 +88,10 @@ class LoginViewModel(
                         ErrorUIState.Error(message = message)
                     }
                 }
+            } catch (e: IOException) {
+                errorUIState = ErrorUIState.Error(R.string.error_network)
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(
-                    if (e is IOException) R.string.error_network else R.string.error_authenticate
-                )
+                errorUIState = ErrorUIState.Error(R.string.error_authenticate)
             } finally {
                 isLoading = false
             }

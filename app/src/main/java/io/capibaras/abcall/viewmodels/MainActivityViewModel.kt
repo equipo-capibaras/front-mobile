@@ -8,6 +8,7 @@ import io.capibaras.abcall.data.TokenManager
 
 class MainActivityViewModel(private val tokenManager: TokenManager) : ViewModel() {
 
+    private val tag = "MainActivityViewModel"
     var isSessionChecked by mutableStateOf(false)
         private set
     var isUserLoggedIn by mutableStateOf(false)

@@ -16,7 +16,7 @@ fun HandleErrorState(
     if (errorUIState is ErrorUIState.Error) {
         val errorMessage =
             errorUIState.resourceId?.let { stringResource(it) } ?: errorUIState.message
-            ?: stringResource(R.string.unknow_error)
+            ?: stringResource(R.string.unknown_error)
         LaunchedEffect(errorMessage) {
             snackbarHostState.showSnackbar(
                 CustomSnackbarVisuals(

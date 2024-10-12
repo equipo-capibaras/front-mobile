@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import io.capibaras.abcall.data.database.models.Company
 
 @Dao
@@ -16,4 +17,10 @@ interface CompanyDAO {
 
     @Query("DELETE FROM companies")
     suspend fun deleteAllCompanies()
+
+    @Transaction
+    suspend fun refreshCompanies(companies: List<Company>) {
+        deleteAllCompanies()
+        insertCompanies(companies)
+    }
 }

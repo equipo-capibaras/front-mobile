@@ -10,9 +10,10 @@ fun CustomSnackbarHost(snackbarHostState: SnackbarHostState) {
     SnackbarHost(
         hostState = snackbarHostState,
         snackbar = { snackbarData ->
-            val snackbarState =
-                (snackbarData.visuals as? CustomSnackbarVisuals)?.state
-                    ?: SnackbarState.SUCCESS
+            val snackbarState = when (val visuals = snackbarData.visuals) {
+                is CustomSnackbarVisuals -> visuals.state
+                else -> SnackbarState.SUCCESS
+            }
             val (backgroundColor, contentColor) = getSnackbarColors(snackbarState)
             Snackbar(
                 snackbarData = snackbarData,
