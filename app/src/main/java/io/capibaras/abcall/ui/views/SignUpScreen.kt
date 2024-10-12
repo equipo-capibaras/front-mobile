@@ -67,7 +67,7 @@ fun SignUpScreen(
     val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
     val companies = viewModel.companies.map { it.name }
-
+    
     HandleErrorState(
         errorUIState = viewModel.errorUIState,
         snackbarHostState = snackbarHostState,

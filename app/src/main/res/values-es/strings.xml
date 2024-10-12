@@ -27,4 +27,5 @@
     <string name="error_email_exist">Ya existe un usuario registrado con este email</string>
     <string name="error_create_user">Error al crear el usuario</string>
     <string name="success_create_user">Cuenta creada exitosamente</string>
+    <string name="success_action">Operación completada exitosamente</string>
 </resources>

@@ -220,10 +220,7 @@ class SignUpViewModelTest {
 
         coEvery {
             usersRepository.createUser(
-                companies[0].id,
-                "Juan",
-                "email@gmail.com",
-                "password123"
+                any(), any(), any(), any()
             )
         } returns mockResponse
 
@@ -268,10 +265,7 @@ class SignUpViewModelTest {
 
         coEvery {
             usersRepository.createUser(
-                companies[0].id,
-                "Juan",
-                "email@gmail.com",
-                "password123"
+                any(), any(), any(), any()
             )
         } returns mockResponse
 
@@ -300,10 +294,7 @@ class SignUpViewModelTest {
 
         coEvery {
             usersRepository.createUser(
-                companies[0].id,
-                "Juan",
-                "email@gmail.com",
-                "password123"
+                any(), any(), any(), any()
             )
         } returns mockResponse
 

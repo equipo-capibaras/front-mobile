@@ -97,7 +97,7 @@ class SignUpViewModel(
             company,
             { companyValidationState = it },
             checks = listOf(
-                { companies.find { it.name == company } != null } to R.string.form_company_doesnt_exist
+                { companies.any { it.name == company } } to R.string.form_company_doesnt_exist
             )
         ) && isValid
 
@@ -155,11 +155,8 @@ class SignUpViewModel(
                         ErrorUIState.Error(R.string.error_email_exist)
                     } else {
                         val errorBody = response.errorBody()!!.string()
-                        println("errorBody $errorBody")
                         val jsonObject = JSONObject(errorBody)
-                        println("jsonObject $jsonObject")
                         val message = jsonObject.getString("message")
-                        println("message $message")
 
                         ErrorUIState.Error(message = message)
                     }
