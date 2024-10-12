@@ -7,20 +7,29 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
+import io.capibaras.abcall.data.database.models.Company
+import io.capibaras.abcall.data.network.models.CreateUserResponse
 import io.capibaras.abcall.data.repositories.CompanyRepository
+import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.Response
 import java.io.IOException
 
-class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewModel() {
+class SignUpViewModel(
+    private val companyRepository: CompanyRepository,
+    private val usersRepository: UsersRepository
+) : ViewModel() {
     var name by mutableStateOf("")
     var email by mutableStateOf("")
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
     var company by mutableStateOf("")
 
-    var companies by mutableStateOf<List<String>>(emptyList())
+    var companies by mutableStateOf<List<Company>>(emptyList())
         private set
     var isLoading by mutableStateOf(false)
         private set
@@ -36,6 +45,8 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
         private set
     var confirmPasswordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
+    var successUIState by mutableStateOf<SuccessUIState>(SuccessUIState.NoSuccess)
+        private set
 
     init {
         getCompanies()
@@ -44,29 +55,22 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
     private fun validateField(
         value: String,
         setValidationState: (ValidationUIState) -> Unit,
-        additionalCheck: ((String) -> Boolean)? = null,
-        invalidErrorMessage: Int? = null
+        checks: List<Pair<() -> Boolean, Int>> = emptyList()
     ): Boolean {
-        return when {
-            value.isBlank() -> {
-                setValidationState(ValidationUIState.Error(R.string.form_required))
-                false
-            }
+        if (value.isBlank()) {
+            setValidationState(ValidationUIState.Error(R.string.form_required))
+            return false
+        }
 
-            additionalCheck != null && !additionalCheck(value) && invalidErrorMessage != null -> {
-                setValidationState(
-                    ValidationUIState.Error(
-                        invalidErrorMessage
-                    )
-                )
-                false
-            }
-
-            else -> {
-                setValidationState(ValidationUIState.NoError)
-                true
+        checks.forEach { (check, errorMessageId) ->
+            if (!check()) {
+                setValidationState(ValidationUIState.Error(errorMessageId))
+                return false
             }
         }
+
+        setValidationState(ValidationUIState.NoError)
+        return true
     }
 
     fun validateFields(): Boolean {
@@ -75,32 +79,42 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
         isValid = validateField(
             name,
             { nameValidationState = it },
+            checks = listOf(
+                { name.length <= 60 } to R.string.form_60_length
+            )
         ) && isValid
 
         isValid = validateField(
             email,
             { emailValidationState = it },
-            additionalCheck = { Patterns.EMAIL_ADDRESS.matcher(it).matches() },
-            invalidErrorMessage = R.string.form_invalid_email
+            checks = listOf(
+                { email.length <= 60 } to R.string.form_60_length,
+                { Patterns.EMAIL_ADDRESS.matcher(email).matches() } to R.string.form_invalid_email
+            )
         ) && isValid
 
         isValid = validateField(
             company,
             { companyValidationState = it },
+            checks = listOf(
+                { companies.any { it.name == company } } to R.string.form_company_doesnt_exist
+            )
         ) && isValid
 
         isValid = validateField(
             password,
             { passwordValidationState = it },
-            additionalCheck = { it.length >= 8 },
-            invalidErrorMessage = R.string.form_password_length
+            checks = listOf(
+                { password.length >= 8 } to R.string.form_password_length
+            )
         ) && isValid
 
         isValid = validateField(
             confirmPassword,
             { confirmPasswordValidationState = it },
-            additionalCheck = { it == password },
-            invalidErrorMessage = R.string.form_confirm_password_invalid
+            checks = listOf(
+                { confirmPassword == password } to R.string.form_confirm_password_invalid
+            )
         ) && isValid
 
         return isValid
@@ -110,8 +124,7 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
         viewModelScope.launch {
             isLoading = true
             try {
-                val companyList = companyRepository.getCompanies(forceUpdate)
-                companies = companyList.map { it.name }
+                companies = companyRepository.getCompanies(forceUpdate)
             } catch (e: IOException) {
                 errorUIState = ErrorUIState.Error(R.string.error_network)
             } catch (e: Exception) {
@@ -122,8 +135,45 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
         }
     }
 
+    fun createUser(onSuccess: () -> Unit) {
+        if (isLoading) return
+        isLoading = true
+        viewModelScope.launch {
+            try {
+                val companyId = companies.find { it.name == company }!!.id
+                val response: Response<CreateUserResponse> =
+                    usersRepository.createUser(companyId, name, email, password)
+
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        errorUIState = ErrorUIState.NoError
+                        successUIState = SuccessUIState.Success(R.string.success_create_user)
+                        onSuccess()
+                    }
+                } else {
+                    errorUIState = if (response.code() == 409) {
+                        ErrorUIState.Error(R.string.error_email_exist)
+                    } else {
+                        val errorBody = response.errorBody()!!.string()
+                        val jsonObject = JSONObject(errorBody)
+                        val message = jsonObject.getString("message")
+
+                        ErrorUIState.Error(message = message)
+                    }
+                }
+            } catch (e: IOException) {
+                errorUIState = ErrorUIState.Error(R.string.error_network)
+            } catch (e: Exception) {
+                errorUIState = ErrorUIState.Error(R.string.error_create_user)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun clearErrorUIState() {
         errorUIState = ErrorUIState.NoError
     }
+
 
 }

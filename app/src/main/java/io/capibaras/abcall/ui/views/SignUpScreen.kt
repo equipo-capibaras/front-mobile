@@ -32,6 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +52,7 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.HandleErrorState
+import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -65,12 +72,16 @@ fun SignUpScreen(
     val passwordValidationState = viewModel.passwordValidationState
     val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
-    val companies = viewModel.companies
+    val companies = viewModel.companies.map { it.name }
 
     HandleErrorState(
         errorUIState = viewModel.errorUIState,
         snackbarHostState = snackbarHostState,
         onClearError = { viewModel.clearErrorUIState() }
+    )
+    HandleSuccessState(
+        successUIState = viewModel.successUIState,
+        snackbarHostState = snackbarHostState
     )
     FullScreenLoading(isLoading = viewModel.isLoading)
 
@@ -95,7 +106,12 @@ fun SignUpScreen(
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
+            modifier = Modifier
+                .padding(top = 30.dp, bottom = 40.dp)
+                .semantics {
+                    traversalIndex = -1f
+                    heading()
+                }
         )
 
         DefaultTextField(
@@ -142,7 +158,9 @@ fun SignUpScreen(
                 val isValid = viewModel.validateFields()
 
                 if (isValid) {
-                    /* TODO: Go to home page" */
+                    viewModel.createUser(
+                        onSuccess = { navController.navigate("home") }
+                    )
                 }
             },
             modifier = Modifier
@@ -199,7 +217,8 @@ fun CompanyDropdown(
 ) {
     var allowExpanded by remember { mutableStateOf(false) }
     val filteredOptions = options.filter { it.contains(selectedText, ignoreCase = true) }
-    val expanded = selectedText.isNotEmpty() && allowExpanded && filteredOptions.isNotEmpty()
+    val expanded = allowExpanded && filteredOptions.isNotEmpty()
+    val noOptionsText = stringResource(R.string.form_no_company_options)
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -209,10 +228,16 @@ fun CompanyDropdown(
             modifier = Modifier
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(bottom = 8.dp)
+                .semantics {
+                    if (filteredOptions.isEmpty()) {
+                        contentDescription = noOptionsText
+                        liveRegion = LiveRegionMode.Assertive
+                    }
+                },
             value = selectedText,
             onValueChange = onValueChange,
-            label = { Text("De qué empresa eres cliente?") },
+            label = { Text(stringResource(R.string.form_company)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded,
