@@ -46,6 +46,7 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.HandleErrorState
+import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -65,12 +66,16 @@ fun SignUpScreen(
     val passwordValidationState = viewModel.passwordValidationState
     val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
-    val companies = viewModel.companies
+    val companies = viewModel.companies.map { it.name }
 
     HandleErrorState(
         errorUIState = viewModel.errorUIState,
         snackbarHostState = snackbarHostState,
         onClearError = { viewModel.clearErrorUIState() }
+    )
+    HandleSuccessState(
+        successUIState = viewModel.successUIState,
+        snackbarHostState = snackbarHostState
     )
     FullScreenLoading(isLoading = viewModel.isLoading)
 
@@ -142,7 +147,9 @@ fun SignUpScreen(
                 val isValid = viewModel.validateFields()
 
                 if (isValid) {
-                    /* TODO: Go to home page" */
+                    viewModel.createUser(
+                        onSuccess = { navController.navigate("home") }
+                    )
                 }
             },
             modifier = Modifier

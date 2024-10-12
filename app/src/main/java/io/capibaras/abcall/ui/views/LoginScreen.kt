@@ -54,6 +54,7 @@ fun LoginScreen(
         snackbarHostState = snackbarHostState,
         onClearError = { viewModel.clearErrorUIState() }
     )
+
     FullScreenLoading(isLoading = viewModel.isLoading)
 
     Column(

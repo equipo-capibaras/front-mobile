@@ -15,11 +15,16 @@
     <string name="signup_login_action">Entrar</string>
     <string name="form_required">Este campo é obrigatório</string>
     <string name="form_invalid_email">E-mail inválido</string>
-    <string name="form_password_length">A senha deve ter pelo menos 8 caracteres</string>
+    <string name="form_password_length">Deve ter pelo menos 8 caracteres</string>
+    <string name="form_60_length">Deve ter no máximo 60 caracteres</string>
     <string name="form_confirm_password_invalid">As senhas não coincidem</string>
+    <string name="form_company_doesnt_exist">A empresa não existe</string>
     <string name="error_incorrect_credentials">Usuário ou senha incorretos</string>
     <string name="error_authenticate">Erro ao autenticar</string>
     <string name="error_network">Erro de rede</string>
     <string name="unknown_error">Erro desconhecido</string>
     <string name="error_get_companies">Erro ao carregar as empresas</string>
+    <string name="error_email_exist">Já existe um usuário registrado com este e-mail</string>
+    <string name="error_create_user">Erro ao criar o usuário</string>
+    <string name="success_create_user">Conta criada com sucesso</string>
 </resources>

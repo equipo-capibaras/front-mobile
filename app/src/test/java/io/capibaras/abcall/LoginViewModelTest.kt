@@ -12,6 +12,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.mockkConstructor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -19,6 +20,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -86,7 +88,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `test loginUser success`() = runTest {
+    fun `test login success`() = runTest {
         val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns true
             every { body() } returns LoginResponse(token = "fake-token")
@@ -113,7 +115,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `test loginUser failure with 401`() = runTest {
+    fun `test login failure with 401`() = runTest {
         val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 401
@@ -140,12 +142,12 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `test loginUser failure with other status code`() = runTest {
+    fun `test login failure with other status code`() = runTest {
         val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 500
             every { errorBody() } returns mockk {
-                every { string() } returns "{\"message\": \"Internal Server Error\"}"
+                every { string() } returns "{\"message\": \"Server error occurred\"}"
             }
         }
 
@@ -156,6 +158,9 @@ class LoginViewModelTest {
 
         var resultToken: String? = null
 
+        mockkConstructor(JSONObject::class)
+        every { anyConstructed<JSONObject>().getString(any()) } returns "Server error occurred"
+
         viewModel.loginUser { token ->
             resultToken = token
         }
@@ -163,15 +168,18 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(null, resultToken)
-        assertEquals(ErrorUIState.Error(R.string.error_authenticate), viewModel.errorUIState)
+        assertEquals(
+            ErrorUIState.Error(message = "Server error occurred"),
+            viewModel.errorUIState
+        )
     }
 
     @Test
-    fun `test loginUser failure with null error body`() = runTest {
+    fun `test login failure with null error body`() = runTest {
         val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 500
-            every { errorBody() } returns null // Simulamos un errorBody nulo
+            every { errorBody() } returns null
         }
 
         coEvery { authRepository.login("johndoe@gmail.com", "password123") } returns mockResponse
@@ -192,7 +200,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `test loginUser network failure`() = runTest {
+    fun `test login network failure`() = runTest {
         coEvery { authRepository.login(any(), any()) } throws IOException("Network error")
 
         viewModel.email = "johndoe@gmail.com"
