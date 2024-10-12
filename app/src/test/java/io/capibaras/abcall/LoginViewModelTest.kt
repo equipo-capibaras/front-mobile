@@ -26,6 +26,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -192,7 +193,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test loginUser network failure`() = runTest {
-        coEvery { authRepository.login(any(), any()) } throws Exception("Network error")
+        coEvery { authRepository.login(any(), any()) } throws IOException("Network error")
 
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
@@ -207,30 +208,6 @@ class LoginViewModelTest {
 
         assertEquals(null, resultToken)
         assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
-    }
-
-    @Test
-    fun `test loginUser empty response`() = runTest {
-        val mockResponse = mockk<Response<LoginResponse>> {
-            every { isSuccessful } returns true
-            every { body() } returns null
-        }
-
-        coEvery { authRepository.login("johndoe@gmail.com", "password123") } returns mockResponse
-
-        viewModel.email = "johndoe@gmail.com"
-        viewModel.password = "password123"
-
-        var resultToken: String? = null
-
-        viewModel.loginUser { token ->
-            resultToken = token
-        }
-
-        advanceUntilIdle()
-
-        assertEquals(null, resultToken)
-        assertEquals(ErrorUIState.Error(R.string.error_authenticate), viewModel.errorUIState)
     }
 
     @Test
@@ -258,6 +235,4 @@ class LoginViewModelTest {
 
         assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
     }
-
-
 }

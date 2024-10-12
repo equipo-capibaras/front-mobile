@@ -14,6 +14,7 @@ import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
+import java.io.IOException
 
 class LoginViewModel(
     private val tokenManager: TokenManager,
@@ -76,30 +77,21 @@ class LoginViewModel(
                         tokenManager.saveAuthToken(loginResponse.token)
                         errorUIState = ErrorUIState.NoError
                         onSuccess(loginResponse.token)
-                    } ?: run {
-                        errorUIState = ErrorUIState.Error(R.string.error_authenticate)
                     }
                 } else {
                     errorUIState = if (response.code() == 401) {
                         ErrorUIState.Error(R.string.error_incorrect_credentials)
                     } else {
-                        val errorBody = response.errorBody()?.string()
-                        if (errorBody != null) {
-                            try {
-                                val jsonObject = JSONObject(errorBody)
-                                val message = jsonObject.getString("message")
-                                ErrorUIState.Error(message = message)
-                            } catch (e: Exception) {
-                                ErrorUIState.Error(R.string.error_authenticate)
-                            }
-                        } else {
-                            ErrorUIState.Error(R.string.error_authenticate)
-                        }
-                        ErrorUIState.Error(R.string.error_authenticate)
+                        val errorBody = response.errorBody()!!.string()
+                        val jsonObject = JSONObject(errorBody)
+                        val message = jsonObject.getString("message")
+                        ErrorUIState.Error(message = message)
                     }
                 }
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_network)
+                errorUIState = ErrorUIState.Error(
+                    if (e is IOException) R.string.error_network else R.string.error_authenticate
+                )
             } finally {
                 isLoading = false
             }

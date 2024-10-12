@@ -2,6 +2,7 @@ package io.capibaras.abcall
 
 import io.capibaras.abcall.data.database.models.Company
 import io.capibaras.abcall.data.repositories.CompanyRepository
+import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import io.mockk.MockKAnnotations
@@ -10,6 +11,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
@@ -17,6 +19,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
@@ -133,5 +136,29 @@ class SignUpViewModelTest {
     fun `test getCompanies success`() = runTest {
         assertFalse(viewModel.isLoading)
         assertEquals(listOf("Empresa XYZ"), viewModel.companies.value)
+    }
+
+    @Test
+    fun `test getCompanies network failure`() = runTest {
+        coEvery { companyRepository.getCompanies() } throws IOException("Network error")
+        viewModel = SignUpViewModel(companyRepository)
+
+        advanceUntilIdle()
+
+        assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
+    }
+
+    @Test
+    fun `test clearErrorUIState`() = runTest {
+        coEvery { companyRepository.getCompanies() } throws IOException("Network error")
+        viewModel = SignUpViewModel(companyRepository)
+
+        advanceUntilIdle()
+
+        assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
+
+        viewModel.clearErrorUIState()
+
+        assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
     }
 }

@@ -11,6 +11,7 @@ import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewModel() {
     var name by mutableStateOf("")
@@ -111,7 +112,9 @@ class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewMo
                 val companyList = companyRepository.getCompanies(forceUpdate)
                 companies.value = companyList.map { it.name }
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_get_companies)
+                errorUIState = ErrorUIState.Error(
+                    if (e is IOException) R.string.error_network else R.string.error_get_companies
+                )
             } finally {
                 isLoading = false
             }
