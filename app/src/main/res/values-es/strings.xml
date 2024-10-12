@@ -15,6 +15,18 @@
     <string name="signup_login_action">Ingresa</string>
     <string name="form_required">Este campo es obligatorio</string>
     <string name="form_invalid_email">Correo no válido</string>
-    <string name="form_password_length">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="form_password_length">Debe tener al menos 8 caracteres</string>
+    <string name="form_60_length">Debe tener máximo 60 caracteres</string>
     <string name="form_confirm_password_invalid">Las contraseñas no coinciden</string>
+    <string name="form_company_doesnt_exist">La empresa no existe</string>
+    <string name="form_no_company_options">No hay empresas que coincidan con el texto ingresado</string>
+    <string name="error_incorrect_credentials">Usuario o contraseña incorrectos</string>
+    <string name="error_authenticate">Error al autenticar</string>
+    <string name="error_network">Error de red</string>
+    <string name="unknown_error">Error desconocido</string>
+    <string name="error_get_companies">Error al cargar las empresas</string>
+    <string name="error_email_exist">Ya existe un usuario registrado con este email</string>
+    <string name="error_create_user">Error al crear el usuario</string>
+    <string name="success_create_user">Cuenta creada exitosamente</string>
+    <string name="success_action">Operación completada exitosamente</string>
 </resources>
