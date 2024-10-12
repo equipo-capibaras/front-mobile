@@ -67,7 +67,7 @@ fun SignUpScreen(
     val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
     val companies = viewModel.companies.map { it.name }
-    
+
     HandleErrorState(
         errorUIState = viewModel.errorUIState,
         snackbarHostState = snackbarHostState,
@@ -206,7 +206,7 @@ fun CompanyDropdown(
 ) {
     var allowExpanded by remember { mutableStateOf(false) }
     val filteredOptions = options.filter { it.contains(selectedText, ignoreCase = true) }
-    val expanded = selectedText.isNotEmpty() && allowExpanded && filteredOptions.isNotEmpty()
+    val expanded = allowExpanded && filteredOptions.isNotEmpty()
 
     ExposedDropdownMenuBox(
         expanded = expanded,

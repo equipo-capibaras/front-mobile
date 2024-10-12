@@ -39,7 +39,7 @@ fun HandleSuccessState(
     if (successUIState is SuccessUIState.Success) {
         val successMessage =
             successUIState.resourceId?.let { stringResource(it) }
-                ?: stringResource(R.string.unknown_error)
+                ?: stringResource(R.string.success_action)
         LaunchedEffect(successMessage) {
             snackbarHostState.showSnackbar(
                 CustomSnackbarVisuals(
