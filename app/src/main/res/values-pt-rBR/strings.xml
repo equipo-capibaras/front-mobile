@@ -19,6 +19,7 @@
     <string name="form_60_length">Deve ter no máximo 60 caracteres</string>
     <string name="form_confirm_password_invalid">As senhas não coincidem</string>
     <string name="form_company_doesnt_exist">A empresa não existe</string>
+    <string name="form_no_company_options">Não há empresa que correspondam ao texto inserido</string>
     <string name="error_incorrect_credentials">Usuário ou senha incorretos</string>
     <string name="error_authenticate">Erro ao autenticar</string>
     <string name="error_network">Erro de rede</string>

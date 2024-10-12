@@ -21,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +48,6 @@ fun LoginScreen(
     snackbarHostState: SnackbarHostState,
     viewModel: LoginViewModel = koinViewModel()
 ) {
-
     val emailValidationState = viewModel.emailValidationState
     val passwordValidationState = viewModel.passwordValidationState
 
@@ -78,7 +80,12 @@ fun LoginScreen(
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
+            modifier = Modifier
+                .padding(top = 30.dp, bottom = 40.dp)
+                .semantics {
+                    traversalIndex = -1f
+                    heading()
+                }
         )
 
         DefaultTextField(
