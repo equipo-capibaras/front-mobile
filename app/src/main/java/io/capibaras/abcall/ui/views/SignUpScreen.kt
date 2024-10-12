@@ -20,6 +20,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,6 +45,7 @@ import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
+import io.capibaras.abcall.ui.components.HandleErrorState
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -52,127 +54,139 @@ import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
 @Composable
-fun SignUpScreen(navController: NavController, viewModel: SignUpViewModel = koinViewModel()) {
+fun SignUpScreen(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    viewModel: SignUpViewModel = koinViewModel()
+) {
     val nameValidationState = viewModel.nameValidationState
     val emailValidationState = viewModel.emailValidationState
     val companyValidationState = viewModel.companyValidationState
     val passwordValidationState = viewModel.passwordValidationState
     val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
-    ABCallTheme {
-        Column(
+    val companies = viewModel.companies
+
+    HandleErrorState(
+        errorUIState = viewModel.errorUIState,
+        snackbarHostState = snackbarHostState,
+        onClearError = { viewModel.clearErrorUIState() }
+    )
+    FullScreenLoading(isLoading = viewModel.isLoading)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Logo de ABCall",
+            modifier = Modifier
+                .width(184.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        Text(
+            text = stringResource(R.string.signup_title),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
+        )
+
+        DefaultTextField(
+            value = viewModel.name,
+            onValueChange = { viewModel.name = it },
+            validationState = nameValidationState,
+            labelRes = R.string.form_name,
+            isPassword = false
+        )
+
+        DefaultTextField(
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
+            validationState = emailValidationState,
+            labelRes = R.string.form_email,
+            isPassword = false
+        )
+
+        CompanyDropdown(
+            selectedText = viewModel.company,
+            onValueChange = { viewModel.company = it },
+            companyValidationState = companyValidationState,
+            options = companies.value
+        )
+
+        DefaultTextField(
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
+            validationState = passwordValidationState,
+            labelRes = R.string.form_password,
+            isPassword = true
+        )
+
+        DefaultTextField(
+            value = viewModel.confirmPassword,
+            onValueChange = { viewModel.confirmPassword = it },
+            validationState = confirmPasswordValidationState,
+            labelRes = R.string.form_confirm_password,
+            isPassword = true
+        )
+
+        Button(
+            onClick = {
+                val isValid = viewModel.validateFields()
+
+                if (isValid) {
+                    /* TODO: Go to home page" */
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 40.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+            Text(text = stringResource(R.string.signup_button))
+        }
+
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom,
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+                .padding(top = 12.dp),
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo de ABCall",
-                modifier = Modifier
-                    .width(184.dp),
-                contentScale = ContentScale.Crop
-            )
+
+            val annotatedString = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                    append(stringResource(R.string.signup_login_question) + " ")
+                }
+                withStyle(
+                    style = SpanStyle(
+                        color = linkText.color,
+                        fontWeight = linkText.fontWeight,
+                    )
+                ) {
+                    append(stringResource(R.string.signup_login_action))
+                }
+            }
 
             Text(
-                text = stringResource(R.string.signup_title),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 30.dp, bottom = 40.dp)
-            )
-
-            DefaultTextField(
-                value = viewModel.name,
-                onValueChange = { viewModel.name = it },
-                validationState = nameValidationState,
-                labelRes = R.string.form_name,
-                isPassword = false
-            )
-
-            DefaultTextField(
-                value = viewModel.email,
-                onValueChange = { viewModel.email = it },
-                validationState = emailValidationState,
-                labelRes = R.string.form_email,
-                isPassword = false
-            )
-
-            CompanyDropdown(
-                selectedText = viewModel.selectedText,
-                onValueChange = { viewModel.selectedText = it },
-                companyValidationState = companyValidationState,
-                options = listOf("Claro", "Movistar", "Tigo")
-            )
-
-            DefaultTextField(
-                value = viewModel.password,
-                onValueChange = { viewModel.password = it },
-                validationState = passwordValidationState,
-                labelRes = R.string.form_password,
-                isPassword = true
-            )
-
-            DefaultTextField(
-                value = viewModel.confirmPassword,
-                onValueChange = { viewModel.confirmPassword = it },
-                validationState = confirmPasswordValidationState,
-                labelRes = R.string.form_confirm_password,
-                isPassword = true
-            )
-
-            Button(
-                onClick = {
-                    val isValid = viewModel.validateFields()
-
-                    if (isValid) {
-                        /* TODO: Go to home page" */
-                    }
+                text = annotatedString,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.clickable {
+                    navController.navigate("login")
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 40.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(text = stringResource(R.string.signup_button))
-            }
-
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.Bottom,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 12.dp),
-            ) {
-
-                val annotatedString = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                        append(stringResource(R.string.signup_login_question) + " ")
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            color = linkText.color,
-                            fontWeight = linkText.fontWeight,
-                        )
-                    ) {
-                        append(stringResource(R.string.signup_login_action))
-                    }
-                }
-
-                Text(
-                    text = annotatedString,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.clickable {
-                        navController.navigate("login")
-                    },
-                    textAlign = TextAlign.Center
-                )
-            }
+                textAlign = TextAlign.Center
+            )
         }
     }
+
 }
 
 @ExperimentalMaterial3Api
@@ -237,7 +251,8 @@ fun CompanyDropdown(
 @Composable
 fun SignUpScreenPreview() {
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
     ABCallTheme {
-        SignUpScreen(navController)
+        SignUpScreen(navController, snackbarHostState)
     }
 }

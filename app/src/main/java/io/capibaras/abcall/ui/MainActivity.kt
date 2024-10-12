@@ -4,44 +4,38 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.ui.navigation.Navigation
 import io.capibaras.abcall.ui.theme.ABCallTheme
-import org.koin.android.ext.android.inject
+import io.capibaras.abcall.viewmodels.MainActivityViewModel
+import org.koin.androidx.compose.koinViewModel
 
 
 class MainActivity : ComponentActivity() {
-    private var isSessionChecked = false
-    private var isUserLoggedIn = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         val splashScreen = installSplashScreen()
-
-        splashScreen.setKeepOnScreenCondition {
-            !isSessionChecked
-        }
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        checkUserSession()
+
+        splashScreen.setKeepOnScreenCondition {
+            false
+        }
+
         setContent {
             ABCallTheme {
-                Navigation(isUserLoggedIn)
+                MainScreen()
             }
         }
     }
+}
 
-    private fun checkUserSession() {
-        try {
-            val tokenManager: TokenManager by inject()
-            val token = tokenManager.getAuthToken()
-            isUserLoggedIn = !token.isNullOrEmpty()
-        } catch (_: Exception) {
-            isSessionChecked = true
-        } finally {
-            isSessionChecked = true
-        }
+@Composable
+fun MainScreen(viewModel: MainActivityViewModel = koinViewModel()) {
+    val isSessionChecked = viewModel.isSessionChecked
+    val isUserLoggedIn = viewModel.isUserLoggedIn
+
+    if (isSessionChecked) {
+        Navigation(isUserLoggedIn)
     }
 }

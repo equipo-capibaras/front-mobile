@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -92,6 +93,12 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.security.crypto)
     implementation(libs.core.splashscreen)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+
+    annotationProcessor(libs.room.compiler)
+
+    ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
@@ -99,13 +106,11 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
 
-
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)
-
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

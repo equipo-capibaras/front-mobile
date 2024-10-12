@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
 import io.capibaras.abcall.data.TokenManager
-import io.capibaras.abcall.data.network.models.LoginResponseJson
+import io.capibaras.abcall.data.network.models.LoginResponse
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -33,16 +33,16 @@ class LoginViewModel(
 
     private fun validateField(
         value: String,
-        validationStateSetter: (ValidationUIState) -> Unit,
+        setValidationState: (ValidationUIState) -> Unit,
     ): Boolean {
         return when {
             value.isBlank() -> {
-                validationStateSetter(ValidationUIState.Error(R.string.form_required))
+                setValidationState(ValidationUIState.Error(R.string.form_required))
                 false
             }
 
             else -> {
-                validationStateSetter(ValidationUIState.NoError)
+                setValidationState(ValidationUIState.NoError)
                 true
             }
         }
@@ -69,7 +69,7 @@ class LoginViewModel(
         isLoading = true
         viewModelScope.launch {
             try {
-                val response: Response<LoginResponseJson> = authRepository.login(email, password)
+                val response: Response<LoginResponse> = authRepository.login(email, password)
 
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
@@ -87,7 +87,8 @@ class LoginViewModel(
                         if (errorBody != null) {
                             try {
                                 val jsonObject = JSONObject(errorBody)
-                                jsonObject.getString("message")
+                                val message = jsonObject.getString("message")
+                                ErrorUIState.Error(message = message)
                             } catch (e: Exception) {
                                 ErrorUIState.Error(R.string.error_authenticate)
                             }

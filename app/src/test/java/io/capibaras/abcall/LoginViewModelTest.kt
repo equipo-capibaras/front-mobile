@@ -1,7 +1,7 @@
 package io.capibaras.abcall
 
 import io.capibaras.abcall.data.TokenManager
-import io.capibaras.abcall.data.network.models.LoginResponseJson
+import io.capibaras.abcall.data.network.models.LoginResponse
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -29,7 +29,6 @@ import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
-
     private lateinit var viewModel: LoginViewModel
 
     @MockK
@@ -44,7 +43,6 @@ class LoginViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-
         Dispatchers.setMain(testDispatcher)
 
         viewModel = LoginViewModel(
@@ -88,9 +86,9 @@ class LoginViewModelTest {
 
     @Test
     fun `test loginUser success`() = runTest {
-        val mockResponse = mockk<Response<LoginResponseJson>> {
+        val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns true
-            every { body() } returns LoginResponseJson(token = "fake-token")
+            every { body() } returns LoginResponse(token = "fake-token")
         }
 
         coEvery { authRepository.login("johndoe@gmail.com", "password123") } returns mockResponse
@@ -115,7 +113,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test loginUser failure with 401`() = runTest {
-        val mockResponse = mockk<Response<LoginResponseJson>> {
+        val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 401
         }
@@ -142,7 +140,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test loginUser failure with other status code`() = runTest {
-        val mockResponse = mockk<Response<LoginResponseJson>> {
+        val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 500
             every { errorBody() } returns mockk {
@@ -169,7 +167,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test loginUser failure with null error body`() = runTest {
-        val mockResponse = mockk<Response<LoginResponseJson>> {
+        val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 500
             every { errorBody() } returns null // Simulamos un errorBody nulo
@@ -213,7 +211,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test loginUser empty response`() = runTest {
-        val mockResponse = mockk<Response<LoginResponseJson>> {
+        val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns true
             every { body() } returns null
         }
@@ -237,7 +235,7 @@ class LoginViewModelTest {
 
     @Test
     fun `test clearErrorUIState`() = runTest {
-        val mockResponse = mockk<Response<LoginResponseJson>> {
+        val mockResponse = mockk<Response<LoginResponse>> {
             every { isSuccessful } returns false
             every { code() } returns 401
         }

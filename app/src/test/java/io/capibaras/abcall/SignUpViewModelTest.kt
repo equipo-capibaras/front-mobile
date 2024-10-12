@@ -1,21 +1,45 @@
 package io.capibaras.abcall
 
+import io.capibaras.abcall.data.database.models.Company
+import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.viewmodels.SignUpViewModel
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
 
     private lateinit var viewModel: SignUpViewModel
 
+    @MockK
+    private lateinit var companyRepository: CompanyRepository
+
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
-        viewModel = SignUpViewModel()
+        MockKAnnotations.init(this)
+        Dispatchers.setMain(testDispatcher)
+        coEvery { companyRepository.getCompanies(any()) } returns listOf(
+            Company(
+                name = "Empresa XYZ",
+                id = "Empresa_XYZ"
+            )
+        )
+
+        viewModel = SignUpViewModel(companyRepository)
     }
 
     @Test
@@ -93,7 +117,7 @@ class SignUpViewModelTest {
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
         viewModel.confirmPassword = "password123"
-        viewModel.selectedText = "Empresa XYZ"
+        viewModel.company = "Empresa XYZ"
 
         val isValid = viewModel.validateFields()
 
@@ -103,5 +127,11 @@ class SignUpViewModelTest {
         assertEquals(ValidationUIState.NoError, viewModel.companyValidationState)
         assertEquals(ValidationUIState.NoError, viewModel.passwordValidationState)
         assertEquals(ValidationUIState.NoError, viewModel.confirmPasswordValidationState)
+    }
+
+    @Test
+    fun `test getCompanies success`() = runTest {
+        assertFalse(viewModel.isLoading)
+        assertEquals(listOf("Empresa XYZ"), viewModel.companies.value)
     }
 }

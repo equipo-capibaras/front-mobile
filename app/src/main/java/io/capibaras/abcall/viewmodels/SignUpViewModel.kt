@@ -5,19 +5,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
+import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import kotlinx.coroutines.launch
 
-class SignUpViewModel : ViewModel() {
+class SignUpViewModel(private val companyRepository: CompanyRepository) : ViewModel() {
     var name by mutableStateOf("")
     var email by mutableStateOf("")
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
-    var selectedText by mutableStateOf("")
+    var company by mutableStateOf("")
 
-    var isLoading: Boolean = false
-
+    var companies = mutableStateOf<List<String>>(emptyList())
+        private set
+    var isLoading by mutableStateOf(false)
     var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
     var nameValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
@@ -31,20 +35,24 @@ class SignUpViewModel : ViewModel() {
     var confirmPasswordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
 
+    init {
+        getCompanies()
+    }
+
     private fun validateField(
         value: String,
-        validationStateSetter: (ValidationUIState) -> Unit,
+        setValidationState: (ValidationUIState) -> Unit,
         additionalCheck: ((String) -> Boolean)? = null,
         invalidErrorMessage: Int? = null
     ): Boolean {
         return when {
             value.isBlank() -> {
-                validationStateSetter(ValidationUIState.Error(R.string.form_required))
+                setValidationState(ValidationUIState.Error(R.string.form_required))
                 false
             }
 
             additionalCheck != null && !additionalCheck(value) && invalidErrorMessage != null -> {
-                validationStateSetter(
+                setValidationState(
                     ValidationUIState.Error(
                         invalidErrorMessage
                     )
@@ -53,7 +61,7 @@ class SignUpViewModel : ViewModel() {
             }
 
             else -> {
-                validationStateSetter(ValidationUIState.NoError)
+                setValidationState(ValidationUIState.NoError)
                 true
             }
         }
@@ -75,7 +83,7 @@ class SignUpViewModel : ViewModel() {
         ) && isValid
 
         isValid = validateField(
-            selectedText,
+            company,
             { companyValidationState = it },
         ) && isValid
 
@@ -94,6 +102,24 @@ class SignUpViewModel : ViewModel() {
         ) && isValid
 
         return isValid
+    }
+
+    private fun getCompanies(forceUpdate: Boolean = false) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val companyList = companyRepository.getCompanies(forceUpdate)
+                companies.value = companyList.map { it.name }
+            } catch (e: Exception) {
+                errorUIState = ErrorUIState.Error(R.string.error_get_companies)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun clearErrorUIState() {
+        errorUIState = ErrorUIState.NoError
     }
 
 }
