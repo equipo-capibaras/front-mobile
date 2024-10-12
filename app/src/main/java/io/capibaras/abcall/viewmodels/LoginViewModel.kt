@@ -7,13 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
 import io.capibaras.abcall.data.TokenManager
-import io.capibaras.abcall.data.network.models.LoginResponseJson
+import io.capibaras.abcall.data.network.models.LoginResponse
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
+import java.io.IOException
 
 class LoginViewModel(
     private val tokenManager: TokenManager,
@@ -33,16 +34,16 @@ class LoginViewModel(
 
     private fun validateField(
         value: String,
-        validationStateSetter: (ValidationUIState) -> Unit,
+        setValidationState: (ValidationUIState) -> Unit,
     ): Boolean {
         return when {
             value.isBlank() -> {
-                validationStateSetter(ValidationUIState.Error(R.string.form_required))
+                setValidationState(ValidationUIState.Error(R.string.form_required))
                 false
             }
 
             else -> {
-                validationStateSetter(ValidationUIState.NoError)
+                setValidationState(ValidationUIState.NoError)
                 true
             }
         }
@@ -69,36 +70,28 @@ class LoginViewModel(
         isLoading = true
         viewModelScope.launch {
             try {
-                val response: Response<LoginResponseJson> = authRepository.login(email, password)
+                val response: Response<LoginResponse> = authRepository.login(email, password)
 
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
                         tokenManager.saveAuthToken(loginResponse.token)
                         errorUIState = ErrorUIState.NoError
                         onSuccess(loginResponse.token)
-                    } ?: run {
-                        errorUIState = ErrorUIState.Error(R.string.error_authenticate)
                     }
                 } else {
                     errorUIState = if (response.code() == 401) {
                         ErrorUIState.Error(R.string.error_incorrect_credentials)
                     } else {
-                        val errorBody = response.errorBody()?.string()
-                        if (errorBody != null) {
-                            try {
-                                val jsonObject = JSONObject(errorBody)
-                                jsonObject.getString("message")
-                            } catch (e: Exception) {
-                                ErrorUIState.Error(R.string.error_authenticate)
-                            }
-                        } else {
-                            ErrorUIState.Error(R.string.error_authenticate)
-                        }
-                        ErrorUIState.Error(R.string.error_authenticate)
+                        val errorBody = response.errorBody()!!.string()
+                        val jsonObject = JSONObject(errorBody)
+                        val message = jsonObject.getString("message")
+                        ErrorUIState.Error(message = message)
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 errorUIState = ErrorUIState.Error(R.string.error_network)
+            } catch (e: Exception) {
+                errorUIState = ErrorUIState.Error(R.string.error_authenticate)
             } finally {
                 isLoading = false
             }
