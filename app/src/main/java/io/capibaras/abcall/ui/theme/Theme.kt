@@ -9,15 +9,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue700,
-    secondary = Blue500,
-    tertiary = Blue400,
+    primary = Blue900,
+    secondary = Blue800,
+    tertiary = Blue700,
     background = Blue950,
     surface = Blue900,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Blue50,
+    onBackground = Color.White,
     onSurface = Blue50,
     outline = Color.White,
 )

@@ -13,8 +13,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import io.capibaras.abcall.ui.components.BottomNavBar
 import io.capibaras.abcall.ui.components.CustomSnackbarHost
+import io.capibaras.abcall.ui.views.AccountScreen
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
@@ -24,10 +27,20 @@ import io.capibaras.abcall.ui.views.SignUpScreen
 fun Navigation(isUserLoggedIn: Boolean) {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
 
     Scaffold(
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            if (navBackStackEntry.value?.destination?.route !in listOf(
+                    "login",
+                    "signup"
+                )
+            ) {
+                BottomNavBar(navController)
+            }
+        },
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
@@ -48,6 +61,9 @@ fun Navigation(isUserLoggedIn: Boolean) {
                 }
                 composable("home") {
                     HomeScreen()
+                }
+                composable("account") {
+                    AccountScreen()
                 }
             }
         }
