@@ -18,7 +18,7 @@ val LightCustomColors = CustomColors(
 val DarkCustomColors = CustomColors(
     success = Color(0xFFADD5AD),
     onSuccess = Color(0xFF0A500C),
-    pill = Blue500,
+    pill = Blue500
 )
 
 val LocalCustomColors = compositionLocalOf { LightCustomColors }
