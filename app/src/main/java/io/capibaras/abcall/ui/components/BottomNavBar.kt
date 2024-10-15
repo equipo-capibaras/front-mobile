@@ -8,6 +8,7 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -65,13 +66,17 @@ fun BottomNavBar(navController: NavController) {
 }
 
 @Composable
-fun getNavigationBarItemColors(): NavigationBarItemColors {
+fun getNavigationBarItemColors(
+    selectedColor: Color = MaterialTheme.colorScheme.onBackground,
+    unselectedColor: Color = MaterialTheme.colorScheme.onBackground,
+    indicatorColor: Color = LocalCustomColors.current.pill
+): NavigationBarItemColors {
     return NavigationBarItemDefaults.colors(
-        selectedIconColor = MaterialTheme.colorScheme.onBackground,
-        unselectedIconColor = MaterialTheme.colorScheme.onBackground,
-        selectedTextColor = MaterialTheme.colorScheme.onBackground,
-        unselectedTextColor = MaterialTheme.colorScheme.onBackground,
-        indicatorColor = LocalCustomColors.current.pill
+        selectedIconColor = selectedColor,
+        unselectedIconColor = unselectedColor,
+        selectedTextColor = selectedColor,
+        unselectedTextColor = unselectedColor,
+        indicatorColor = indicatorColor
     )
 }
 
