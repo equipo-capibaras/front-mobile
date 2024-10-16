@@ -1,6 +1,6 @@
 [versions]
 sonarqube = "5.1.0.4882"
-agp = "8.7.0"
+agp = "8.7.1"
 kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
