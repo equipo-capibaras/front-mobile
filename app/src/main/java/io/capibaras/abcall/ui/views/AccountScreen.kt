@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
@@ -24,9 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.capibaras.abcall.R
 
 @Composable
 fun AccountScreen() {
@@ -57,17 +60,17 @@ fun AccountScreen() {
         ) {
             AccountItem(icon = Icons.Outlined.Person, text = "Maria Aristizabal")
             AccountItem(icon = Icons.Outlined.Email, text = "maria@gmail.com")
-            AccountItem(icon = Icons.Outlined.Domain, text = "Claro")
+            AccountItem(icon = Icons.Filled.Domain, text = "Claro")
         }
 
 
 
         Button(
-            onClick = { /* Acción para cerrar sesión */ },
+            onClick = { /* TODO: Acción para cerrar sesión */ },
             modifier = Modifier
                 .padding(top = 24.dp),
         ) {
-            Text(text = "Cerrar sesión", color = Color.White)
+            Text(text = stringResource(R.string.logout), color = Color.White)
         }
     }
 }
@@ -75,6 +78,7 @@ fun AccountScreen() {
 
 @Composable
 fun AccountItem(icon: ImageVector, text: String) {
+    val borderColor = MaterialTheme.colorScheme.primary
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,7 +87,7 @@ fun AccountItem(icon: ImageVector, text: String) {
                 val strokeWidth = 1.dp.toPx()
                 val y = size.height + 16.dp.toPx() - strokeWidth / 2
                 drawLine(
-                    color = Color.Gray,
+                    color = borderColor,
                     start = androidx.compose.ui.geometry.Offset(0f, y),
                     end = androidx.compose.ui.geometry.Offset(size.width, y),
                     strokeWidth = strokeWidth
@@ -95,7 +99,7 @@ fun AccountItem(icon: ImageVector, text: String) {
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onBackground
         )
 
         Text(

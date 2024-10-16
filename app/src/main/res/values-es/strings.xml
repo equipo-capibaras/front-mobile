@@ -33,4 +33,5 @@
     <string name="navbar_account">Mi cuenta</string>
     <string name="account_title">Mi cuenta</string>
     <string name="requests_title">Peticiones</string>
+    <string name="logout">Cerrar sesión</string>
 </resources>

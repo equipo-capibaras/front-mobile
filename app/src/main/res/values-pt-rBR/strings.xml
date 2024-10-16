@@ -33,4 +33,5 @@
     <string name="navbar_account">Minha conta</string>
     <string name="account_title">Minha conta</string>
     <string name="requests_title">Solicitações</string>
+    <string name="logout">Sair</string>
 </resources>
