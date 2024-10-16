@@ -31,4 +31,7 @@
     <string name="success_action">Operación completada exitosamente</string>
     <string name="navbar_requests">Peticiones</string>
     <string name="navbar_account">Mi cuenta</string>
+    <string name="account_title">Mi cuenta</string>
+    <string name="requests_title">Peticiones</string>
+    <string name="logout">Cerrar sesión</string>
 </resources>
