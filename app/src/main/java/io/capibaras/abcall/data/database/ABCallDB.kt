@@ -9,7 +9,7 @@ import io.capibaras.abcall.data.database.dao.UserDAO
 import io.capibaras.abcall.data.database.models.Company
 import io.capibaras.abcall.data.database.models.User
 
-@Database(entities = [Company::class, User::class], version = 1)
+@Database(entities = [Company::class, User::class], version = 2)
 abstract class ABCallDB : RoomDatabase() {
     abstract fun companyDAO(): CompanyDAO
     abstract fun userDAO(): UserDAO
@@ -24,7 +24,7 @@ abstract class ABCallDB : RoomDatabase() {
                     context.applicationContext,
                     ABCallDB::class.java,
                     "abcall_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }

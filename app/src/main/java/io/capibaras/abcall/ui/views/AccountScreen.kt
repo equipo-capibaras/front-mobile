@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.HandleErrorState
 import io.capibaras.abcall.viewmodels.AccountViewModel
@@ -38,9 +37,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AccountScreen(
-    navController: NavController,
     snackbarHostState: SnackbarHostState,
-    viewModel: AccountViewModel = koinViewModel()
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val userInfo = viewModel.user
 
@@ -80,14 +78,17 @@ fun AccountScreen(
             if (userInfo != null) {
                 AccountItem(icon = Icons.Outlined.Person, text = userInfo.name)
                 AccountItem(icon = Icons.Outlined.Email, text = userInfo.email)
-                AccountItem(icon = Icons.Filled.Domain, text = userInfo.clientId)
+                if (userInfo.clientName != null) {
+                    AccountItem(icon = Icons.Filled.Domain, text = userInfo.clientName)
+                }
+
             }
         }
 
 
 
         Button(
-            onClick = { /* TODO: Acción para cerrar sesión */ },
+            onClick = { viewModel.logout() },
             modifier = Modifier
                 .padding(top = 24.dp),
         ) {

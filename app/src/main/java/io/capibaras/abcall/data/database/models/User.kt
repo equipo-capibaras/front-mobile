@@ -8,5 +8,6 @@ data class User(
     @PrimaryKey val id: String,
     val clientId: String,
     val name: String,
-    val email: String
+    val email: String,
+    val clientName: String?,
 )
