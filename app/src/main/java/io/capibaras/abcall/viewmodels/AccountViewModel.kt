@@ -1,11 +1,11 @@
 package io.capibaras.abcall.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class AccountViewModel(
     private val tokenManager: TokenManager,
+    private val logoutManager: LogoutManager,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
     var user by mutableStateOf<User?>(null)
@@ -34,10 +35,8 @@ class AccountViewModel(
         viewModelScope.launch {
             try {
                 val response: User = usersRepository.getUserInfo()
-                Log.d("Get user", response.toString())
                 user = response
             } catch (e: Exception) {
-                Log.d("Get user error", e.message.toString())
                 errorUIState = ErrorUIState.Error(message = e.message.toString())
             } finally {
                 isLoading = false
@@ -45,15 +44,9 @@ class AccountViewModel(
         }
     }
 
-    fun logout(onLogoutSuccess: () -> Unit) {
+    fun logout() {
         viewModelScope.launch {
-            try {
-                usersRepository.deleteUsers()
-                tokenManager.clearAuthToken()
-                onLogoutSuccess()
-            } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(message = e.message)
-            }
+            logoutManager.logout()
         }
     }
 

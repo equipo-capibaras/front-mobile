@@ -1,15 +1,20 @@
 package io.capibaras.abcall.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.ui.navigation.Navigation
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.viewmodels.MainActivityViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 
 class MainActivity : ComponentActivity() {
@@ -31,11 +36,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(viewModel: MainActivityViewModel = koinViewModel()) {
+fun MainScreen(
+    viewModel: MainActivityViewModel = koinViewModel(),
+    logoutManager: LogoutManager = koinInject(),
+) {
     val isSessionChecked = viewModel.isSessionChecked
     val isUserLoggedIn = viewModel.isUserLoggedIn
+    val isLoggedOut by logoutManager.logoutEvent.collectAsState(initial = null)
 
-    if (isSessionChecked) {
+    Log.d("MainScreen", "isLoggedOut $isLoggedOut")
+
+    if (isLoggedOut != false) {
+        Log.d("MainScreen", "isLoggedOut not null")
+        Navigation(false)
+    } else if (isSessionChecked) {
         Navigation(isUserLoggedIn)
     }
 }

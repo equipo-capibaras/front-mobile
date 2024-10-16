@@ -8,7 +8,11 @@ import io.capibaras.abcall.data.network.services.UsersService
 import org.json.JSONObject
 import retrofit2.Response
 
-class UsersRepository(private val usersService: UsersService, private val userDAO: UserDAO) {
+class UsersRepository(
+    private val usersService: UsersService,
+    private val userDAO: UserDAO,
+    private val companyRepository: CompanyRepository
+) {
     suspend fun createUser(
         clientId: String,
         name: String,
@@ -19,20 +23,23 @@ class UsersRepository(private val usersService: UsersService, private val userDA
     }
 
     suspend fun getUserInfo(): User {
-//        val localData = userDAO.getUserInfo()
-//
-//        if (localData != null) {
-//            return localData
-//        }
+        val localData = userDAO.getUserInfo()
+        if (localData != null) {
+            return localData
+        }
+
+        Log.d("getUserInfo", "localData $localData")
 
         return try {
-            Log.d("getUserInfo remoteData", usersService.getUserInfo().toString())
             val response = usersService.getUserInfo()
             if (response.isSuccessful) {
                 val remoteData =
                     response.body() ?: throw Exception("El cuerpo de la respuesta es nulo")
-                userDAO.refreshUser(remoteData)
-                remoteData
+                val company = companyRepository.getCompany(remoteData.clientId)
+                Log.d("getUserInfo", "company $company")
+                val userWithCompany = remoteData.copy(clientName = company.name)
+                userDAO.refreshUser(userWithCompany)
+                userWithCompany
             } else {
                 val errorBody = response.errorBody()!!.string()
                 val jsonObject = JSONObject(errorBody)
