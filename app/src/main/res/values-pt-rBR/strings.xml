@@ -29,4 +29,6 @@
     <string name="error_create_user">Erro ao criar o usuário</string>
     <string name="success_create_user">Conta criada com sucesso</string>
     <string name="success_action">Operação concluída com sucesso</string>
+    <string name="navbar_requests">Solicitações</string>
+    <string name="navbar_account">Minha conta</string>
 </resources>
