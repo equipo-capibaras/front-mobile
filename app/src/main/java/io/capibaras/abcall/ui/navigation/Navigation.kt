@@ -82,7 +82,7 @@ fun Navigation(isUserLoggedIn: Boolean) {
                     HomeScreen()
                 }
                 composable("account") {
-                    AccountScreen()
+                    AccountScreen(navController, snackbarHostState)
                 }
             }
         }

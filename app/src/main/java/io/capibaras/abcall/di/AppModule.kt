@@ -13,6 +13,7 @@ import io.capibaras.abcall.data.network.services.UsersService
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
+import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import io.capibaras.abcall.viewmodels.MainActivityViewModel
 import io.capibaras.abcall.viewmodels.SignUpViewModel
@@ -42,6 +43,7 @@ val appModule = module {
     }
 
     single { get<ABCallDB>().companyDAO() }
+    single { get<ABCallDB>().userDAO() }
 
     single {
         Retrofit.Builder()
@@ -58,9 +60,10 @@ val appModule = module {
 
     single { AuthRepository(get()) }
     single { CompanyRepository(get(), get(), get()) }
-    single { UsersRepository(get()) }
+    single { UsersRepository(get(), get()) }
 
     viewModel { MainActivityViewModel(get()) }
     viewModel { SignUpViewModel(get(), get()) }
     viewModel { LoginViewModel(get(), get()) }
+    viewModel { AccountViewModel(get(), get()) }
 }

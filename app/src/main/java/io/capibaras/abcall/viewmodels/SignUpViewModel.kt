@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
 import io.capibaras.abcall.data.database.models.Company
-import io.capibaras.abcall.data.network.models.CreateUserResponse
+import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
@@ -141,7 +141,7 @@ class SignUpViewModel(
         viewModelScope.launch {
             try {
                 val companyId = companies.find { it.name == company }!!.id
-                val response: Response<CreateUserResponse> =
+                val response: Response<User> =
                     usersRepository.createUser(companyId, name, email, password)
 
                 if (response.isSuccessful) {

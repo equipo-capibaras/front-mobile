@@ -41,6 +41,7 @@ android {
     kotlinOptions {
         jvmTarget = "21"
     }
+    
     buildFeatures {
         compose = true
         buildConfig = true
