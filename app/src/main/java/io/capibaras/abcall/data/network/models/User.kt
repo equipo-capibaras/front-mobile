@@ -1,6 +1,6 @@
 package io.capibaras.abcall.data.network.models
 
-data class CreateUserResponse(
+data class UserResponse(
     val id: String,
     val clientId: String,
     val name: String,

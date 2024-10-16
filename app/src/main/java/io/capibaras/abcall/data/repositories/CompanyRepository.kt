@@ -15,7 +15,6 @@ class CompanyRepository(
         private const val LAST_UPDATE_KEY = "companies_last_update"
     }
 
-
     suspend fun getCompanies(forceUpdate: Boolean = false): List<Company> {
         val lastUpdate = sharedPreferences.getLong(LAST_UPDATE_KEY, 0L)
         val cacheExpired = System.currentTimeMillis() - lastUpdate > CACHE_EXPIRATION_TIME
@@ -32,7 +31,7 @@ class CompanyRepository(
         }
 
         companyDAO.refreshCompanies(remoteData)
-        
+
         sharedPreferences.edit().putLong(LAST_UPDATE_KEY, System.currentTimeMillis()).apply()
 
         return remoteData

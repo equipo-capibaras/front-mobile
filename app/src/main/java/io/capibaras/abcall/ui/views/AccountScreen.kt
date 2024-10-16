@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,10 +30,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import io.capibaras.abcall.R
+import io.capibaras.abcall.ui.components.HandleErrorState
+import io.capibaras.abcall.viewmodels.AccountViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AccountScreen() {
+fun AccountScreen(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    viewModel: AccountViewModel = koinViewModel()
+) {
+    val userInfo = viewModel.user
+
+    HandleErrorState(
+        errorUIState = viewModel.errorUIState,
+        snackbarHostState = snackbarHostState,
+        onClearError = { viewModel.clearErrorUIState() }
+    )
+
+    FullScreenLoading(isLoading = viewModel.isLoading)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,9 +77,11 @@ fun AccountScreen() {
         Column(
             modifier = Modifier.padding(top = 50.dp, bottom = 50.dp),
         ) {
-            AccountItem(icon = Icons.Outlined.Person, text = "Maria Aristizabal")
-            AccountItem(icon = Icons.Outlined.Email, text = "maria@gmail.com")
-            AccountItem(icon = Icons.Filled.Domain, text = "Claro")
+            if (userInfo != null) {
+                AccountItem(icon = Icons.Outlined.Person, text = userInfo.name)
+                AccountItem(icon = Icons.Outlined.Email, text = userInfo.email)
+                AccountItem(icon = Icons.Filled.Domain, text = userInfo.clientId)
+            }
         }
 
 
