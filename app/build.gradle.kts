@@ -95,7 +95,8 @@ dependencies {
     implementation(libs.core.splashscreen)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    
+    implementation(libs.androidx.material.icons.extended)
+
     ksp(libs.room.compiler)
 
     testImplementation(libs.junit)

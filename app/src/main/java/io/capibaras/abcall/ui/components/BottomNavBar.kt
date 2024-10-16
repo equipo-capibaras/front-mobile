@@ -1,5 +1,8 @@
 package io.capibaras.abcall.ui.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ListAlt
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -9,7 +12,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,7 +34,7 @@ fun BottomNavBar(navController: NavController) {
             onClick = { navController.navigate("home") },
             icon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.requests),
+                    imageVector = Icons.AutoMirrored.Outlined.ListAlt,
                     contentDescription = stringResource(R.string.navbar_requests)
                 )
             },
@@ -50,7 +52,7 @@ fun BottomNavBar(navController: NavController) {
             onClick = { navController.navigate("account") },
             icon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.profile),
+                    imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = stringResource(R.string.navbar_account)
                 )
             },
