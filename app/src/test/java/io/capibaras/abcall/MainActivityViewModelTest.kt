@@ -3,6 +3,7 @@ package io.capibaras.abcall
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
+import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import io.capibaras.abcall.viewmodels.MainActivityViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -26,6 +27,8 @@ import org.junit.Test
 class MainActivityViewModelTest {
     private lateinit var viewModel: MainActivityViewModel
     private val logoutEventFlow = MutableStateFlow(false)
+    private val expiredTokenFlow = MutableStateFlow(false)
+    private val manualLogoutFlow = MutableStateFlow(false)
 
     @MockK
     private lateinit var tokenManager: TokenManager
@@ -44,6 +47,8 @@ class MainActivityViewModelTest {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
         coEvery { logoutManager.logoutEvent } returns logoutEventFlow
+        coEvery { logoutManager.expiredToken } returns expiredTokenFlow
+        coEvery { logoutManager.isManualLogout } returns manualLogoutFlow
         coEvery { tokenManager.clearAuthToken() } just Runs
         coEvery { usersRepository.deleteUsers() } just Runs
         coEvery { logoutManager.resetLogoutState() } just Runs
@@ -102,5 +107,17 @@ class MainActivityViewModelTest {
         coVerify { tokenManager.clearAuthToken() }
         coVerify { usersRepository.deleteUsers() }
         coVerify { logoutManager.resetLogoutState() }
+    }
+
+    @Test
+    fun `test manual logout triggers success state`() = runTest {
+        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+
+        manualLogoutFlow.emit(true)
+        logoutEventFlow.emit(true)
+
+        advanceUntilIdle()
+
+        assertEquals(SuccessUIState.Success(R.string.success_logout), viewModel.successUIState)
     }
 }

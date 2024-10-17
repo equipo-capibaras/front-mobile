@@ -75,7 +75,7 @@ class AccountViewModelTest {
 
     @Test
     fun `test logout calls logoutManager`() = runTest {
-        coEvery { logoutManager.logout() } just runs
+        coEvery { logoutManager.logout(isManual = true) } just runs
 
         viewModel = AccountViewModel(logoutManager, usersRepository)
 
@@ -83,7 +83,7 @@ class AccountViewModelTest {
 
         advanceUntilIdle()
 
-        coVerify(exactly = 1) { logoutManager.logout() }
+        coVerify(exactly = 1) { logoutManager.logout(isManual = true) }
     }
 
     @Test

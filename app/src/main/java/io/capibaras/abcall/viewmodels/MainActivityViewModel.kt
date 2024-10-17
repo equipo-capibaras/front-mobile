@@ -25,8 +25,7 @@ class MainActivityViewModel(
         private set
     var isLoggedOut by mutableStateOf(false)
         private set
-    var isManualLogout by mutableStateOf(false)
-        private set
+    private var isManualLogout by mutableStateOf(false)
     var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
     var successUIState by mutableStateOf<SuccessUIState>(SuccessUIState.NoSuccess)
