@@ -81,7 +81,8 @@ fun SignUpScreen(
     )
     HandleSuccessState(
         successUIState = viewModel.successUIState,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onClearSuccess = { viewModel.clearSuccessUIState() }
     )
     FullScreenLoading(isLoading = viewModel.isLoading)
 
@@ -159,7 +160,7 @@ fun SignUpScreen(
 
                 if (isValid) {
                     viewModel.createUser(
-                        onSuccess = { navController.navigate("home") }
+                        onSuccess = { navController.navigate("login") }
                     )
                 }
             },

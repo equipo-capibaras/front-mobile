@@ -34,7 +34,7 @@ fun HandleErrorState(
 fun HandleSuccessState(
     successUIState: SuccessUIState,
     snackbarHostState: SnackbarHostState,
-    onClearSuccess: (() -> Unit)? = null
+    onClearSuccess: () -> Unit
 ) {
     if (successUIState is SuccessUIState.Success) {
         val successMessage =
@@ -47,7 +47,7 @@ fun HandleSuccessState(
                     state = SnackbarState.SUCCESS
                 )
             )
-            onClearSuccess?.invoke()
+            onClearSuccess()
         }
     }
 }

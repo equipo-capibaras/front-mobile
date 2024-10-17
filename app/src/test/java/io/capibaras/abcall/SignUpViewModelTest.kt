@@ -1,7 +1,7 @@
 package io.capibaras.abcall
 
 import io.capibaras.abcall.data.database.models.Company
-import io.capibaras.abcall.data.network.models.CreateUserResponse
+import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
@@ -208,13 +208,14 @@ class SignUpViewModelTest {
 
     @Test
     fun `test createUser success`() = runTest {
-        val mockResponse = mockk<Response<CreateUserResponse>> {
+        val mockResponse = mockk<Response<User>> {
             every { isSuccessful } returns true
-            every { body() } returns CreateUserResponse(
+            every { body() } returns User(
                 id = "user-id",
                 clientId = companies[0].id,
                 name = "Juan",
-                email = "email@gmail.com"
+                email = "email@gmail.com",
+                clientName = null
             )
         }
 
@@ -258,7 +259,7 @@ class SignUpViewModelTest {
 
     @Test
     fun `test createUser email already exists`() = runTest {
-        val mockResponse = mockk<Response<CreateUserResponse>> {
+        val mockResponse = mockk<Response<User>> {
             every { isSuccessful } returns false
             every { code() } returns 409
         }
@@ -283,7 +284,7 @@ class SignUpViewModelTest {
 
     @Test
     fun `test createUser  failure with other status code`() = runTest {
-        val mockResponse = mockk<Response<CreateUserResponse>> {
+        val mockResponse = mockk<Response<User>> {
             every { isSuccessful } returns false
             every { code() } returns 500
             every { errorBody() } returns mockk {
@@ -342,10 +343,30 @@ class SignUpViewModelTest {
         advanceUntilIdle()
 
         assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
-
         viewModel.clearErrorUIState()
-
         assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
+    }
+
+    @Test
+    fun `test clearSuccessUIState resets success state after user creation`() = runTest {
+        val mockUser = User("user-id", "client-id", "John Doe", "johndoe@gmail.com", null)
+        coEvery { usersRepository.createUser(any(), any(), any(), any()) } returns Response.success(
+            mockUser
+        )
+
+        viewModel.name = "John Doe"
+        viewModel.email = "johndoe@gmail.com"
+        viewModel.password = "password123"
+        viewModel.confirmPassword = "password123"
+        viewModel.company = companies[0].name
+        
+        viewModel.createUser {}
+
+        advanceUntilIdle()
+
+        assertEquals(SuccessUIState.Success(R.string.success_create_user), viewModel.successUIState)
+        viewModel.clearSuccessUIState()
+        assertEquals(SuccessUIState.NoSuccess, viewModel.successUIState)
     }
 
 }
