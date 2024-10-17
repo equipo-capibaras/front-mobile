@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedButton
 import io.capibaras.abcall.ui.components.HandleErrorState
-import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,7 +47,7 @@ fun AccountScreen(
 ) {
     val userInfo = viewModel.user
     val showDialog = remember { mutableStateOf(false) }
-    
+
     HandleErrorState(
         errorUIState = viewModel.errorUIState,
         snackbarHostState = snackbarHostState,
@@ -63,30 +62,32 @@ fun AccountScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "M",
-                color = Color.White,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
+        if (userInfo != null) {
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = userInfo.name[0].uppercase(),
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
-        Column(
-            modifier = Modifier.padding(top = 50.dp, bottom = 50.dp),
-        ) {
-            if (userInfo != null) {
+            Column(
+                modifier = Modifier.padding(top = 50.dp, bottom = 50.dp),
+            ) {
+
                 AccountItem(icon = Icons.Outlined.Person, text = userInfo.name)
                 AccountItem(icon = Icons.Outlined.Email, text = userInfo.email)
                 if (userInfo.clientName != null) {
                     AccountItem(icon = Icons.Filled.Domain, text = userInfo.clientName)
                 }
+
 
             }
         }
