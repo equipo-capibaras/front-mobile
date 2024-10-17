@@ -19,7 +19,7 @@ import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.capibaras.abcall.viewmodels.LoginViewModel
-import io.capibaras.abcall.viewmodels.MainActivityViewModel
+import io.capibaras.abcall.viewmodels.NavigationViewModel
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +89,7 @@ val appModule = module {
     single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
 
     viewModel {
-        MainActivityViewModel(
+        NavigationViewModel(
             get<UsersRepository>(),
             get<TokenManager>(),
             get<LogoutManager>()

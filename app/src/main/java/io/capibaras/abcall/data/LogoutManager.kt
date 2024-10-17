@@ -1,25 +1,34 @@
 package io.capibaras.abcall.data
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+data class LogoutState(
+    val isLoggedOut: Boolean = false,
+    val isExpiredToken: Boolean = false,
+    val isManualLogout: Boolean = false
+)
 
 class LogoutManager {
-    private val _logoutEvent = MutableStateFlow(false)
-    val logoutEvent = _logoutEvent.asStateFlow()
-    private val _expiredToken = MutableStateFlow(false)
-    val expiredToken = _expiredToken.asStateFlow()
-    private val _isManualLogout = MutableStateFlow(false)
-    val isManualLogout = _isManualLogout.asStateFlow()
+    private val _logoutState = MutableStateFlow(LogoutState())
+    val logoutState: StateFlow<LogoutState> = _logoutState
 
     fun logout(isExpiredToken: Boolean = false, isManual: Boolean = false) {
-        _expiredToken.value = isExpiredToken
-        _logoutEvent.value = true
-        _isManualLogout.value = isManual
+        _logoutState.value =
+            LogoutState(
+                isLoggedOut = true,
+                isManualLogout = isManual,
+                isExpiredToken = isExpiredToken
+            )
+
     }
 
     fun resetLogoutState() {
-        _expiredToken.value = false
-        _logoutEvent.value = false
-        _isManualLogout.value = false
+        _logoutState.value =
+            LogoutState(
+                isLoggedOut = false,
+                isManualLogout = false,
+                isExpiredToken = false
+            )
     }
 }

@@ -1,11 +1,12 @@
 package io.capibaras.abcall
 
 import io.capibaras.abcall.data.LogoutManager
+import io.capibaras.abcall.data.LogoutState
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
-import io.capibaras.abcall.viewmodels.MainActivityViewModel
+import io.capibaras.abcall.viewmodels.NavigationViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -25,11 +26,15 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainActivityViewModelTest {
-    private lateinit var viewModel: MainActivityViewModel
-    private val logoutEventFlow = MutableStateFlow(false)
-    private val expiredTokenFlow = MutableStateFlow(false)
-    private val manualLogoutFlow = MutableStateFlow(false)
+class NavigationViewModelTest {
+    private lateinit var viewModel: NavigationViewModel
+    private val logoutStateFlow = MutableStateFlow(
+        LogoutState(
+            isLoggedOut = false,
+            isExpiredToken = false,
+            isManualLogout = false
+        )
+    )
 
     @MockK
     private lateinit var tokenManager: TokenManager
@@ -47,9 +52,7 @@ class MainActivityViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
-        coEvery { logoutManager.logoutEvent } returns logoutEventFlow
-        coEvery { logoutManager.expiredToken } returns expiredTokenFlow
-        coEvery { logoutManager.isManualLogout } returns manualLogoutFlow
+        coEvery { logoutManager.logoutState } returns logoutStateFlow
         coEvery { tokenManager.clearAuthToken() } just Runs
         coEvery { usersRepository.deleteUsers() } just Runs
         coEvery { logoutManager.resetLogoutState() } just Runs
@@ -59,7 +62,7 @@ class MainActivityViewModelTest {
     fun `test user is logged in when token is available`() = runTest {
         coEvery { tokenManager.getAuthToken() } returns "valid_token"
 
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -73,7 +76,7 @@ class MainActivityViewModelTest {
     fun `test user is not logged in when token is null or empty`() = runTest {
         coEvery { tokenManager.getAuthToken() } returns ""
 
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -87,7 +90,7 @@ class MainActivityViewModelTest {
     fun `test user is not logged in when exception occurs`() = runTest {
         coEvery { tokenManager.getAuthToken() } throws Exception("Error getting token")
 
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -99,23 +102,37 @@ class MainActivityViewModelTest {
 
     @Test
     fun `test logout event triggers user data deletion`() = runTest {
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
-        logoutEventFlow.emit(true)
+        // Emit a logout event
+        logoutStateFlow.emit(
+            LogoutState(
+                isLoggedOut = true,
+                isExpiredToken = false,
+                isManualLogout = false
+            )
+        )
 
         advanceUntilIdle()
 
         coVerify { tokenManager.clearAuthToken() }
         coVerify { usersRepository.deleteUsers() }
         coVerify { logoutManager.resetLogoutState() }
+
+        assertEquals(true, viewModel.redirectToLogin)
     }
 
     @Test
     fun `test manual logout triggers success state`() = runTest {
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
-        manualLogoutFlow.emit(true)
-        logoutEventFlow.emit(true)
+        logoutStateFlow.emit(
+            LogoutState(
+                isLoggedOut = true,
+                isExpiredToken = false,
+                isManualLogout = true
+            )
+        )
 
         advanceUntilIdle()
 
@@ -124,8 +141,11 @@ class MainActivityViewModelTest {
 
     @Test
     fun `test clearErrorUIState after token expiration error`() = runTest {
-        coEvery { logoutManager.expiredToken } returns MutableStateFlow(true)
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        coEvery { logoutManager.logoutState } returns MutableStateFlow(
+            LogoutState(isLoggedOut = false, isExpiredToken = true, isManualLogout = false)
+        )
+
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -136,10 +156,11 @@ class MainActivityViewModelTest {
 
     @Test
     fun `test clearSuccessUIState after successful manual logout`() = runTest {
-        coEvery { logoutManager.logoutEvent } returns MutableStateFlow(true)
-        coEvery { logoutManager.isManualLogout } returns MutableStateFlow(true)
+        coEvery { logoutManager.logoutState } returns MutableStateFlow(
+            LogoutState(isLoggedOut = true, isExpiredToken = false, isManualLogout = true)
+        )
 
-        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+        viewModel = NavigationViewModel(usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 

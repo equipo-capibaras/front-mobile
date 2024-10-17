@@ -13,7 +13,7 @@ import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel(
+class NavigationViewModel(
     private val usersRepository: UsersRepository,
     private val tokenManager: TokenManager,
     private val logoutManager: LogoutManager,
@@ -23,40 +23,28 @@ class MainActivityViewModel(
         private set
     var isUserLoggedIn by mutableStateOf(false)
         private set
-    var isLoggedOut by mutableStateOf(false)
-        private set
     private var isManualLogout by mutableStateOf(false)
     var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
     var successUIState by mutableStateOf<SuccessUIState>(SuccessUIState.NoSuccess)
         private set
+    var redirectToLogin by mutableStateOf(false)
 
     init {
         checkUserSession()
         viewModelScope.launch {
-            logoutManager.expiredToken.collect { expired ->
-                errorUIState = if (expired) {
+            logoutManager.logoutState.collect { state ->
+                errorUIState = if (state.isExpiredToken) {
                     ErrorUIState.Error(R.string.expired_token)
                 } else {
                     ErrorUIState.NoError
-
                 }
 
-            }
-        }
+                isManualLogout = state.isManualLogout
 
-        viewModelScope.launch {
-            logoutManager.isManualLogout.collect { manual ->
-                isManualLogout = manual
-                checkLogoutStatus()
-            }
-        }
-
-        viewModelScope.launch {
-            logoutManager.logoutEvent.collect { loggedOut ->
-                isLoggedOut = loggedOut
-                if (loggedOut) {
+                if (state.isLoggedOut) {
                     deleteUserData()
+                    redirectToLogin = true
                     checkLogoutStatus()
                 }
             }
@@ -64,7 +52,7 @@ class MainActivityViewModel(
     }
 
     private fun checkLogoutStatus() {
-        if (isLoggedOut && isManualLogout) {
+        if (!isUserLoggedIn && isManualLogout) {
             successUIState = SuccessUIState.Success(R.string.success_logout)
         }
     }
@@ -83,6 +71,7 @@ class MainActivityViewModel(
     private suspend fun deleteUserData() {
         tokenManager.clearAuthToken()
         usersRepository.deleteUsers()
+        isUserLoggedIn = false
         logoutManager.resetLogoutState()
     }
 
