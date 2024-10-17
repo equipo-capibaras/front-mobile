@@ -2,6 +2,7 @@ package io.capibaras.abcall.data.network.interceptors
 
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
@@ -11,7 +12,7 @@ import org.json.JSONObject
 class AuthInterceptor(
     private val tokenManager: TokenManager,
     private val logoutManager: LogoutManager,
-    private val coroutineScope: CoroutineScope
+    private val dispatcher: CoroutineDispatcher
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -20,7 +21,7 @@ class AuthInterceptor(
         val token = tokenManager.getAuthToken()
 
         if (token.isNullOrEmpty() && !excludedPaths.any { requestPath == it }) {
-            coroutineScope.launch {
+            CoroutineScope(dispatcher).launch {
                 logoutManager.logout(isExpiredToken = true)
             }
         }
@@ -41,7 +42,7 @@ class AuthInterceptor(
                 val message = jsonObject.getString("message")
 
                 if (message.contains("Jwt is expired")) {
-                    coroutineScope.launch {
+                    CoroutineScope(dispatcher).launch {
                         logoutManager.logout(isExpiredToken = true)
                     }
                 }

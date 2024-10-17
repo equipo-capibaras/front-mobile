@@ -21,7 +21,7 @@ import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import io.capibaras.abcall.viewmodels.MainActivityViewModel
 import io.capibaras.abcall.viewmodels.SignUpViewModel
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -55,9 +55,15 @@ val appModule = module {
     single { TokenManager(get()) }
     single { LogoutManager() }
 
-    single<CoroutineScope> { CoroutineScope(Dispatchers.IO) }
+    single { Dispatchers.IO }
 
-    single { AuthInterceptor(get<TokenManager>(), get<LogoutManager>(), get<CoroutineScope>()) }
+    single {
+        AuthInterceptor(
+            get<TokenManager>(),
+            get<LogoutManager>(),
+            get<CoroutineDispatcher>()
+        )
+    }
 
     single {
         OkHttpClient.Builder()

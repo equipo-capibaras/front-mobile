@@ -3,6 +3,7 @@ package io.capibaras.abcall
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
+import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import io.capibaras.abcall.viewmodels.MainActivityViewModel
 import io.mockk.MockKAnnotations
@@ -119,5 +120,31 @@ class MainActivityViewModelTest {
         advanceUntilIdle()
 
         assertEquals(SuccessUIState.Success(R.string.success_logout), viewModel.successUIState)
+    }
+
+    @Test
+    fun `test clearErrorUIState after token expiration error`() = runTest {
+        coEvery { logoutManager.expiredToken } returns MutableStateFlow(true)
+        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+
+        advanceUntilIdle()
+
+        assertEquals(ErrorUIState.Error(R.string.expired_token), viewModel.errorUIState)
+        viewModel.clearErrorUIState()
+        assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
+    }
+
+    @Test
+    fun `test clearSuccessUIState after successful manual logout`() = runTest {
+        coEvery { logoutManager.logoutEvent } returns MutableStateFlow(true)
+        coEvery { logoutManager.isManualLogout } returns MutableStateFlow(true)
+
+        viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
+
+        advanceUntilIdle()
+
+        assertEquals(SuccessUIState.Success(R.string.success_logout), viewModel.successUIState)
+        viewModel.clearSuccessUIState()
+        assertEquals(SuccessUIState.NoSuccess, viewModel.successUIState)
     }
 }

@@ -31,6 +31,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,11 +70,15 @@ fun AccountScreen(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(MaterialTheme.colorScheme.primary)
+                    .semantics(mergeDescendants = true) {
+                        contentDescription = "Avatar"
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = userInfo.name[0].uppercase(),
+                    modifier = Modifier.clearAndSetSemantics { },
                     color = Color.White,
                     fontSize = 40.sp,
                     fontWeight = FontWeight.Medium
@@ -82,10 +89,22 @@ fun AccountScreen(
                 modifier = Modifier.padding(top = 50.dp, bottom = 50.dp),
             ) {
 
-                AccountItem(icon = Icons.Outlined.Person, text = userInfo.name)
-                AccountItem(icon = Icons.Outlined.Email, text = userInfo.email)
+                AccountItem(
+                    icon = Icons.Outlined.Person,
+                    text = userInfo.name,
+                    iconLabel = stringResource(R.string.form_name)
+                )
+                AccountItem(
+                    icon = Icons.Outlined.Email,
+                    text = userInfo.email,
+                    iconLabel = stringResource(R.string.form_email)
+                )
                 if (userInfo.clientName != null) {
-                    AccountItem(icon = Icons.Filled.Domain, text = userInfo.clientName)
+                    AccountItem(
+                        icon = Icons.Filled.Domain,
+                        text = userInfo.clientName,
+                        iconLabel = stringResource(R.string.company)
+                    )
                 }
 
 
@@ -105,12 +124,15 @@ fun AccountScreen(
 }
 
 @Composable
-fun AccountItem(icon: ImageVector, text: String) {
+fun AccountItem(icon: ImageVector, text: String, iconLabel: String) {
     val borderColor = MaterialTheme.colorScheme.primary
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$iconLabel, $text"
+            }
             .drawBehind {
                 val strokeWidth = 1.dp.toPx()
                 val y = size.height + 16.dp.toPx() - strokeWidth / 2
@@ -127,14 +149,15 @@ fun AccountItem(icon: ImageVector, text: String) {
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onBackground
+            tint = MaterialTheme.colorScheme.onBackground,
         )
 
         Text(
             text = text,
             modifier = Modifier
                 .padding(start = 16.dp)
-                .weight(1f),
+                .weight(1f)
+                .clearAndSetSemantics { },
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -144,7 +167,11 @@ fun AccountItem(icon: ImageVector, text: String) {
 fun ConfirmLogout(showDialog: MutableState<Boolean>, logout: () -> Unit) {
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
-        title = { Text(text = stringResource(R.string.logout)) },
+        title = {
+            Text(
+                text = stringResource(R.string.logout),
+                modifier = Modifier.clearAndSetSemantics { })
+        },
         text = { Text(text = stringResource(R.string.confirm_logout_question)) },
         confirmButton = {
             Button(

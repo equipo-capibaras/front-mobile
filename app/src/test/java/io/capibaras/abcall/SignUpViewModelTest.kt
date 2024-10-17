@@ -343,10 +343,30 @@ class SignUpViewModelTest {
         advanceUntilIdle()
 
         assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
-
         viewModel.clearErrorUIState()
-
         assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
+    }
+
+    @Test
+    fun `test clearSuccessUIState resets success state after user creation`() = runTest {
+        val mockUser = User("user-id", "client-id", "John Doe", "johndoe@gmail.com", null)
+        coEvery { usersRepository.createUser(any(), any(), any(), any()) } returns Response.success(
+            mockUser
+        )
+
+        viewModel.name = "John Doe"
+        viewModel.email = "johndoe@gmail.com"
+        viewModel.password = "password123"
+        viewModel.confirmPassword = "password123"
+        viewModel.company = companies[0].name
+        
+        viewModel.createUser {}
+
+        advanceUntilIdle()
+
+        assertEquals(SuccessUIState.Success(R.string.success_create_user), viewModel.successUIState)
+        viewModel.clearSuccessUIState()
+        assertEquals(SuccessUIState.NoSuccess, viewModel.successUIState)
     }
 
 }

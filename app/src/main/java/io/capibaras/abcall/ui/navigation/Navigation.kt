@@ -26,7 +26,10 @@ import io.capibaras.abcall.ui.views.SignUpScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Navigation(isUserLoggedIn: Boolean, snackbarHostState: SnackbarHostState) {
+fun Navigation(
+    isUserLoggedIn: Boolean,
+    snackbarHostState: SnackbarHostState,
+) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
 

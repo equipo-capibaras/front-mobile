@@ -40,4 +40,5 @@
     <string name="cancel">Cancelar</string>
     <string name="confirm_logout_question">¿Estás seguro de que deseas cerrar sesión?</string>
     <string name="success_logout">Sesión cerrada exitosamente</string>
+    <string name="company">Empresa</string>
 </resources>

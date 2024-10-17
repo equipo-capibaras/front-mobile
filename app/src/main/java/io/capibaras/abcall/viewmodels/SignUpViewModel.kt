@@ -136,15 +136,20 @@ class SignUpViewModel(
     }
 
     fun createUser(onSuccess: () -> Unit) {
+
         if (isLoading) return
         isLoading = true
         viewModelScope.launch {
             try {
                 val companyId = companies.find { it.name == company }!!.id
+                println("createUser companyId $companyId")
                 val response: Response<User> =
                     usersRepository.createUser(companyId, name, email, password)
 
+                println("createUser response $response")
+
                 if (response.isSuccessful) {
+                    println("createUser isSuccessful")
                     response.body()?.let {
                         errorUIState = ErrorUIState.NoError
                         successUIState = SuccessUIState.Success(R.string.success_create_user)

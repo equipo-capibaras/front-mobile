@@ -35,10 +35,10 @@ class MainActivityViewModel(
         checkUserSession()
         viewModelScope.launch {
             logoutManager.expiredToken.collect { expired ->
-                if (expired) {
-                    errorUIState = ErrorUIState.Error(R.string.expired_token)
+                errorUIState = if (expired) {
+                    ErrorUIState.Error(R.string.expired_token)
                 } else {
-                    errorUIState = ErrorUIState.NoError
+                    ErrorUIState.NoError
 
                 }
 
