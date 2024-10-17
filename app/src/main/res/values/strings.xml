@@ -35,4 +35,9 @@
     <string name="requests_title">Peticiones</string>
     <string name="logout">Cerrar sesión</string>
     <string name="error_getting_user_info">Error al obtener la información del usuario</string>
+    <string name="expired_token">Sesión expirada. Por favor, inicia sesión nuevamente</string>
+    <string name="confirm">Confirmar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="confirm_logout_question">¿Estás seguro de que deseas cerrar sesión?</string>
+    <string name="success_logout">Sesión cerrada exitosamente</string>
 </resources>

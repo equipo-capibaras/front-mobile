@@ -14,12 +14,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.capibaras.abcall.R
+import io.capibaras.abcall.ui.components.CustomOutlinedButton
 import io.capibaras.abcall.ui.components.HandleErrorState
+import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -41,13 +47,13 @@ fun AccountScreen(
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val userInfo = viewModel.user
-
+    val showDialog = remember { mutableStateOf(false) }
+    
     HandleErrorState(
         errorUIState = viewModel.errorUIState,
         snackbarHostState = snackbarHostState,
         onClearError = { viewModel.clearErrorUIState() }
     )
-
     FullScreenLoading(isLoading = viewModel.isLoading)
 
     Column(
@@ -85,18 +91,17 @@ fun AccountScreen(
             }
         }
 
-
-
         Button(
-            onClick = { viewModel.logout() },
+            onClick = { showDialog.value = true },
             modifier = Modifier
                 .padding(top = 24.dp),
         ) {
             Text(text = stringResource(R.string.logout), color = Color.White)
         }
+
+        if (showDialog.value) ConfirmLogout(showDialog, logout = { viewModel.logout() })
     }
 }
-
 
 @Composable
 fun AccountItem(icon: ImageVector, text: String) {
@@ -132,4 +137,28 @@ fun AccountItem(icon: ImageVector, text: String) {
             style = MaterialTheme.typography.bodyLarge
         )
     }
+}
+
+@Composable
+fun ConfirmLogout(showDialog: MutableState<Boolean>, logout: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text(text = stringResource(R.string.logout)) },
+        text = { Text(text = stringResource(R.string.confirm_logout_question)) },
+        confirmButton = {
+            Button(
+                onClick = {
+                    showDialog.value = false
+                    logout()
+                }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            CustomOutlinedButton(onClick = { showDialog.value = false }) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }

@@ -2,8 +2,7 @@ package io.capibaras.abcall.data.network.interceptors
 
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -11,23 +10,27 @@ import org.json.JSONObject
 
 class AuthInterceptor(
     private val tokenManager: TokenManager,
-    private val logoutManager: LogoutManager
+    private val logoutManager: LogoutManager,
+    private val coroutineScope: CoroutineScope
 ) : Interceptor {
-    @OptIn(DelicateCoroutinesApi::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val requestPath = request.url().encodedPath().removePrefix("/api/v1")
-        val excludedPaths = listOf("users", "auth/user", "clients")
+        val excludedPaths = listOf("/users", "/auth/user", "/clients")
+        val token = tokenManager.getAuthToken()
 
+        if (token.isNullOrEmpty() && !excludedPaths.any { requestPath == it }) {
+            coroutineScope.launch {
+                logoutManager.logout(isExpiredToken = true)
+            }
+        }
 
-        val response = if (excludedPaths.any { requestPath.startsWith(it) }) {
+        val response = if (excludedPaths.any { requestPath == it }) {
             chain.proceed(request)
         } else {
-            val token = tokenManager.getAuthToken()
             val newRequest = request.newBuilder()
                 .addHeader("Authorization", "Bearer $token")
                 .build()
-
             chain.proceed(newRequest)
         }
 
@@ -38,8 +41,8 @@ class AuthInterceptor(
                 val message = jsonObject.getString("message")
 
                 if (message.contains("Jwt is expired")) {
-                    GlobalScope.launch {
-                        logoutManager.logout()
+                    coroutineScope.launch {
+                        logoutManager.logout(isExpiredToken = true)
                     }
                 }
             } catch (e: Exception) {

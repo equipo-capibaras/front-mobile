@@ -175,5 +175,7 @@ class SignUpViewModel(
         errorUIState = ErrorUIState.NoError
     }
 
-
+    fun clearSuccessUIState() {
+        successUIState = SuccessUIState.NoSuccess
+    }
 }

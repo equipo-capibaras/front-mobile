@@ -81,7 +81,8 @@ fun SignUpScreen(
     )
     HandleSuccessState(
         successUIState = viewModel.successUIState,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onClearSuccess = { viewModel.clearSuccessUIState() }
     )
     FullScreenLoading(isLoading = viewModel.isLoading)
 

@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
@@ -27,9 +26,8 @@ import io.capibaras.abcall.ui.views.SignUpScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Navigation(isUserLoggedIn: Boolean) {
+fun Navigation(isUserLoggedIn: Boolean, snackbarHostState: SnackbarHostState) {
     val navController = rememberNavController()
-    val snackbarHostState = remember { SnackbarHostState() }
     val navBackStackEntry = navController.currentBackStackEntryAsState()
 
     val currentRoute = navBackStackEntry.value?.destination?.route

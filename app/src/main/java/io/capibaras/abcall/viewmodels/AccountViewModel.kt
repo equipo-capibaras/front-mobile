@@ -49,7 +49,7 @@ class AccountViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            logoutManager.logout()
+            logoutManager.logout(isManual = true)
         }
     }
 
