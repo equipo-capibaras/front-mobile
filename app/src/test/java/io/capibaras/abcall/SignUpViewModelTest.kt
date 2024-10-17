@@ -214,7 +214,8 @@ class SignUpViewModelTest {
                 id = "user-id",
                 clientId = companies[0].id,
                 name = "Juan",
-                email = "email@gmail.com"
+                email = "email@gmail.com",
+                clientName = null
             )
         }
 

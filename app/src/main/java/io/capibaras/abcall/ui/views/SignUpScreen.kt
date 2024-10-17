@@ -159,7 +159,7 @@ fun SignUpScreen(
 
                 if (isValid) {
                     viewModel.createUser(
-                        onSuccess = { navController.navigate("home") }
+                        onSuccess = { navController.navigate("login") }
                     )
                 }
             },
