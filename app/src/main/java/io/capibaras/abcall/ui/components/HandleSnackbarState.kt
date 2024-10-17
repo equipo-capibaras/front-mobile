@@ -1,6 +1,5 @@
 package io.capibaras.abcall.ui.components
 
-import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,7 +36,6 @@ fun HandleSuccessState(
     snackbarHostState: SnackbarHostState,
     onClearSuccess: () -> Unit
 ) {
-    Log.d("HandleSuccessState", "successUIState $successUIState")
     if (successUIState is SuccessUIState.Success) {
         val successMessage =
             successUIState.resourceId?.let { stringResource(it) }
