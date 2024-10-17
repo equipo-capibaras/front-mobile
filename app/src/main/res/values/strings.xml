@@ -34,4 +34,5 @@
     <string name="account_title">Mi cuenta</string>
     <string name="requests_title">Peticiones</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="error_getting_user_info">Error al obtener la información del usuario</string>
 </resources>

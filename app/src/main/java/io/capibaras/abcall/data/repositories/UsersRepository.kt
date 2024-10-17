@@ -1,6 +1,5 @@
 package io.capibaras.abcall.data.repositories
 
-import android.util.Log
 import io.capibaras.abcall.data.database.dao.UserDAO
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.network.models.CreateUserRequest
@@ -28,15 +27,11 @@ class UsersRepository(
             return localData
         }
 
-        Log.d("getUserInfo", "localData $localData")
-
         return try {
             val response = usersService.getUserInfo()
             if (response.isSuccessful) {
-                val remoteData =
-                    response.body() ?: throw Exception("El cuerpo de la respuesta es nulo")
-                val company = companyRepository.getCompany(remoteData.clientId)
-                Log.d("getUserInfo", "company $company")
+                val remoteData = response.body()!!
+                val company = remoteData.let { companyRepository.getCompany(it.clientId) }
                 val userWithCompany = remoteData.copy(clientName = company.name)
                 userDAO.refreshUser(userWithCompany)
                 userWithCompany
@@ -45,9 +40,7 @@ class UsersRepository(
                 val jsonObject = JSONObject(errorBody)
                 val message = jsonObject.getString("message")
 
-                throw Exception(
-                    "Error del servidor: ${response.code()} - $message"
-                )
+                throw Exception(message)
             }
         } catch (e: Exception) {
             throw e

@@ -1,10 +1,10 @@
 package io.capibaras.abcall.data.repositories
 
 import android.content.SharedPreferences
-import android.util.Log
 import io.capibaras.abcall.data.database.dao.CompanyDAO
 import io.capibaras.abcall.data.database.models.Company
 import io.capibaras.abcall.data.network.services.CompanyService
+import org.json.JSONException
 import org.json.JSONObject
 
 class CompanyRepository(
@@ -40,7 +40,6 @@ class CompanyRepository(
     }
 
     suspend fun getCompany(clientId: String): Company {
-        Log.d("getCompany", "clientId $clientId")
         val localCompany = companyDAO.getCompany(clientId)
         if (localCompany != null) {
             return localCompany
@@ -48,22 +47,19 @@ class CompanyRepository(
 
         return try {
             val response = companyService.getCompany(clientId)
-            Log.d("getCompany", "response $response")
             if (response.isSuccessful) {
-                val remoteData =
-                    response.body() ?: throw Exception("El cuerpo de la respuesta es nulo")
-
-                Log.d("getCompany", "remoteData $remoteData")
+                val remoteData = response.body()!!
                 companyDAO.insertCompany(remoteData)
                 remoteData
             } else {
                 val errorBody = response.errorBody()!!.string()
-                val jsonObject = JSONObject(errorBody)
-                val message = jsonObject.getString("message")
-
-                throw Exception(
-                    "Error del servidor: ${response.code()} - $message"
-                )
+                val message = try {
+                    val jsonObject = JSONObject(errorBody)
+                    jsonObject.getString("message")
+                } catch (e: JSONException) {
+                    e.message
+                }
+                throw Exception(message)
             }
         } catch (e: Exception) {
             throw e

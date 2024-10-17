@@ -20,12 +20,17 @@ class MainActivityViewModel(
         private set
     var isUserLoggedIn by mutableStateOf(false)
         private set
+    var isLoggedOut by mutableStateOf(false)
+        private set
 
     init {
         checkUserSession()
         viewModelScope.launch {
-            logoutManager.logoutEvent.collect {
-                deleteUserData()
+            logoutManager.logoutEvent.collect { loggedOut ->
+                isLoggedOut = loggedOut
+                if (loggedOut) {
+                    deleteUserData()
+                }
             }
         }
     }

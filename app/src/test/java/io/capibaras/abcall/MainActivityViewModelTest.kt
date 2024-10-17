@@ -93,10 +93,6 @@ class MainActivityViewModelTest {
 
     @Test
     fun `test logout event triggers user data deletion`() = runTest {
-        coEvery { tokenManager.clearAuthToken() } returns Unit
-        coEvery { usersRepository.deleteUsers() } returns Unit
-        coEvery { logoutManager.resetLogoutState() } returns Unit
-
         viewModel = MainActivityViewModel(usersRepository, tokenManager, logoutManager)
 
         logoutEventFlow.emit(true)

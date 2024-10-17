@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.capibaras.abcall.R
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
@@ -35,7 +36,11 @@ class AccountViewModel(
                 val response: User = usersRepository.getUserInfo()
                 user = response
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(message = e.message.toString())
+                errorUIState = if (e.message != null) {
+                    ErrorUIState.Error(message = e.message.toString())
+                } else {
+                    ErrorUIState.Error(R.string.error_getting_user_info)
+                }
             } finally {
                 isLoading = false
             }

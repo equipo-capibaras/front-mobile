@@ -8,6 +8,8 @@ import io.capibaras.abcall.BuildConfig
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.database.ABCallDB
+import io.capibaras.abcall.data.database.dao.CompanyDAO
+import io.capibaras.abcall.data.database.dao.UserDAO
 import io.capibaras.abcall.data.network.interceptors.AuthInterceptor
 import io.capibaras.abcall.data.network.services.AuthService
 import io.capibaras.abcall.data.network.services.CompanyService
@@ -51,7 +53,7 @@ val appModule = module {
     single { TokenManager(get()) }
     single { LogoutManager() }
 
-    single { AuthInterceptor(get(), get()) }
+    single { AuthInterceptor(get<TokenManager>(), get<LogoutManager>()) }
 
     single {
         OkHttpClient.Builder()
@@ -72,12 +74,18 @@ val appModule = module {
     single { get<Retrofit>().create(CompanyService::class.java) }
     single { get<Retrofit>().create(UsersService::class.java) }
 
-    single { AuthRepository(get()) }
-    single { CompanyRepository(get(), get(), get()) }
-    single { UsersRepository(get(), get(), get()) }
+    single { AuthRepository(get<AuthService>()) }
+    single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>(), get<SharedPreferences>()) }
+    single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
 
-    viewModel { MainActivityViewModel(get(), get(), get()) }
-    viewModel { SignUpViewModel(get(), get()) }
-    viewModel { LoginViewModel(get(), get()) }
-    viewModel { AccountViewModel(get(), get()) }
+    viewModel {
+        MainActivityViewModel(
+            get<UsersRepository>(),
+            get<TokenManager>(),
+            get<LogoutManager>()
+        )
+    }
+    viewModel { SignUpViewModel(get<CompanyRepository>(), get<UsersRepository>()) }
+    viewModel { LoginViewModel(get<TokenManager>(), get<AuthRepository>()) }
+    viewModel { AccountViewModel(get<LogoutManager>(), get<UsersRepository>()) }
 }
