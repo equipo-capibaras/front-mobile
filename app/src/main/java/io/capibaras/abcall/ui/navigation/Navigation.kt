@@ -11,9 +11,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -31,7 +34,6 @@ import io.capibaras.abcall.ui.views.SignUpScreen
 import io.capibaras.abcall.viewmodels.NavigationViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(
     viewModel: NavigationViewModel = koinViewModel(),
@@ -62,67 +64,87 @@ fun Navigation(
             }
         }
 
-        val topBarTitle = when (currentRoute) {
-            "home" -> stringResource(R.string.requests_title)
-            "account" -> stringResource(R.string.account_title)
-            else -> ""
-        }
+        CustomScaffold(
+            viewModel,
+            currentRoute,
+            snackbarHostState,
+            navBackStackEntry,
+            navController,
+            isUserLoggedIn
+        )
 
-        Scaffold(
-            snackbarHost = { CustomSnackbarHost(snackbarHostState) },
-            containerColor = MaterialTheme.colorScheme.background,
-            topBar = {
-                if (navBackStackEntry.value?.destination?.route !in listOf(
-                        "login",
-                        "signup"
-                    )
-                ) {
-                    TopBar(topBarTitle)
-                }
-            },
-            bottomBar = {
-                if (navBackStackEntry.value?.destination?.route !in listOf(
-                        "login",
-                        "signup"
-                    )
-                ) {
-                    BottomNavBar(navController)
-                }
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier.fillMaxSize()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomScaffold(
+    viewModel: NavigationViewModel,
+    currentRoute: String?,
+    snackbarHostState: SnackbarHostState,
+    navBackStackEntry: State<NavBackStackEntry?>,
+    navController: NavHostController,
+    isUserLoggedIn: Boolean
+) {
+    val topBarTitle = when (currentRoute) {
+        "home" -> stringResource(R.string.requests_title)
+        "account" -> stringResource(R.string.account_title)
+        else -> ""
+    }
+    Scaffold(
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            if (navBackStackEntry.value?.destination?.route !in listOf(
+                    "login",
+                    "signup"
+                )
             ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = if (isUserLoggedIn) "home" else "login",
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-                    composable("login") {
-                        LoginScreen(navController, snackbarHostState)
-                    }
-                    composable("signup") {
-                        SignUpScreen(navController, snackbarHostState)
-                    }
-                    composable("home") {
-                        HomeScreen()
-                    }
-                    composable("account") {
-                        AccountScreen(snackbarHostState)
-                    }
-                }
-
-                if (viewModel.redirectToLogin) {
-                    navController.navigate("login") {
-                        popUpTo("home") { inclusive = true }
-                    }
-                    viewModel.redirectToLogin = false
-                }
-
+                TopBar(topBarTitle)
             }
+        },
+        bottomBar = {
+            if (navBackStackEntry.value?.destination?.route !in listOf(
+                    "login",
+                    "signup"
+                )
+            ) {
+                BottomNavBar(navController)
+            }
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = if (isUserLoggedIn) "home" else "login",
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                composable("login") {
+                    LoginScreen(navController, snackbarHostState)
+                }
+                composable("signup") {
+                    SignUpScreen(navController, snackbarHostState)
+                }
+                composable("home") {
+                    HomeScreen()
+                }
+                composable("account") {
+                    AccountScreen(snackbarHostState)
+                }
+            }
+
+            if (viewModel.redirectToLogin) {
+                navController.navigate("login") {
+                    popUpTo("home") { inclusive = true }
+                }
+                viewModel.redirectToLogin = false
+            }
+
         }
     }
 }
