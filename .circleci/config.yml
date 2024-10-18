@@ -73,7 +73,7 @@ jobs:
             while true; do
               timestamp=$(date +%Y%m%d_%H%M%S)
               adb exec-out screencap -p > ~/artifacts/screenshot_$timestamp.png
-              sleep 1 
+              sleep 10
             done
       - android/run_tests
       - android/kill_emulators
