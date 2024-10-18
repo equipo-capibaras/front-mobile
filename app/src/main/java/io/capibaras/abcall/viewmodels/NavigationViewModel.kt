@@ -14,30 +14,26 @@ import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import kotlinx.coroutines.launch
 
 class NavigationViewModel(
+    private val sharedViewModel: SharedViewModel,
     private val usersRepository: UsersRepository,
     private val tokenManager: TokenManager,
     private val logoutManager: LogoutManager,
 ) : ViewModel() {
-
     var isSessionChecked by mutableStateOf(false)
         private set
     var isUserLoggedIn by mutableStateOf(false)
         private set
     private var isManualLogout by mutableStateOf(false)
-    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
-        private set
-    var successUIState by mutableStateOf<SuccessUIState>(SuccessUIState.NoSuccess)
-        private set
     var redirectToLogin by mutableStateOf(false)
 
     init {
         checkUserSession()
         viewModelScope.launch {
             logoutManager.logoutState.collect { state ->
-                errorUIState = if (state.isExpiredToken) {
-                    ErrorUIState.Error(R.string.expired_token)
+                if (state.isExpiredToken) {
+                    sharedViewModel.setErrorState(ErrorUIState.Error(R.string.expired_token))
                 } else {
-                    ErrorUIState.NoError
+                    sharedViewModel.setErrorState(ErrorUIState.NoError)
                 }
 
                 isManualLogout = state.isManualLogout
@@ -53,7 +49,7 @@ class NavigationViewModel(
 
     private fun checkLogoutStatus() {
         if (!isUserLoggedIn && isManualLogout) {
-            successUIState = SuccessUIState.Success(R.string.success_logout)
+            sharedViewModel.setSuccessState(SuccessUIState.Success(R.string.success_logout))
         }
     }
 
@@ -73,14 +69,6 @@ class NavigationViewModel(
         usersRepository.deleteUsers()
         isUserLoggedIn = false
         logoutManager.resetLogoutState()
-    }
-
-    fun clearErrorUIState() {
-        errorUIState = ErrorUIState.NoError
-    }
-
-    fun clearSuccessUIState() {
-        successUIState = SuccessUIState.NoSuccess
     }
 }
 

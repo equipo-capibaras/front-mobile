@@ -17,16 +17,13 @@ import retrofit2.Response
 import java.io.IOException
 
 class LoginViewModel(
+    private val sharedViewModel: SharedViewModel,
     private val tokenManager: TokenManager,
     private val authRepository: AuthRepository
 ) : ViewModel() {
     var email by mutableStateOf("")
     var password by mutableStateOf("")
 
-    var isLoading by mutableStateOf(false)
-
-    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
-        private set
     var emailValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
     var passwordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
@@ -66,8 +63,8 @@ class LoginViewModel(
     }
 
     fun loginUser(onSuccess: (String) -> Unit) {
-        if (isLoading) return
-        isLoading = true
+        if (sharedViewModel.isLoading) return
+        sharedViewModel.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val response: Response<LoginResponse> = authRepository.login(email, password)
@@ -75,31 +72,26 @@ class LoginViewModel(
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
                         tokenManager.saveAuthToken(loginResponse.token)
-                        errorUIState = ErrorUIState.NoError
+                        sharedViewModel.setErrorState(ErrorUIState.NoError)
                         onSuccess(loginResponse.token)
                     }
                 } else {
-                    errorUIState = if (response.code() == 401) {
-                        ErrorUIState.Error(R.string.error_incorrect_credentials)
+                    if (response.code() == 401) {
+                        sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_incorrect_credentials))
                     } else {
                         val errorBody = response.errorBody()!!.string()
                         val jsonObject = JSONObject(errorBody)
                         val message = jsonObject.getString("message")
-                        ErrorUIState.Error(message = message)
+                        sharedViewModel.setErrorState(ErrorUIState.Error(message = message))
                     }
                 }
             } catch (e: IOException) {
-                errorUIState = ErrorUIState.Error(R.string.error_network)
+                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_authenticate)
+                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_authenticate))
             } finally {
-                isLoading = false
+                sharedViewModel.setLoadingState(false)
             }
         }
     }
-
-    fun clearErrorUIState() {
-        errorUIState = ErrorUIState.NoError
-    }
-
 }

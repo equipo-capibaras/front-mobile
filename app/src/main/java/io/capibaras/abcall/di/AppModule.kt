@@ -20,6 +20,7 @@ import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import io.capibaras.abcall.viewmodels.NavigationViewModel
+import io.capibaras.abcall.viewmodels.SharedViewModel
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -88,14 +89,28 @@ val appModule = module {
     single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>(), get<SharedPreferences>()) }
     single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
 
+    single { SharedViewModel() }
     viewModel {
         NavigationViewModel(
+            get<SharedViewModel>(),
             get<UsersRepository>(),
             get<TokenManager>(),
             get<LogoutManager>()
         )
     }
-    viewModel { SignUpViewModel(get<CompanyRepository>(), get<UsersRepository>()) }
-    viewModel { LoginViewModel(get<TokenManager>(), get<AuthRepository>()) }
-    viewModel { AccountViewModel(get<LogoutManager>(), get<UsersRepository>()) }
+    viewModel {
+        SignUpViewModel(
+            get<SharedViewModel>(),
+            get<CompanyRepository>(),
+            get<UsersRepository>()
+        )
+    }
+    viewModel { LoginViewModel(get<SharedViewModel>(), get<TokenManager>(), get<AuthRepository>()) }
+    viewModel {
+        AccountViewModel(
+            get<SharedViewModel>(),
+            get<LogoutManager>(),
+            get<UsersRepository>()
+        )
+    }
 }
