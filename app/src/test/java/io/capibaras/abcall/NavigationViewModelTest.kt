@@ -4,15 +4,18 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.LogoutState
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
+import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.NavigationViewModel
-import io.capibaras.abcall.viewmodels.SharedViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
+import io.mockk.runs
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +31,9 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class NavigationViewModelTest {
     private lateinit var viewModel: NavigationViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+
+    @MockK
+    private lateinit var stateMediator: StateMediator
 
     private val logoutStateFlow = MutableStateFlow(
         LogoutState(
@@ -59,7 +64,12 @@ class NavigationViewModelTest {
         coEvery { usersRepository.deleteUsers() } just Runs
         coEvery { logoutManager.resetLogoutState() } just Runs
 
-        sharedViewModel = SharedViewModel()
+        every { stateMediator.isLoading } returns false
+        every { stateMediator.setLoadingState(any()) } just runs
+        every { stateMediator.errorUIState } returns ErrorUIState.NoError
+        every { stateMediator.setErrorState(any()) } just runs
+        every { stateMediator.successUIState } returns SuccessUIState.NoSuccess
+        every { stateMediator.setSuccessState(any()) } just runs
     }
 
     @Test
@@ -67,7 +77,7 @@ class NavigationViewModelTest {
         coEvery { tokenManager.getAuthToken() } returns "valid_token"
 
         viewModel =
-            NavigationViewModel(sharedViewModel, usersRepository, tokenManager, logoutManager)
+            NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -82,7 +92,7 @@ class NavigationViewModelTest {
         coEvery { tokenManager.getAuthToken() } returns ""
 
         viewModel =
-            NavigationViewModel(sharedViewModel, usersRepository, tokenManager, logoutManager)
+            NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -97,7 +107,7 @@ class NavigationViewModelTest {
         coEvery { tokenManager.getAuthToken() } throws Exception("Error getting token")
 
         viewModel =
-            NavigationViewModel(sharedViewModel, usersRepository, tokenManager, logoutManager)
+            NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
 
         advanceUntilIdle()
 
@@ -110,7 +120,7 @@ class NavigationViewModelTest {
     @Test
     fun `test logout event triggers user data deletion`() = runTest {
         viewModel =
-            NavigationViewModel(sharedViewModel, usersRepository, tokenManager, logoutManager)
+            NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
 
         // Emit a logout event
         logoutStateFlow.emit(
@@ -132,8 +142,10 @@ class NavigationViewModelTest {
 
     @Test
     fun `test manual logout triggers success state`() = runTest {
+        every { stateMediator.successUIState } returns SuccessUIState.Success(R.string.success_logout)
+
         viewModel =
-            NavigationViewModel(sharedViewModel, usersRepository, tokenManager, logoutManager)
+            NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
 
         logoutStateFlow.emit(
             LogoutState(
@@ -147,7 +159,7 @@ class NavigationViewModelTest {
 
         assertEquals(
             SuccessUIState.Success(R.string.success_logout),
-            sharedViewModel.successUIState
+            stateMediator.successUIState
         )
     }
 }

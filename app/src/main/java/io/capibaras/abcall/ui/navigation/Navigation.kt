@@ -32,14 +32,15 @@ import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.NavigationViewModel
-import io.capibaras.abcall.viewmodels.SharedViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun Navigation(
     viewModel: NavigationViewModel = koinViewModel(),
-    sharedViewModel: SharedViewModel = koinViewModel(),
+    stateMediator: StateMediator = koinInject(),
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -49,18 +50,18 @@ fun Navigation(
 
     if (isSessionChecked) {
         HandleErrorState(
-            errorUIState = sharedViewModel.errorUIState,
+            errorUIState = stateMediator.errorUIState,
             snackbarHostState = snackbarHostState,
-            onClearError = { sharedViewModel.clearErrorUIState() }
+            onClearError = { stateMediator.clearErrorUIState() }
         )
 
         HandleSuccessState(
-            successUIState = sharedViewModel.successUIState,
+            successUIState = stateMediator.successUIState,
             snackbarHostState = snackbarHostState,
-            onClearSuccess = { sharedViewModel.clearSuccessUIState() }
+            onClearSuccess = { stateMediator.clearSuccessUIState() }
         )
 
-        FullScreenLoading(isLoading = sharedViewModel.isLoading)
+        FullScreenLoading(isLoading = stateMediator.isLoading)
 
         val currentRoute = navBackStackEntry.value?.destination?.route
 

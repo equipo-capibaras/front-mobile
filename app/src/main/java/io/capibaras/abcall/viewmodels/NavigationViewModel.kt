@@ -11,10 +11,11 @@ import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
+import io.capibaras.abcall.util.StateMediator
 import kotlinx.coroutines.launch
 
 class NavigationViewModel(
-    private val sharedViewModel: SharedViewModel,
+    private val stateMediator: StateMediator,
     private val usersRepository: UsersRepository,
     private val tokenManager: TokenManager,
     private val logoutManager: LogoutManager,
@@ -31,9 +32,9 @@ class NavigationViewModel(
         viewModelScope.launch {
             logoutManager.logoutState.collect { state ->
                 if (state.isExpiredToken) {
-                    sharedViewModel.setErrorState(ErrorUIState.Error(R.string.expired_token))
+                    stateMediator.setErrorState(ErrorUIState.Error(R.string.expired_token))
                 } else {
-                    sharedViewModel.setErrorState(ErrorUIState.NoError)
+                    stateMediator.setErrorState(ErrorUIState.NoError)
                 }
 
                 isManualLogout = state.isManualLogout
@@ -49,7 +50,7 @@ class NavigationViewModel(
 
     private fun checkLogoutStatus() {
         if (!isUserLoggedIn && isManualLogout) {
-            sharedViewModel.setSuccessState(SuccessUIState.Success(R.string.success_logout))
+            stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_logout))
         }
     }
 

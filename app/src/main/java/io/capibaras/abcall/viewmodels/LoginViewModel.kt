@@ -11,13 +11,14 @@ import io.capibaras.abcall.data.network.models.LoginResponse
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.util.StateMediator
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
 import java.io.IOException
 
 class LoginViewModel(
-    private val sharedViewModel: SharedViewModel,
+    private val stateMediator: StateMediator,
     private val tokenManager: TokenManager,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -63,8 +64,8 @@ class LoginViewModel(
     }
 
     fun loginUser(onSuccess: (String) -> Unit) {
-        if (sharedViewModel.isLoading) return
-        sharedViewModel.setLoadingState(true)
+        if (stateMediator.isLoading) return
+        stateMediator.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val response: Response<LoginResponse> = authRepository.login(email, password)
@@ -72,25 +73,25 @@ class LoginViewModel(
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
                         tokenManager.saveAuthToken(loginResponse.token)
-                        sharedViewModel.setErrorState(ErrorUIState.NoError)
+                        stateMediator.setErrorState(ErrorUIState.NoError)
                         onSuccess(loginResponse.token)
                     }
                 } else {
                     if (response.code() == 401) {
-                        sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_incorrect_credentials))
+                        stateMediator.setErrorState(ErrorUIState.Error(R.string.error_incorrect_credentials))
                     } else {
                         val errorBody = response.errorBody()!!.string()
                         val jsonObject = JSONObject(errorBody)
                         val message = jsonObject.getString("message")
-                        sharedViewModel.setErrorState(ErrorUIState.Error(message = message))
+                        stateMediator.setErrorState(ErrorUIState.Error(message = message))
                     }
                 }
             } catch (e: IOException) {
-                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_network))
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_authenticate))
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_authenticate))
             } finally {
-                sharedViewModel.setLoadingState(false)
+                stateMediator.setLoadingState(false)
             }
         }
     }

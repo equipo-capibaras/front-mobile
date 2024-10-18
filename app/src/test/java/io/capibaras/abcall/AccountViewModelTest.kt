@@ -4,11 +4,12 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.AccountViewModel
-import io.capibaras.abcall.viewmodels.SharedViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.runs
@@ -31,7 +32,9 @@ class AccountViewModelTest {
     private lateinit var usersRepository: UsersRepository
 
     private lateinit var viewModel: AccountViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+
+    @MockK
+    private lateinit var stateMediator: StateMediator
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -39,7 +42,11 @@ class AccountViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
-        sharedViewModel = SharedViewModel()
+
+        every { stateMediator.isLoading } returns false
+        every { stateMediator.setLoadingState(any()) } just runs
+        every { stateMediator.errorUIState } returns ErrorUIState.NoError
+        every { stateMediator.setErrorState(any()) } just runs
     }
 
     @Test
@@ -47,12 +54,12 @@ class AccountViewModelTest {
         val mockUser = User("user-id", "client-id", "Test User", "test@test.com", null)
         coEvery { usersRepository.getUserInfo() } returns mockUser
 
-        viewModel = AccountViewModel(sharedViewModel, logoutManager, usersRepository)
+        viewModel = AccountViewModel(stateMediator, logoutManager, usersRepository)
 
         advanceUntilIdle()
 
         assertEquals(mockUser, viewModel.user)
-        assertEquals(false, sharedViewModel.isLoading)
+        assertEquals(false, stateMediator.isLoading)
 
         coVerify(exactly = 1) { usersRepository.getUserInfo() }
     }
@@ -60,16 +67,17 @@ class AccountViewModelTest {
     @Test
     fun `test getUserInfo sets error when exception occurs`() = runTest {
         coEvery { usersRepository.getUserInfo() } throws Exception("Error fetching user info")
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(message = "Error fetching user info")
 
-        viewModel = AccountViewModel(sharedViewModel, logoutManager, usersRepository)
+        viewModel = AccountViewModel(stateMediator, logoutManager, usersRepository)
 
         advanceUntilIdle()
 
         assertEquals(
             ErrorUIState.Error(message = "Error fetching user info"),
-            sharedViewModel.errorUIState
+            stateMediator.errorUIState
         )
-        assertEquals(false, sharedViewModel.isLoading)
+        assertEquals(false, stateMediator.isLoading)
 
         coVerify(exactly = 1) { usersRepository.getUserInfo() }
     }
@@ -78,7 +86,7 @@ class AccountViewModelTest {
     fun `test logout calls logoutManager`() = runTest {
         coEvery { logoutManager.logout(isManual = true) } just runs
 
-        viewModel = AccountViewModel(sharedViewModel, logoutManager, usersRepository)
+        viewModel = AccountViewModel(stateMediator, logoutManager, usersRepository)
 
         viewModel.logout()
 

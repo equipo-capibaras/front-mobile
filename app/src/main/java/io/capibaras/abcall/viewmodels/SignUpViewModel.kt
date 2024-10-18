@@ -14,13 +14,14 @@ import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.util.StateMediator
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
 import java.io.IOException
 
 class SignUpViewModel(
-    private val sharedViewModel: SharedViewModel,
+    private val stateMediator: StateMediator,
     private val companyRepository: CompanyRepository,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
@@ -117,22 +118,22 @@ class SignUpViewModel(
 
     private fun getCompanies(forceUpdate: Boolean = false) {
         viewModelScope.launch {
-            sharedViewModel.setLoadingState(true)
+            stateMediator.setLoadingState(true)
             try {
                 companies = companyRepository.getCompanies(forceUpdate)
             } catch (e: IOException) {
-                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_network))
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_get_companies))
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_get_companies))
             } finally {
-                sharedViewModel.setLoadingState(false)
+                stateMediator.setLoadingState(false)
             }
         }
     }
 
     fun createUser(onSuccess: () -> Unit) {
-        if (sharedViewModel.isLoading) return
-        sharedViewModel.setLoadingState(true)
+        if (stateMediator.isLoading) return
+        stateMediator.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val companyId = companies.find { it.name == company }!!.id
@@ -140,28 +141,28 @@ class SignUpViewModel(
                     usersRepository.createUser(companyId, name, email, password)
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        sharedViewModel.setErrorState(ErrorUIState.NoError)
-                        sharedViewModel.setSuccessState(SuccessUIState.Success(R.string.success_create_user))
+                        stateMediator.setErrorState(ErrorUIState.NoError)
+                        stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_create_user))
                         onSuccess()
                     }
                 } else {
                     if (response.code() == 409) {
-                        sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_email_exist))
+                        stateMediator.setErrorState(ErrorUIState.Error(R.string.error_email_exist))
 
                     } else {
                         val errorBody = response.errorBody()!!.string()
                         val jsonObject = JSONObject(errorBody)
                         val message = jsonObject.getString("message")
 
-                        sharedViewModel.setErrorState(ErrorUIState.Error(message = message))
+                        stateMediator.setErrorState(ErrorUIState.Error(message = message))
                     }
                 }
             } catch (e: IOException) {
-                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_network))
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_create_user))
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_create_user))
             } finally {
-                sharedViewModel.setLoadingState(false)
+                stateMediator.setLoadingState(false)
             }
         }
     }

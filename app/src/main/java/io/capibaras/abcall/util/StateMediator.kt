@@ -1,13 +1,12 @@
-package io.capibaras.abcall.viewmodels
+package io.capibaras.abcall.util
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 
-class SharedViewModel : ViewModel() {
+class StateMediator {
     var isLoading by mutableStateOf(false)
         private set
     var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)

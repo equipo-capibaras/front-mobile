@@ -10,10 +10,12 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.util.StateMediator
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class AccountViewModel(
-    private val sharedViewModel: SharedViewModel,
+    private val stateMediator: StateMediator,
     private val logoutManager: LogoutManager,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
@@ -25,20 +27,22 @@ class AccountViewModel(
     }
 
     private fun getUserInfo() {
-        if (sharedViewModel.isLoading) return
-        sharedViewModel.setLoadingState(true)
+        if (stateMediator.isLoading) return
+        stateMediator.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val response: User = usersRepository.getUserInfo()
                 user = response
+            } catch (e: IOException) {
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
                 if (e.message != null) {
-                    sharedViewModel.setErrorState(ErrorUIState.Error(message = e.message.toString()))
+                    stateMediator.setErrorState(ErrorUIState.Error(message = e.message.toString()))
                 } else {
-                    sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_getting_user_info))
+                    stateMediator.setErrorState(ErrorUIState.Error(R.string.error_getting_user_info))
                 }
             } finally {
-                sharedViewModel.setLoadingState(false)
+                stateMediator.setLoadingState(false)
             }
         }
     }
@@ -48,6 +52,6 @@ class AccountViewModel(
             logoutManager.logout(isManual = true)
         }
     }
-    
+
 
 }

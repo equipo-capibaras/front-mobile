@@ -17,10 +17,10 @@ import io.capibaras.abcall.data.network.services.UsersService
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import io.capibaras.abcall.viewmodels.NavigationViewModel
-import io.capibaras.abcall.viewmodels.SharedViewModel
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -89,10 +89,11 @@ val appModule = module {
     single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>(), get<SharedPreferences>()) }
     single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
 
-    single { SharedViewModel() }
+    single { StateMediator() }
+
     viewModel {
         NavigationViewModel(
-            get<SharedViewModel>(),
+            get<StateMediator>(),
             get<UsersRepository>(),
             get<TokenManager>(),
             get<LogoutManager>()
@@ -100,15 +101,15 @@ val appModule = module {
     }
     viewModel {
         SignUpViewModel(
-            get<SharedViewModel>(),
+            get<StateMediator>(),
             get<CompanyRepository>(),
             get<UsersRepository>()
         )
     }
-    viewModel { LoginViewModel(get<SharedViewModel>(), get<TokenManager>(), get<AuthRepository>()) }
+    viewModel { LoginViewModel(get<StateMediator>(), get<TokenManager>(), get<AuthRepository>()) }
     viewModel {
         AccountViewModel(
-            get<SharedViewModel>(),
+            get<StateMediator>(),
             get<LogoutManager>(),
             get<UsersRepository>()
         )

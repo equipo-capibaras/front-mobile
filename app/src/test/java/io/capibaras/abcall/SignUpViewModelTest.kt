@@ -7,14 +7,16 @@ import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
-import io.capibaras.abcall.viewmodels.SharedViewModel
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.runs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -35,7 +37,9 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
     private lateinit var viewModel: SignUpViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+
+    @MockK
+    private lateinit var stateMediator: StateMediator
 
     @MockK
     private lateinit var companyRepository: CompanyRepository
@@ -56,9 +60,14 @@ class SignUpViewModelTest {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
         coEvery { companyRepository.getCompanies(any()) } returns companies
+        every { stateMediator.isLoading } returns false
+        every { stateMediator.setLoadingState(any()) } just runs
+        every { stateMediator.errorUIState } returns ErrorUIState.NoError
+        every { stateMediator.setErrorState(any()) } just runs
+        every { stateMediator.successUIState } returns SuccessUIState.NoSuccess
+        every { stateMediator.setSuccessState(any()) } just runs
 
-        sharedViewModel = SharedViewModel()
-        viewModel = SignUpViewModel(sharedViewModel, companyRepository, usersRepository)
+        viewModel = SignUpViewModel(stateMediator, companyRepository, usersRepository)
     }
 
     @After
@@ -184,28 +193,32 @@ class SignUpViewModelTest {
     @Test
     fun `test getCompanies success`() = runTest {
         advanceUntilIdle()
-        assertFalse(sharedViewModel.isLoading)
+        assertFalse(stateMediator.isLoading)
         assertEquals(companies, viewModel.companies)
     }
 
     @Test
     fun `test getCompanies network failure`() = runTest {
         coEvery { companyRepository.getCompanies() } throws IOException("Network error")
-        viewModel = SignUpViewModel(sharedViewModel, companyRepository, usersRepository)
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_network)
+
+        viewModel = SignUpViewModel(stateMediator, companyRepository, usersRepository)
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_network), sharedViewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_network), stateMediator.errorUIState)
     }
 
     @Test
     fun `test getCompanies unknown failure`() = runTest {
         coEvery { companyRepository.getCompanies() } throws Exception("Error")
-        viewModel = SignUpViewModel(sharedViewModel, companyRepository, usersRepository)
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_get_companies)
+
+        viewModel = SignUpViewModel(stateMediator, companyRepository, usersRepository)
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_get_companies), sharedViewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_get_companies), stateMediator.errorUIState)
     }
 
     @Test
@@ -226,6 +239,7 @@ class SignUpViewModelTest {
                 any(), any(), any(), any()
             )
         } returns mockResponse
+        every { stateMediator.successUIState } returns SuccessUIState.Success(R.string.success_create_user)
 
         viewModel.name = "Juan"
         viewModel.email = "email@gmail.com"
@@ -236,10 +250,10 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.NoError, sharedViewModel.errorUIState)
+        assertEquals(ErrorUIState.NoError, stateMediator.errorUIState)
         assertEquals(
             SuccessUIState.Success(R.string.success_create_user),
-            sharedViewModel.successUIState
+            stateMediator.successUIState
         )
     }
 
@@ -249,6 +263,7 @@ class SignUpViewModelTest {
         coEvery {
             usersRepository.createUser(any(), any(), any(), any())
         } throws IOException("Network error")
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_network)
 
         viewModel.name = "Juan"
         viewModel.email = "email@gmail.com"
@@ -259,7 +274,7 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_network), sharedViewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_network), stateMediator.errorUIState)
     }
 
     @Test
@@ -274,6 +289,7 @@ class SignUpViewModelTest {
                 any(), any(), any(), any()
             )
         } returns mockResponse
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_email_exist)
 
         viewModel.name = "Juan"
         viewModel.email = "email@gmail.com"
@@ -284,7 +300,7 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_email_exist), sharedViewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_email_exist), stateMediator.errorUIState)
     }
 
     @Test
@@ -297,12 +313,12 @@ class SignUpViewModelTest {
             }
         }
 
-
         coEvery {
             usersRepository.createUser(
                 any(), any(), any(), any()
             )
         } returns mockResponse
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(message = "Server error occurred")
 
         viewModel.name = "Juan"
         viewModel.email = "email@gmail.com"
@@ -318,7 +334,7 @@ class SignUpViewModelTest {
 
         assertEquals(
             ErrorUIState.Error(message = "Server error occurred"),
-            sharedViewModel.errorUIState
+            stateMediator.errorUIState
         )
     }
 
@@ -327,6 +343,8 @@ class SignUpViewModelTest {
         coEvery {
             usersRepository.createUser(any(), any(), any(), any())
         } throws Exception("Error")
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_create_user)
+
 
         viewModel.name = "Juan"
         viewModel.email = "email@gmail.com"
@@ -337,6 +355,6 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_create_user), sharedViewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_create_user), stateMediator.errorUIState)
     }
 }
