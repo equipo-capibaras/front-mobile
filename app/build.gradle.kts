@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jacoco)
 }
 
 android {
@@ -57,6 +58,13 @@ android {
     }
 }
 
+tasks.withType(Test::class) {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
 task<JacocoReport>("codeCoverageReportDebug") {
     group = "Verification"
     description = "Generate Jacoco coverage report for the debug build."
@@ -106,10 +114,13 @@ dependencies {
     ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.roboelectric)
+    testImplementation(libs.androidx.test.core.ktx)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlin.faker)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
