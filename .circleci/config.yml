@@ -66,20 +66,30 @@ jobs:
           avd_name: testavd-35
           restore_gradle_cache_post_emulator_launch: false
       - run:
-          name: "Test"
+          name: "Capture screenshots"
           background: true
           command: |
             mkdir -p ~/artifacts/
             while true; do
               timestamp=$(date +%Y%m%d_%H%M%S)
               adb exec-out screencap -p > ~/artifacts/screenshot_$timestamp.png
-              sleep 10
+              sleep 5
             done
       - android/run_tests
       - android/kill_emulators
       - android/start_emulator:
           avd_name: testavd-26
           restore_gradle_cache_post_emulator_launch: false
+      - run:
+          name: "Capture screenshots"
+          background: true
+          command: |
+            mkdir -p ~/artifacts/
+            while true; do
+              timestamp=$(date +%Y%m%d_%H%M%S)
+              adb exec-out screencap -p > ~/artifacts/screenshot_$timestamp.png
+              sleep 5
+            done
       - android/run_tests
       - android/kill_emulators
       - run:
