@@ -7,6 +7,7 @@ import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import io.capibaras.abcall.ui.viewmodels.SuccessUIState
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.viewmodels.SharedViewModel
 import io.capibaras.abcall.viewmodels.SignUpViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -33,8 +34,8 @@ import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SignUpViewModelTest {
-
     private lateinit var viewModel: SignUpViewModel
+    private lateinit var sharedViewModel: SharedViewModel
 
     @MockK
     private lateinit var companyRepository: CompanyRepository
@@ -56,7 +57,8 @@ class SignUpViewModelTest {
         Dispatchers.setMain(testDispatcher)
         coEvery { companyRepository.getCompanies(any()) } returns companies
 
-        viewModel = SignUpViewModel(companyRepository, usersRepository)
+        sharedViewModel = SharedViewModel()
+        viewModel = SignUpViewModel(sharedViewModel, companyRepository, usersRepository)
     }
 
     @After
@@ -182,28 +184,28 @@ class SignUpViewModelTest {
     @Test
     fun `test getCompanies success`() = runTest {
         advanceUntilIdle()
-        assertFalse(viewModel.isLoading)
+        assertFalse(sharedViewModel.isLoading)
         assertEquals(companies, viewModel.companies)
     }
 
     @Test
     fun `test getCompanies network failure`() = runTest {
         coEvery { companyRepository.getCompanies() } throws IOException("Network error")
-        viewModel = SignUpViewModel(companyRepository, usersRepository)
+        viewModel = SignUpViewModel(sharedViewModel, companyRepository, usersRepository)
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_network), sharedViewModel.errorUIState)
     }
 
     @Test
     fun `test getCompanies unknown failure`() = runTest {
         coEvery { companyRepository.getCompanies() } throws Exception("Error")
-        viewModel = SignUpViewModel(companyRepository, usersRepository)
+        viewModel = SignUpViewModel(sharedViewModel, companyRepository, usersRepository)
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_get_companies), viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_get_companies), sharedViewModel.errorUIState)
     }
 
     @Test
@@ -234,8 +236,11 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
-        assertEquals(SuccessUIState.Success(R.string.success_create_user), viewModel.successUIState)
+        assertEquals(ErrorUIState.NoError, sharedViewModel.errorUIState)
+        assertEquals(
+            SuccessUIState.Success(R.string.success_create_user),
+            sharedViewModel.successUIState
+        )
     }
 
 
@@ -254,7 +259,7 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_network), sharedViewModel.errorUIState)
     }
 
     @Test
@@ -279,7 +284,7 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_email_exist), viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_email_exist), sharedViewModel.errorUIState)
     }
 
     @Test
@@ -313,7 +318,7 @@ class SignUpViewModelTest {
 
         assertEquals(
             ErrorUIState.Error(message = "Server error occurred"),
-            viewModel.errorUIState
+            sharedViewModel.errorUIState
         )
     }
 
@@ -332,41 +337,6 @@ class SignUpViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(ErrorUIState.Error(R.string.error_create_user), viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_create_user), sharedViewModel.errorUIState)
     }
-
-    @Test
-    fun `test clearErrorUIState`() = runTest {
-        coEvery { companyRepository.getCompanies() } throws IOException("Network error")
-        viewModel = SignUpViewModel(companyRepository, usersRepository)
-
-        advanceUntilIdle()
-
-        assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
-        viewModel.clearErrorUIState()
-        assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
-    }
-
-    @Test
-    fun `test clearSuccessUIState resets success state after user creation`() = runTest {
-        val mockUser = User("user-id", "client-id", "John Doe", "johndoe@gmail.com", null)
-        coEvery { usersRepository.createUser(any(), any(), any(), any()) } returns Response.success(
-            mockUser
-        )
-
-        viewModel.name = "John Doe"
-        viewModel.email = "johndoe@gmail.com"
-        viewModel.password = "password123"
-        viewModel.confirmPassword = "password123"
-        viewModel.company = companies[0].name
-        
-        viewModel.createUser {}
-
-        advanceUntilIdle()
-
-        assertEquals(SuccessUIState.Success(R.string.success_create_user), viewModel.successUIState)
-        viewModel.clearSuccessUIState()
-        assertEquals(SuccessUIState.NoSuccess, viewModel.successUIState)
-    }
-
 }

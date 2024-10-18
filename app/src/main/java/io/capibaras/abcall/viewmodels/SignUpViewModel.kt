@@ -20,6 +20,7 @@ import retrofit2.Response
 import java.io.IOException
 
 class SignUpViewModel(
+    private val sharedViewModel: SharedViewModel,
     private val companyRepository: CompanyRepository,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
@@ -28,13 +29,9 @@ class SignUpViewModel(
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
     var company by mutableStateOf("")
-
     var companies by mutableStateOf<List<Company>>(emptyList())
         private set
-    var isLoading by mutableStateOf(false)
-        private set
-    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
-        private set
+
     var nameValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
     var companyValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
@@ -44,8 +41,6 @@ class SignUpViewModel(
     var passwordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
     var confirmPasswordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
-        private set
-    var successUIState by mutableStateOf<SuccessUIState>(SuccessUIState.NoSuccess)
         private set
 
     init {
@@ -122,65 +117,52 @@ class SignUpViewModel(
 
     private fun getCompanies(forceUpdate: Boolean = false) {
         viewModelScope.launch {
-            isLoading = true
+            sharedViewModel.setLoadingState(true)
             try {
                 companies = companyRepository.getCompanies(forceUpdate)
             } catch (e: IOException) {
-                errorUIState = ErrorUIState.Error(R.string.error_network)
+                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_get_companies)
+                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_get_companies))
             } finally {
-                isLoading = false
+                sharedViewModel.setLoadingState(false)
             }
         }
     }
 
     fun createUser(onSuccess: () -> Unit) {
-
-        if (isLoading) return
-        isLoading = true
+        if (sharedViewModel.isLoading) return
+        sharedViewModel.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val companyId = companies.find { it.name == company }!!.id
-                println("createUser companyId $companyId")
                 val response: Response<User> =
                     usersRepository.createUser(companyId, name, email, password)
-
-                println("createUser response $response")
-
                 if (response.isSuccessful) {
-                    println("createUser isSuccessful")
                     response.body()?.let {
-                        errorUIState = ErrorUIState.NoError
-                        successUIState = SuccessUIState.Success(R.string.success_create_user)
+                        sharedViewModel.setErrorState(ErrorUIState.NoError)
+                        sharedViewModel.setSuccessState(SuccessUIState.Success(R.string.success_create_user))
                         onSuccess()
                     }
                 } else {
-                    errorUIState = if (response.code() == 409) {
-                        ErrorUIState.Error(R.string.error_email_exist)
+                    if (response.code() == 409) {
+                        sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_email_exist))
+
                     } else {
                         val errorBody = response.errorBody()!!.string()
                         val jsonObject = JSONObject(errorBody)
                         val message = jsonObject.getString("message")
 
-                        ErrorUIState.Error(message = message)
+                        sharedViewModel.setErrorState(ErrorUIState.Error(message = message))
                     }
                 }
             } catch (e: IOException) {
-                errorUIState = ErrorUIState.Error(R.string.error_network)
+                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_create_user)
+                sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_create_user))
             } finally {
-                isLoading = false
+                sharedViewModel.setLoadingState(false)
             }
         }
-    }
-
-    fun clearErrorUIState() {
-        errorUIState = ErrorUIState.NoError
-    }
-
-    fun clearSuccessUIState() {
-        successUIState = SuccessUIState.NoSuccess
     }
 }

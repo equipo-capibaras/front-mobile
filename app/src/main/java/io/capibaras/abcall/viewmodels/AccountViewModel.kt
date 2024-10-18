@@ -13,15 +13,11 @@ import io.capibaras.abcall.ui.viewmodels.ErrorUIState
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
+    private val sharedViewModel: SharedViewModel,
     private val logoutManager: LogoutManager,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
     var user by mutableStateOf<User?>(null)
-        private set
-
-    var isLoading by mutableStateOf(false)
-
-    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
 
     init {
@@ -29,20 +25,20 @@ class AccountViewModel(
     }
 
     private fun getUserInfo() {
-        if (isLoading) return
-        isLoading = true
+        if (sharedViewModel.isLoading) return
+        sharedViewModel.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val response: User = usersRepository.getUserInfo()
                 user = response
             } catch (e: Exception) {
-                errorUIState = if (e.message != null) {
-                    ErrorUIState.Error(message = e.message.toString())
+                if (e.message != null) {
+                    sharedViewModel.setErrorState(ErrorUIState.Error(message = e.message.toString()))
                 } else {
-                    ErrorUIState.Error(R.string.error_getting_user_info)
+                    sharedViewModel.setErrorState(ErrorUIState.Error(R.string.error_getting_user_info))
                 }
             } finally {
-                isLoading = false
+                sharedViewModel.setLoadingState(false)
             }
         }
     }
@@ -52,9 +48,6 @@ class AccountViewModel(
             logoutManager.logout(isManual = true)
         }
     }
-
-    fun clearErrorUIState() {
-        errorUIState = ErrorUIState.NoError
-    }
+    
 
 }

@@ -18,7 +18,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -39,24 +38,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedButton
-import io.capibaras.abcall.ui.components.HandleErrorState
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AccountScreen(
-    snackbarHostState: SnackbarHostState,
     viewModel: AccountViewModel = koinViewModel(),
 ) {
     val userInfo = viewModel.user
     val showDialog = remember { mutableStateOf(false) }
-
-    HandleErrorState(
-        errorUIState = viewModel.errorUIState,
-        snackbarHostState = snackbarHostState,
-        onClearError = { viewModel.clearErrorUIState() }
-    )
-    FullScreenLoading(isLoading = viewModel.isLoading)
 
     Column(
         modifier = Modifier
