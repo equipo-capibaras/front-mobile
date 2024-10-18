@@ -72,8 +72,7 @@ task<JacocoReport>("codeCoverageReportDebug") {
         exclude("**/ui/**")
         exclude("**/di/**")
         exclude("**/navigation/**")
-        include("**/viewmodels/**")
-        include("**/util/**")
+        exclude("**/App.class")
     })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
@@ -131,6 +130,6 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
         )
-        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**, **/data/**")
+        property("sonar.coverage.exclusions",  "**/ui/**,, **/di/**, **/navigation/**, **/App.kt")
     }
 }
