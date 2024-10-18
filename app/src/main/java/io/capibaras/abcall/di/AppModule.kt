@@ -17,6 +17,7 @@ import io.capibaras.abcall.data.network.services.UsersService
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.capibaras.abcall.viewmodels.LoginViewModel
 import io.capibaras.abcall.viewmodels.NavigationViewModel
@@ -88,14 +89,29 @@ val appModule = module {
     single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>(), get<SharedPreferences>()) }
     single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
 
+    single { StateMediator() }
+
     viewModel {
         NavigationViewModel(
+            get<StateMediator>(),
             get<UsersRepository>(),
             get<TokenManager>(),
             get<LogoutManager>()
         )
     }
-    viewModel { SignUpViewModel(get<CompanyRepository>(), get<UsersRepository>()) }
-    viewModel { LoginViewModel(get<TokenManager>(), get<AuthRepository>()) }
-    viewModel { AccountViewModel(get<LogoutManager>(), get<UsersRepository>()) }
+    viewModel {
+        SignUpViewModel(
+            get<StateMediator>(),
+            get<CompanyRepository>(),
+            get<UsersRepository>()
+        )
+    }
+    viewModel { LoginViewModel(get<StateMediator>(), get<TokenManager>(), get<AuthRepository>()) }
+    viewModel {
+        AccountViewModel(
+            get<StateMediator>(),
+            get<LogoutManager>(),
+            get<UsersRepository>()
+        )
+    }
 }

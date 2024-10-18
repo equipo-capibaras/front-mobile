@@ -10,18 +10,16 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.util.StateMediator
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class AccountViewModel(
+    private val stateMediator: StateMediator,
     private val logoutManager: LogoutManager,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
     var user by mutableStateOf<User?>(null)
-        private set
-
-    var isLoading by mutableStateOf(false)
-
-    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
         private set
 
     init {
@@ -29,20 +27,22 @@ class AccountViewModel(
     }
 
     private fun getUserInfo() {
-        if (isLoading) return
-        isLoading = true
+        if (stateMediator.isLoading) return
+        stateMediator.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val response: User = usersRepository.getUserInfo()
                 user = response
+            } catch (e: IOException) {
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                errorUIState = if (e.message != null) {
-                    ErrorUIState.Error(message = e.message.toString())
+                if (e.message != null) {
+                    stateMediator.setErrorState(ErrorUIState.Error(message = e.message.toString()))
                 } else {
-                    ErrorUIState.Error(R.string.error_getting_user_info)
+                    stateMediator.setErrorState(ErrorUIState.Error(R.string.error_getting_user_info))
                 }
             } finally {
-                isLoading = false
+                stateMediator.setLoadingState(false)
             }
         }
     }
@@ -53,8 +53,5 @@ class AccountViewModel(
         }
     }
 
-    fun clearErrorUIState() {
-        errorUIState = ErrorUIState.NoError
-    }
 
 }

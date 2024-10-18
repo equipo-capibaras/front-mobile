@@ -1,6 +1,5 @@
 package io.capibaras.abcall.ui.views
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -20,7 +18,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,15 +26,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -45,14 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
-import io.capibaras.abcall.ui.components.HandleErrorState
-import io.capibaras.abcall.ui.components.HandleSuccessState
+import io.capibaras.abcall.ui.components.InitalPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -63,9 +54,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SignUpScreen(
     navController: NavController,
-    snackbarHostState: SnackbarHostState,
     viewModel: SignUpViewModel = koinViewModel()
 ) {
+    val pageTitle = stringResource(R.string.signup_title)
     val nameValidationState = viewModel.nameValidationState
     val emailValidationState = viewModel.emailValidationState
     val companyValidationState = viewModel.companyValidationState
@@ -73,18 +64,6 @@ fun SignUpScreen(
     val confirmPasswordValidationState = viewModel.confirmPasswordValidationState
 
     val companies = viewModel.companies.map { it.name }
-
-    HandleErrorState(
-        errorUIState = viewModel.errorUIState,
-        snackbarHostState = snackbarHostState,
-        onClearError = { viewModel.clearErrorUIState() }
-    )
-    HandleSuccessState(
-        successUIState = viewModel.successUIState,
-        snackbarHostState = snackbarHostState,
-        onClearSuccess = { viewModel.clearSuccessUIState() }
-    )
-    FullScreenLoading(isLoading = viewModel.isLoading)
 
     Column(
         modifier = Modifier
@@ -94,26 +73,7 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo de ABCall",
-            modifier = Modifier
-                .width(184.dp),
-            contentScale = ContentScale.Crop
-        )
-
-        Text(
-            text = stringResource(R.string.signup_title),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .padding(top = 30.dp, bottom = 40.dp)
-                .semantics {
-                    traversalIndex = -1f
-                    heading()
-                }
-        )
+        InitalPagesTitle(pageTitle)
 
         DefaultTextField(
             value = viewModel.name,
@@ -277,8 +237,7 @@ fun CompanyDropdown(
 @Composable
 fun SignUpScreenPreview() {
     val navController = rememberNavController()
-    val snackbarHostState = remember { SnackbarHostState() }
     ABCallTheme {
-        SignUpScreen(navController, snackbarHostState)
+        SignUpScreen(navController)
     }
 }

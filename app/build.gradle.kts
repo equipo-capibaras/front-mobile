@@ -41,7 +41,7 @@ android {
     kotlinOptions {
         jvmTarget = "21"
     }
-    
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -73,6 +73,7 @@ task<JacocoReport>("codeCoverageReportDebug") {
         exclude("**/di/**")
         exclude("**/navigation/**")
         include("**/viewmodels/**")
+        include("**/util/**")
     })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }

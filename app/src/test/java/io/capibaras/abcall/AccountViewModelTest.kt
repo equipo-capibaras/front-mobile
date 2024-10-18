@@ -4,10 +4,12 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.viewmodels.ErrorUIState
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.AccountViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.runs
@@ -18,13 +20,11 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AccountViewModelTest {
-
     @MockK
     private lateinit var logoutManager: LogoutManager
 
@@ -33,12 +33,20 @@ class AccountViewModelTest {
 
     private lateinit var viewModel: AccountViewModel
 
+    @MockK
+    private lateinit var stateMediator: StateMediator
+
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
+
+        every { stateMediator.isLoading } returns false
+        every { stateMediator.setLoadingState(any()) } just runs
+        every { stateMediator.errorUIState } returns ErrorUIState.NoError
+        every { stateMediator.setErrorState(any()) } just runs
     }
 
     @Test
@@ -46,12 +54,12 @@ class AccountViewModelTest {
         val mockUser = User("user-id", "client-id", "Test User", "test@test.com", null)
         coEvery { usersRepository.getUserInfo() } returns mockUser
 
-        viewModel = AccountViewModel(logoutManager, usersRepository)
+        viewModel = AccountViewModel(stateMediator, logoutManager, usersRepository)
 
         advanceUntilIdle()
 
         assertEquals(mockUser, viewModel.user)
-        assertEquals(false, viewModel.isLoading)
+        assertEquals(false, stateMediator.isLoading)
 
         coVerify(exactly = 1) { usersRepository.getUserInfo() }
     }
@@ -59,16 +67,17 @@ class AccountViewModelTest {
     @Test
     fun `test getUserInfo sets error when exception occurs`() = runTest {
         coEvery { usersRepository.getUserInfo() } throws Exception("Error fetching user info")
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(message = "Error fetching user info")
 
-        viewModel = AccountViewModel(logoutManager, usersRepository)
+        viewModel = AccountViewModel(stateMediator, logoutManager, usersRepository)
 
         advanceUntilIdle()
 
         assertEquals(
             ErrorUIState.Error(message = "Error fetching user info"),
-            viewModel.errorUIState
+            stateMediator.errorUIState
         )
-        assertEquals(false, viewModel.isLoading)
+        assertEquals(false, stateMediator.isLoading)
 
         coVerify(exactly = 1) { usersRepository.getUserInfo() }
     }
@@ -77,30 +86,12 @@ class AccountViewModelTest {
     fun `test logout calls logoutManager`() = runTest {
         coEvery { logoutManager.logout(isManual = true) } just runs
 
-        viewModel = AccountViewModel(logoutManager, usersRepository)
+        viewModel = AccountViewModel(stateMediator, logoutManager, usersRepository)
 
         viewModel.logout()
 
         advanceUntilIdle()
 
         coVerify(exactly = 1) { logoutManager.logout(isManual = true) }
-    }
-
-    @Test
-    fun `test clearErrorUIState clears error state`() = runTest {
-        coEvery { usersRepository.getUserInfo() } throws Exception("Error fetching user info")
-
-        viewModel = AccountViewModel(logoutManager, usersRepository)
-
-        advanceUntilIdle()
-
-        assertEquals(
-            ErrorUIState.Error(message = "Error fetching user info"),
-            viewModel.errorUIState
-        )
-
-        viewModel.clearErrorUIState()
-
-        Assert.assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
     }
 }

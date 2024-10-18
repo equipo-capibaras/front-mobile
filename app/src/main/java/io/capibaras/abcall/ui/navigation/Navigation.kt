@@ -28,15 +28,19 @@ import io.capibaras.abcall.ui.components.HandleErrorState
 import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.ui.components.TopBar
 import io.capibaras.abcall.ui.views.AccountScreen
+import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
+import io.capibaras.abcall.util.StateMediator
 import io.capibaras.abcall.viewmodels.NavigationViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun Navigation(
     viewModel: NavigationViewModel = koinViewModel(),
+    stateMediator: StateMediator = koinInject(),
 ) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -46,15 +50,18 @@ fun Navigation(
 
     if (isSessionChecked) {
         HandleErrorState(
-            errorUIState = viewModel.errorUIState,
+            errorUIState = stateMediator.errorUIState,
             snackbarHostState = snackbarHostState,
-            onClearError = { viewModel.clearErrorUIState() }
+            onClearError = { stateMediator.clearErrorUIState() }
         )
+
         HandleSuccessState(
-            successUIState = viewModel.successUIState,
+            successUIState = stateMediator.successUIState,
             snackbarHostState = snackbarHostState,
-            onClearSuccess = { viewModel.clearSuccessUIState() }
+            onClearSuccess = { stateMediator.clearSuccessUIState() }
         )
+
+        FullScreenLoading(isLoading = stateMediator.isLoading)
 
         val currentRoute = navBackStackEntry.value?.destination?.route
 
@@ -125,16 +132,16 @@ fun CustomScaffold(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 composable("login") {
-                    LoginScreen(navController, snackbarHostState)
+                    LoginScreen(navController)
                 }
                 composable("signup") {
-                    SignUpScreen(navController, snackbarHostState)
+                    SignUpScreen(navController)
                 }
                 composable("home") {
                     HomeScreen()
                 }
                 composable("account") {
-                    AccountScreen(snackbarHostState)
+                    AccountScreen()
                 }
             }
 
