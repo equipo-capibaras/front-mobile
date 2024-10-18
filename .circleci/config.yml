@@ -65,6 +65,16 @@ jobs:
       - android/start_emulator:
           avd_name: testavd-35
           restore_gradle_cache_post_emulator_launch: false
+      - run:
+          name: "Test"
+          background: true
+          command: |
+            mkdir -p ~/artifacts/
+            while true; do
+              timestamp=$(date +%Y%m%d_%H%M%S)
+              adb exec-out screencap -p > screenshot_$timestamp.png
+              sleep 1 
+            done
       - android/run_tests
       - android/kill_emulators
       - android/start_emulator:
