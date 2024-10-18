@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 
-class TokenManager(context: Context) {
-    private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-
+class TokenManager(context: Context, masterKeyAlias: String = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)) {
     private val sharedPreferences = EncryptedSharedPreferences.create(
         "secure_prefs",
         masterKeyAlias,
