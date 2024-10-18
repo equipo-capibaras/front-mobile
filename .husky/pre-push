@@ -18,7 +18,7 @@ fi
 
 # Unit tests
 ./gradlew testDebug --continue
-instrumented_test_status=$?
+test_status=$?
 
 if [ "$test_status" -ne 0 ]; then
   echo "❌ Unit tests failed."
@@ -29,7 +29,7 @@ fi
 
 # Instrumented  tests
 ./gradlew connectedAndroidTest --continue
-test_status=$?
+instrumented_test_status=$?
 
 if [ "instrumented_test_status" -ne 0 ]; then
   echo "❌ Instrumented tests failed."

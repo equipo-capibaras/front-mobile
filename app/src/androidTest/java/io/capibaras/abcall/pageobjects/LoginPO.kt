@@ -3,8 +3,6 @@ package io.capibaras.abcall.pageobjects
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import io.capibaras.abcall.ui.MainActivity
 
@@ -12,25 +10,19 @@ class LoginPO(private val composeTestRule: AndroidComposeTestRule<ActivityScenar
     PageObject(composeTestRule) {
 
     fun fillEmail(email: String) {
-        findExactlyOne(
-            hasTestTag("form-email")
-        ).performClick().performTextInput(email)
+        fillInputField("form-email", email)
     }
 
     fun fillPassword(password: String) {
-        findExactlyOne(
-            hasTestTag("form-password")
-        ).performClick().performTextInput(password)
+        fillInputField("form-password", password)
     }
 
     fun submit() {
-        findExactlyOne(
-            hasTestTag("login-button")
-        ).performClick()
+        clickElementByTestTag("login-button")
     }
 
     fun navigateToSignUp() {
-        findExactlyOne(hasTestTag("navigate-signup")).performClick()
+        clickElementByTestTag("navigate-signup")
     }
 
     fun assertLoginScreenVisible() {

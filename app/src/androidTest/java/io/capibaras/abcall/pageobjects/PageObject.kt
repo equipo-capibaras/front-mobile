@@ -3,7 +3,10 @@ package io.capibaras.abcall.pageobjects
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import io.capibaras.abcall.ui.MainActivity
 
@@ -22,5 +25,17 @@ abstract class PageObject(private val composeTestRule: AndroidComposeTestRule<Ac
         }
 
         return composeTestRule.onAllNodes(matcher)
+    }
+
+    fun fillInputField(testTag: String, text: String) {
+        findExactlyOne(
+            hasTestTag(testTag)
+        ).performClick().performTextInput(text)
+    }
+
+    fun clickElementByTestTag(testTag: String) {
+        findExactlyOne(
+            hasTestTag(testTag)
+        ).performClick()
     }
 }

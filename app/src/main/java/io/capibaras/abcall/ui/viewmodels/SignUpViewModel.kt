@@ -117,7 +117,7 @@ class SignUpViewModel(
         viewModelScope.launch {
             stateMediator.setLoadingState(true)
             try {
-                companies = companyRepository.getCompanies(forceUpdate)
+                companies = companyRepository.getCompanies()
             } catch (e: IOException) {
                 stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
