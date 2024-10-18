@@ -72,7 +72,7 @@ jobs:
             mkdir -p ~/artifacts/
             while true; do
               timestamp=$(date +%Y%m%d_%H%M%S)
-              adb exec-out screencap -p > screenshot_$timestamp.png
+              adb exec-out screencap -p > ~/artifacts/screenshot_$timestamp.png
               sleep 1 
             done
       - android/run_tests
