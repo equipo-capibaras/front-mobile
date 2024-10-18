@@ -50,6 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
+import io.capibaras.abcall.ui.components.InitalPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
@@ -79,30 +80,8 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Column(
-            modifier = Modifier.clearAndSetSemantics {
-                contentDescription = pageTitle
-                heading()
-            },
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo de ABCall",
-                modifier = Modifier
-                    .width(184.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            Text(
-                text = pageTitle,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .padding(top = 30.dp, bottom = 40.dp)
-            )
-        }
+        InitalPagesTitle(pageTitle)
+        
         DefaultTextField(
             value = viewModel.name,
             onValueChange = { viewModel.name = it },
