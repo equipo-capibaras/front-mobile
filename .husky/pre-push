@@ -53,7 +53,8 @@ coverage_file="./app/build/reports/jacoco/codeCoverageReportDebug/html/index.htm
 
 if [ -f "$coverage_file" ]; then
   echo "Coverage report found: $coverage_file"
-  coverage_percentage=$(grep -oE '<td class="ctr2">[^%]+' "$coverage_file" | sed -E 's/.*<td class="ctr2">([^%]+).*/\1/' | head -n 1)
+
+  coverage_percentage=$(grep -A 1 '<tfoot>' "$coverage_file" | grep -oE '<td class="ctr2">[^%]+' | sed -E 's/.*<td class="ctr2">([^%]+).*/\1/' | head -n 1)
 
   if [ -z "$coverage_percentage" ]; then
     echo "❌ Error: Coverage percentage value is empty or not found."
