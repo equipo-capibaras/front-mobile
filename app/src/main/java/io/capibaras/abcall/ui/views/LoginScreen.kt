@@ -29,7 +29,7 @@ import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.InitalPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
-import io.capibaras.abcall.viewmodels.LoginViewModel
+import io.capibaras.abcall.ui.viewmodels.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

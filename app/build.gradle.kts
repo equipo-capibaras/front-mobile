@@ -69,11 +69,15 @@ task<JacocoReport>("codeCoverageReportDebug") {
 
     sourceDirectories.setFrom("${project.projectDir}/src/main/java")
     classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude("**/ui/**")
+        exclude("**/App.class")
+        exclude("**/data/database/ABCallDB*")
         exclude("**/di/**")
         exclude("**/navigation/**")
-        include("**/viewmodels/**")
-        include("**/util/**")
+        exclude("**/ui/*MainActivity*")
+        exclude("**/ui/components/**")
+        exclude("**/ui/navigation/**")
+        exclude("**/ui/theme/**")
+        exclude("**/ui/views/**")
     })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
@@ -126,11 +130,12 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.organization", "equipo-capibaras")
         property("sonar.projectKey", "equipo-capibaras_front-mobile")
-        property("sonar.gradle.skipCompile", "equipo-capibaras_front-mobile")
+        property("sonar.sources", "src/main/")
+        property("sonar.gradle.skipCompile", "true")
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
         )
-        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**, **/data/**")
+        property("sonar.coverage.exclusions", "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt")
     }
 }

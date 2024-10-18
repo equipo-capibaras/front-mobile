@@ -17,11 +17,11 @@ import io.capibaras.abcall.data.network.services.UsersService
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
-import io.capibaras.abcall.util.StateMediator
-import io.capibaras.abcall.viewmodels.AccountViewModel
-import io.capibaras.abcall.viewmodels.LoginViewModel
-import io.capibaras.abcall.viewmodels.NavigationViewModel
-import io.capibaras.abcall.viewmodels.SignUpViewModel
+import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.AccountViewModel
+import io.capibaras.abcall.ui.viewmodels.LoginViewModel
+import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
+import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient

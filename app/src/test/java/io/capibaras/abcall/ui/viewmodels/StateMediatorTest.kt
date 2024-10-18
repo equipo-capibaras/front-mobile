@@ -1,8 +1,6 @@
-package io.capibaras.abcall
+package io.capibaras.abcall.ui.viewmodels
 
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.SuccessUIState
-import io.capibaras.abcall.util.StateMediator
+import io.capibaras.abcall.ui.util.StateMediator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -1,11 +1,9 @@
-package io.capibaras.abcall
+package io.capibaras.abcall.ui.viewmodels
 
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.util.StateMediator
-import io.capibaras.abcall.viewmodels.AccountViewModel
+import io.capibaras.abcall.ui.util.StateMediator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

@@ -1,4 +1,4 @@
-package io.capibaras.abcall.util
+package io.capibaras.abcall.ui.util
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

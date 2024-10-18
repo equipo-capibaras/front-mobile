@@ -1,4 +1,4 @@
-package io.capibaras.abcall.viewmodels
+package io.capibaras.abcall.ui.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,9 +9,7 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.network.models.LoginResponse
 import io.capibaras.abcall.data.repositories.AuthRepository
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
-import io.capibaras.abcall.util.StateMediator
+import io.capibaras.abcall.ui.util.StateMediator
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
