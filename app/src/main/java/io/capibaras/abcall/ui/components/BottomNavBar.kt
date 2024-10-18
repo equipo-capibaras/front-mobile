@@ -11,7 +11,9 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -44,7 +46,8 @@ fun BottomNavBar(navController: NavController) {
                     style = pillText.copy(color = if (currentRoute == "home") navigationBarItemColors.selectedTextColor else navigationBarItemColors.unselectedTextColor)
                 )
             },
-            colors = navigationBarItemColors
+            colors = navigationBarItemColors,
+            modifier = Modifier.testTag("navbar-requests")
         )
 
         NavigationBarItem(
@@ -62,7 +65,8 @@ fun BottomNavBar(navController: NavController) {
                     style = pillText.copy(color = if (currentRoute == "account") navigationBarItemColors.selectedTextColor else navigationBarItemColors.unselectedTextColor)
                 )
             },
-            colors = navigationBarItemColors
+            colors = navigationBarItemColors,
+            modifier = Modifier.testTag("navbar-account")
         )
     }
 }

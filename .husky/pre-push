@@ -16,15 +16,26 @@ else
   echo "✅ Linting passed successfully."
 fi
 
-# Tests
+# Unit tests
 ./gradlew testDebug --continue
 test_status=$?
 
 if [ "$test_status" -ne 0 ]; then
-  echo "❌ Tests failed."
+  echo "❌ Unit tests failed."
   exit 1
 else
-  echo "✅ Tests passed successfully."
+  echo "✅ Unit tests passed successfully."
+fi
+
+# Instrumented  tests
+./gradlew connectedAndroidTest --continue
+instrumented_test_status=$?
+
+if [ "instrumented_test_status" -ne 0 ]; then
+  echo "❌ Instrumented tests failed."
+  exit 1
+else
+  echo "✅ Instrumented tests passed successfully."
 fi
 
 
@@ -42,7 +53,8 @@ coverage_file="./app/build/reports/jacoco/codeCoverageReportDebug/html/index.htm
 
 if [ -f "$coverage_file" ]; then
   echo "Coverage report found: $coverage_file"
-  coverage_percentage=$(grep -oE '<td class="ctr2">[^%]+' "$coverage_file" | sed -E 's/.*<td class="ctr2">([^%]+).*/\1/' | head -n 1)
+
+  coverage_percentage=$(grep -A 1 '<tfoot>' "$coverage_file" | grep -oE '<td class="ctr2">[^%]+' | sed -E 's/.*<td class="ctr2">([^%]+).*/\1/' | head -n 1)
 
   if [ -z "$coverage_percentage" ]; then
     echo "❌ Error: Coverage percentage value is empty or not found."

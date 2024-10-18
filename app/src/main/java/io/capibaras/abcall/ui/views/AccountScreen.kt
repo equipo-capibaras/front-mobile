@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -104,7 +105,8 @@ fun AccountScreen(
         Button(
             onClick = { showDialog.value = true },
             modifier = Modifier
-                .padding(top = 24.dp),
+                .padding(top = 24.dp)
+                .testTag("logout-button"),
         ) {
             Text(text = stringResource(R.string.logout), color = Color.White)
         }
@@ -168,7 +170,8 @@ fun ConfirmLogout(showDialog: MutableState<Boolean>, logout: () -> Unit) {
                 onClick = {
                     showDialog.value = false
                     logout()
-                }
+                },
+                modifier = Modifier.testTag("confirm-logout")
             ) {
                 Text(stringResource(R.string.confirm))
             }

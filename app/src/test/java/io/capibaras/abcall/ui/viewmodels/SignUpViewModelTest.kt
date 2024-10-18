@@ -56,7 +56,7 @@ class SignUpViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
-        coEvery { companyRepository.getCompanies(any()) } returns companies
+        coEvery { companyRepository.getCompanies() } returns companies
         every { stateMediator.isLoading } returns false
         every { stateMediator.setLoadingState(any()) } just runs
         every { stateMediator.errorUIState } returns ErrorUIState.NoError

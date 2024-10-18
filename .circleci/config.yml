@@ -73,6 +73,9 @@ jobs:
       - android/run_tests
       - android/kill_emulators
       - run:
+          name: "Run Instrumented Tests"
+          command: ./gradlew connectedAndroidTest --continue
+      - run:
           name: "Build APK"
           command: |
             echo "$KEY_FILE" | base64 -d > /tmp/app.jks

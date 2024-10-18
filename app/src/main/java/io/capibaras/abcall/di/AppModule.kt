@@ -86,7 +86,7 @@ val appModule = module {
     single { get<Retrofit>().create(UsersService::class.java) }
 
     single { AuthRepository(get<AuthService>()) }
-    single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>(), get<SharedPreferences>()) }
+    single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>()) }
     single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
 
     single { StateMediator() }
