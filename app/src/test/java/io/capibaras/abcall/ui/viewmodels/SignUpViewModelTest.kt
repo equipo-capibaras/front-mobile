@@ -1,14 +1,11 @@
-package io.capibaras.abcall
+package io.capibaras.abcall.ui.viewmodels
 
+import io.capibaras.abcall.R
 import io.capibaras.abcall.data.database.models.Company
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.SuccessUIState
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
-import io.capibaras.abcall.util.StateMediator
-import io.capibaras.abcall.viewmodels.SignUpViewModel
+import io.capibaras.abcall.ui.util.StateMediator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

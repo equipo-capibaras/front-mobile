@@ -32,8 +32,8 @@ import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
-import io.capibaras.abcall.util.StateMediator
-import io.capibaras.abcall.viewmodels.NavigationViewModel
+import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 

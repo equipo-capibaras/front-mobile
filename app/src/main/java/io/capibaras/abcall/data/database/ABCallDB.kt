@@ -9,7 +9,7 @@ import io.capibaras.abcall.data.database.dao.UserDAO
 import io.capibaras.abcall.data.database.models.Company
 import io.capibaras.abcall.data.database.models.User
 
-@Database(entities = [Company::class, User::class], version = 2)
+@Database(entities = [Company::class, User::class], version = 2, exportSchema = false)
 abstract class ABCallDB : RoomDatabase() {
     abstract fun companyDAO(): CompanyDAO
     abstract fun userDAO(): UserDAO

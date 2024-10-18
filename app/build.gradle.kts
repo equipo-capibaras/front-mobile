@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jacoco)
 }
 
 android {
@@ -57,6 +58,13 @@ android {
     }
 }
 
+tasks.withType(Test::class) {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
 task<JacocoReport>("codeCoverageReportDebug") {
     group = "Verification"
     description = "Generate Jacoco coverage report for the debug build."
@@ -69,11 +77,16 @@ task<JacocoReport>("codeCoverageReportDebug") {
 
     sourceDirectories.setFrom("${project.projectDir}/src/main/java")
     classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude("**/ui/**")
+        exclude("**/App.class")
+        exclude("**/data/database/ABCallDB*")
+        exclude("**/data/network/models/**")
         exclude("**/di/**")
         exclude("**/navigation/**")
-        include("**/viewmodels/**")
-        include("**/util/**")
+        exclude("**/ui/*MainActivity*")
+        exclude("**/ui/components/**")
+        exclude("**/ui/navigation/**")
+        exclude("**/ui/theme/**")
+        exclude("**/ui/views/**")
     })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
@@ -102,10 +115,13 @@ dependencies {
     ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.roboelectric)
+    testImplementation(libs.androidx.test.core.ktx)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlin.faker)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -126,11 +142,12 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.organization", "equipo-capibaras")
         property("sonar.projectKey", "equipo-capibaras_front-mobile")
-        property("sonar.gradle.skipCompile", "equipo-capibaras_front-mobile")
+        property("sonar.sources", "src/main/")
+        property("sonar.gradle.skipCompile", "true")
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
         )
-        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**, **/data/**")
+        property("sonar.coverage.exclusions", "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/data/network/models/**, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt")
     }
 }

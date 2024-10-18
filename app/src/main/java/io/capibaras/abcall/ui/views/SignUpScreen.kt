@@ -47,7 +47,7 @@ import io.capibaras.abcall.ui.components.InitalPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
-import io.capibaras.abcall.viewmodels.SignUpViewModel
+import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api

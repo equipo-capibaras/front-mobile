@@ -1,4 +1,4 @@
-package io.capibaras.abcall.viewmodels
+package io.capibaras.abcall.ui.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,8 +9,7 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.util.StateMediator
+import io.capibaras.abcall.ui.util.StateMediator
 import kotlinx.coroutines.launch
 import java.io.IOException
 

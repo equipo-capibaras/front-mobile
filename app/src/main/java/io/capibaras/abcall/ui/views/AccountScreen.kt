@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedButton
-import io.capibaras.abcall.viewmodels.AccountViewModel
+import io.capibaras.abcall.ui.viewmodels.AccountViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
