@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -19,7 +20,8 @@ fun DefaultTextField(
     onValueChange: (String) -> Unit,
     validationState: ValidationUIState,
     @androidx.annotation.StringRes labelRes: Int,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    testTag: String
 ) {
     CustomOutlinedTextField(
         value = value,
@@ -27,7 +29,8 @@ fun DefaultTextField(
         label = { Text(text = stringResource(labelRes)) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp),
+            .padding(bottom = 8.dp)
+            .testTag(testTag),
         isError = validationState is ValidationUIState.Error,
         supportingText = {
             if (validationState is ValidationUIState.Error) {

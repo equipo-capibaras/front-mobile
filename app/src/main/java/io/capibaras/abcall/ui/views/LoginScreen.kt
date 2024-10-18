@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -55,7 +56,8 @@ fun LoginScreen(
             onValueChange = { viewModel.email = it },
             validationState = emailValidationState,
             labelRes = R.string.form_email,
-            isPassword = false
+            isPassword = false,
+            testTag = "form-email"
         )
 
         DefaultTextField(
@@ -63,7 +65,8 @@ fun LoginScreen(
             onValueChange = { viewModel.password = it },
             validationState = passwordValidationState,
             labelRes = R.string.form_password,
-            isPassword = true
+            isPassword = true,
+            testTag = "form-password"
         )
 
         Button(
@@ -81,7 +84,8 @@ fun LoginScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 40.dp),
+                .padding(vertical = 40.dp)
+                .testTag("login-button"),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text(text = stringResource(R.string.login_button))
@@ -113,9 +117,11 @@ fun LoginScreen(
             Text(
                 text = annotatedString,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.clickable {
-                    navController.navigate("signup")
-                },
+                modifier = Modifier
+                    .testTag("navigate-signup")
+                    .clickable {
+                        navController.navigate("signup")
+                    },
                 textAlign = TextAlign.Center
             )
         }

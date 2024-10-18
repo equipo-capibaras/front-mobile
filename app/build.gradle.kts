@@ -148,6 +148,9 @@ sonar {
             "sonar.coverage.jacoco.xmlReportPaths",
             "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
         )
-        property("sonar.coverage.exclusions", "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/data/network/models/**, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt")
+        property(
+            "sonar.coverage.exclusions",
+            "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/data/network/models/**, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt"
+        )
     }
 }
