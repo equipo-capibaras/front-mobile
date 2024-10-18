@@ -16,15 +16,26 @@ else
   echo "✅ Linting passed successfully."
 fi
 
-# Tests
+# Unit tests
 ./gradlew testDebug --continue
-test_status=$?
+instrumented_test_status=$?
 
 if [ "$test_status" -ne 0 ]; then
-  echo "❌ Tests failed."
+  echo "❌ Unit tests failed."
   exit 1
 else
-  echo "✅ Tests passed successfully."
+  echo "✅ Unit tests passed successfully."
+fi
+
+# Instrumented  tests
+./gradlew connectedAndroidTest --continue
+test_status=$?
+
+if [ "instrumented_test_status" -ne 0 ]; then
+  echo "❌ Instrumented tests failed."
+  exit 1
+else
+  echo "✅ Instrumented tests passed successfully."
 fi
 
 
