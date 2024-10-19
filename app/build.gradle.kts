@@ -79,7 +79,6 @@ task<JacocoReport>("codeCoverageReportDebug") {
     classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
         exclude("**/App.class")
         exclude("**/data/database/ABCallDB*")
-        exclude("**/data/network/models/**")
         exclude("**/di/**")
         exclude("**/navigation/**")
         exclude("**/ui/*MainActivity*")
@@ -151,7 +150,7 @@ sonar {
         )
         property(
             "sonar.coverage.exclusions",
-            "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/data/network/models/**, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt"
+            "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt"
         )
     }
 }

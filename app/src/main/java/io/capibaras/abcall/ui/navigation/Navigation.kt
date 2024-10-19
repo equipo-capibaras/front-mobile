@@ -1,7 +1,5 @@
 package io.capibaras.abcall.ui.navigation
 
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,13 +25,13 @@ import io.capibaras.abcall.ui.components.CustomSnackbarHost
 import io.capibaras.abcall.ui.components.HandleErrorState
 import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.ui.components.TopBar
+import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import io.capibaras.abcall.ui.views.AccountScreen
 import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
-import io.capibaras.abcall.ui.util.StateMediator
-import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -64,12 +62,6 @@ fun Navigation(
         FullScreenLoading(isLoading = stateMediator.isLoading)
 
         val currentRoute = navBackStackEntry.value?.destination?.route
-
-        if (currentRoute in listOf("login")) {
-            BackHandler(true) {
-                (navController.context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
-            }
-        }
 
         CustomScaffold(
             viewModel,

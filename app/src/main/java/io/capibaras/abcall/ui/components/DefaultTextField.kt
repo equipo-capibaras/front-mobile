@@ -8,11 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+
+enum class TextFieldType { TEXT, PASSWORD, EMAIL }
 
 @Composable
 fun DefaultTextField(
@@ -20,7 +23,7 @@ fun DefaultTextField(
     onValueChange: (String) -> Unit,
     validationState: ValidationUIState,
     @androidx.annotation.StringRes labelRes: Int,
-    isPassword: Boolean = false,
+    type: TextFieldType = TextFieldType.TEXT,
     testTag: String
 ) {
     CustomOutlinedTextField(
@@ -37,11 +40,21 @@ fun DefaultTextField(
                 Text(stringResource(validationState.resourceId))
             }
         },
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = if (isPassword) KeyboardOptions(
-            autoCorrectEnabled = false,
-            keyboardType = KeyboardType.Password
-        ) else null
+        visualTransformation = when (type) {
+            TextFieldType.PASSWORD -> PasswordVisualTransformation()
+            else -> VisualTransformation.None
+        },
+        keyboardOptions = when (type) {
+            TextFieldType.PASSWORD -> KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Password
+            )
+            TextFieldType.EMAIL -> KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                capitalization = KeyboardCapitalization.None
+            )
+            TextFieldType.TEXT -> KeyboardOptions.Default
+        }
     )
 }
 
