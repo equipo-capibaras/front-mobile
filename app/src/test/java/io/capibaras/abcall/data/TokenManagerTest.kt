@@ -11,7 +11,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest=Config.NONE)
+@Config(manifest = Config.NONE)
 class TokenManagerTest {
     private lateinit var tokenManager: TokenManager
     private lateinit var faker: Faker
@@ -29,7 +29,6 @@ class TokenManagerTest {
     fun `should save the token`() {
         val token = faker.random.randomString()
         tokenManager.saveAuthToken(token)
-
         assertEquals(token, tokenManager.getAuthToken())
     }
 
@@ -43,8 +42,17 @@ class TokenManagerTest {
         val token = faker.random.randomString()
         tokenManager.saveAuthToken(token)
         assertEquals(token, tokenManager.getAuthToken())
-
         tokenManager.clearAuthToken()
         assertNull(tokenManager.getAuthToken())
     }
+
+    @Test
+    fun `should save and retrieve the token in prod mode`() {
+        tokenManager =
+            TokenManager(ApplicationProvider.getApplicationContext(), "key", isDebug = false)
+        val token = faker.random.randomString()
+        tokenManager.saveAuthToken(token)
+        assertEquals(token, tokenManager.getAuthToken())
+    }
+
 }

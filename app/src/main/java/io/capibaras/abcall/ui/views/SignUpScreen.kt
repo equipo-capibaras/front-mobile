@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
@@ -43,11 +44,11 @@ import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
-import io.capibaras.abcall.ui.components.InitalPagesTitle
+import io.capibaras.abcall.ui.components.InitialPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
+import io.capibaras.abcall.ui.viewmodels.ValidationUIState
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
@@ -73,14 +74,15 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        InitalPagesTitle(pageTitle)
+        InitialPagesTitle(pageTitle)
 
         DefaultTextField(
             value = viewModel.name,
             onValueChange = { viewModel.name = it },
             validationState = nameValidationState,
             labelRes = R.string.form_name,
-            isPassword = false
+            isPassword = false,
+            testTag = "form-name"
         )
 
         DefaultTextField(
@@ -88,7 +90,8 @@ fun SignUpScreen(
             onValueChange = { viewModel.email = it },
             validationState = emailValidationState,
             labelRes = R.string.form_email,
-            isPassword = false
+            isPassword = false,
+            testTag = "form-email"
         )
 
         CompanyDropdown(
@@ -103,7 +106,8 @@ fun SignUpScreen(
             onValueChange = { viewModel.password = it },
             validationState = passwordValidationState,
             labelRes = R.string.form_password,
-            isPassword = true
+            isPassword = true,
+            testTag = "form-password"
         )
 
         DefaultTextField(
@@ -111,7 +115,8 @@ fun SignUpScreen(
             onValueChange = { viewModel.confirmPassword = it },
             validationState = confirmPasswordValidationState,
             labelRes = R.string.form_confirm_password,
-            isPassword = true
+            isPassword = true,
+            testTag = "form-confirm-password"
         )
 
         Button(
@@ -126,7 +131,8 @@ fun SignUpScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 40.dp),
+                .padding(vertical = 40.dp)
+                .testTag("signup-button"),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text(text = stringResource(R.string.signup_button))
@@ -140,7 +146,6 @@ fun SignUpScreen(
                 .fillMaxSize()
                 .padding(top = 12.dp),
         ) {
-
             val annotatedString = buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
                     append(stringResource(R.string.signup_login_question) + " ")
@@ -158,14 +163,15 @@ fun SignUpScreen(
             Text(
                 text = annotatedString,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.clickable {
-                    navController.navigate("login")
-                },
+                modifier = Modifier
+                    .testTag("navigate-login")
+                    .clickable {
+                        navController.navigate("login")
+                    },
                 textAlign = TextAlign.Center
             )
         }
     }
-
 }
 
 @ExperimentalMaterial3Api
@@ -190,6 +196,7 @@ fun CompanyDropdown(
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
+                .testTag("form-company")
                 .semantics {
                     if (filteredOptions.isEmpty()) {
                         contentDescription = noOptionsText
@@ -218,7 +225,7 @@ fun CompanyDropdown(
             expanded = expanded,
             onDismissRequest = { allowExpanded = false },
         ) {
-            filteredOptions.forEach { option ->
+            filteredOptions.forEachIndexed { index, option ->
                 DropdownMenuItem(
                     text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
@@ -226,6 +233,7 @@ fun CompanyDropdown(
                         allowExpanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    modifier = Modifier.testTag("form-company-$index")
                 )
             }
         }

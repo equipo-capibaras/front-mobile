@@ -3,7 +3,7 @@ package io.capibaras.abcall.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import io.capibaras.abcall.R
 
 @Composable
-fun InitalPagesTitle(pageTitle: String) {
+fun InitialPagesTitle(pageTitle: String) {
     Column(
         modifier = Modifier.clearAndSetSemantics {
             contentDescription = pageTitle
@@ -32,8 +32,8 @@ fun InitalPagesTitle(pageTitle: String) {
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Logo de ABCall",
             modifier = Modifier
-                .width(184.dp),
-            contentScale = ContentScale.Crop
+                .size(200.dp),
+            contentScale = ContentScale.Fit
         )
 
         Text(
@@ -42,7 +42,7 @@ fun InitalPagesTitle(pageTitle: String) {
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
-                .padding(top = 30.dp, bottom = 40.dp)
+                .padding(top = 10.dp, bottom = 40.dp)
         )
     }
 }

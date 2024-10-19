@@ -113,11 +113,11 @@ class SignUpViewModel(
         return isValid
     }
 
-    private fun getCompanies(forceUpdate: Boolean = false) {
+    private fun getCompanies() {
         viewModelScope.launch {
             stateMediator.setLoadingState(true)
             try {
-                companies = companyRepository.getCompanies(forceUpdate)
+                companies = companyRepository.getCompanies()
             } catch (e: IOException) {
                 stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
