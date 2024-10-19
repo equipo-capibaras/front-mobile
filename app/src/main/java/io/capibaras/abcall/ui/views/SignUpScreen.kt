@@ -125,7 +125,10 @@ fun SignUpScreen(
 
                 if (isValid) {
                     viewModel.createUser(
-                        onSuccess = { navController.navigate("login") }
+                        onSuccess = { navController.navigate("login") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        }
                     )
                 }
             },
@@ -166,7 +169,9 @@ fun SignUpScreen(
                 modifier = Modifier
                     .testTag("navigate-login")
                     .clickable {
-                        navController.navigate("login")
+                        navController.navigate("login") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     },
                 textAlign = TextAlign.Center
             )
