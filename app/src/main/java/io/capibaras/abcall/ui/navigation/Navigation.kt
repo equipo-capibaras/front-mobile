@@ -65,12 +65,6 @@ fun Navigation(
 
         val currentRoute = navBackStackEntry.value?.destination?.route
 
-        if (currentRoute in listOf("login")) {
-            BackHandler(true) {
-                (navController.context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
-            }
-        }
-
         CustomScaffold(
             viewModel,
             currentRoute,
