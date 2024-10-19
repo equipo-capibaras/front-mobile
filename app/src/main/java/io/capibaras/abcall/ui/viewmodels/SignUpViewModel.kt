@@ -113,7 +113,7 @@ class SignUpViewModel(
         return isValid
     }
 
-    private fun getCompanies(forceUpdate: Boolean = false) {
+    private fun getCompanies() {
         viewModelScope.launch {
             stateMediator.setLoadingState(true)
             try {

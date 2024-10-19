@@ -27,7 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.DefaultTextField
-import io.capibaras.abcall.ui.components.InitalPagesTitle
+import io.capibaras.abcall.ui.components.InitialPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.LoginViewModel
@@ -49,7 +49,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        InitalPagesTitle(pageTitle)
+        InitialPagesTitle(pageTitle)
 
         DefaultTextField(
             value = viewModel.email,

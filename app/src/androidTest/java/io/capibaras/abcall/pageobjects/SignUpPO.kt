@@ -4,7 +4,7 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import io.capibaras.abcall.ui.MainActivity
 
-class SignUpPO(private val composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>) :
+class SignUpPO(composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>) :
     PageObject(composeTestRule) {
 
     fun fillName(name: String) {

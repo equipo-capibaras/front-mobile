@@ -44,7 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
-import io.capibaras.abcall.ui.components.InitalPagesTitle
+import io.capibaras.abcall.ui.components.InitialPagesTitle
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
@@ -74,7 +74,7 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        InitalPagesTitle(pageTitle)
+        InitialPagesTitle(pageTitle)
 
         DefaultTextField(
             value = viewModel.name,
@@ -146,7 +146,6 @@ fun SignUpScreen(
                 .fillMaxSize()
                 .padding(top = 12.dp),
         ) {
-
             val annotatedString = buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
                     append(stringResource(R.string.signup_login_question) + " ")
@@ -173,7 +172,6 @@ fun SignUpScreen(
             )
         }
     }
-
 }
 
 @ExperimentalMaterial3Api
