@@ -66,17 +66,11 @@ jobs:
           avd_name: testavd-35
           restore_gradle_cache_post_emulator_launch: false
       - android/run_tests
-      - run:
-          name: "Run Instrumented Tests"
-          command: ./gradlew connectedAndroidTest --continue
       - android/kill_emulators
       - android/start_emulator:
           avd_name: testavd-26
           restore_gradle_cache_post_emulator_launch: false
       - android/run_tests
-      - run:
-          name: "Run Instrumented Tests"
-          command: ./gradlew connectedAndroidTest --continue
       - android/kill_emulators
       - run:
           name: "Build APK"
