@@ -40,15 +40,21 @@ fun DefaultTextField(
                 Text(stringResource(validationState.resourceId))
             }
         },
-        visualTransformation = if (type == TextFieldType.PASSWORD) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = if (type == TextFieldType.PASSWORD) KeyboardOptions(
-            autoCorrectEnabled = false,
-            keyboardType = KeyboardType.Password
-        ) else if (type == TextFieldType.EMAIL) KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            capitalization = KeyboardCapitalization.None
-        )
-        else null
+        visualTransformation = when (type) {
+            TextFieldType.PASSWORD -> PasswordVisualTransformation()
+            else -> VisualTransformation.None
+        },
+        keyboardOptions = when (type) {
+            TextFieldType.PASSWORD -> KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Password
+            )
+            TextFieldType.EMAIL -> KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                capitalization = KeyboardCapitalization.None
+            )
+            TextFieldType.TEXT -> KeyboardOptions.Default
+        }
     )
 }
 
