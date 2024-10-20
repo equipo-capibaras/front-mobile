@@ -1,5 +1,6 @@
 package io.capibaras.abcall.ui.components
 
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -17,6 +18,7 @@ fun CustomOutlinedTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
+    keyboardOptions: KeyboardOptions? = null
 ) {
     OutlinedTextField(
         value = value,
@@ -30,6 +32,7 @@ fun CustomOutlinedTextField(
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         isError = isError,
-        supportingText = supportingText
+        supportingText = supportingText,
+        keyboardOptions = keyboardOptions ?: KeyboardOptions.Default
     )
 }

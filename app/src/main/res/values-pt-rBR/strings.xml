@@ -29,4 +29,16 @@
     <string name="error_create_user">Erro ao criar o usuário</string>
     <string name="success_create_user">Conta criada com sucesso</string>
     <string name="success_action">Operação concluída com sucesso</string>
+    <string name="navbar_requests">Solicitações</string>
+    <string name="navbar_account">Minha conta</string>
+    <string name="account_title">Minha conta</string>
+    <string name="requests_title">Solicitações</string>
+    <string name="logout">Sair</string>
+    <string name="error_getting_user_info">Erro ao obter as informações do usuário</string>
+    <string name="expired_token">Sessão expirada. Por favor, faça login novamente</string>
+    <string name="confirm">Confirmar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="confirm_logout_question">Você tem certeza de que deseja sair?</string>
+    <string name="success_logout">Sessão encerrada com sucesso</string>
+    <string name="company">Empresa</string>
 </resources>

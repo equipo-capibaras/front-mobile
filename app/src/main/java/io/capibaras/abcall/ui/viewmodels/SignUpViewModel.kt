@@ -1,4 +1,4 @@
-package io.capibaras.abcall.viewmodels
+package io.capibaras.abcall.ui.viewmodels
 
 import android.util.Patterns
 import androidx.compose.runtime.getValue
@@ -8,18 +8,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
 import io.capibaras.abcall.data.database.models.Company
-import io.capibaras.abcall.data.network.models.CreateUserResponse
+import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.SuccessUIState
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.ui.util.StateMediator
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
 import java.io.IOException
 
 class SignUpViewModel(
+    private val stateMediator: StateMediator,
     private val companyRepository: CompanyRepository,
     private val usersRepository: UsersRepository
 ) : ViewModel() {
@@ -28,13 +27,9 @@ class SignUpViewModel(
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
     var company by mutableStateOf("")
-
     var companies by mutableStateOf<List<Company>>(emptyList())
         private set
-    var isLoading by mutableStateOf(false)
-        private set
-    var errorUIState by mutableStateOf<ErrorUIState>(ErrorUIState.NoError)
-        private set
+
     var nameValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
     var companyValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
@@ -44,8 +39,6 @@ class SignUpViewModel(
     var passwordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
     var confirmPasswordValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
-        private set
-    var successUIState by mutableStateOf<SuccessUIState>(SuccessUIState.NoSuccess)
         private set
 
     init {
@@ -120,60 +113,54 @@ class SignUpViewModel(
         return isValid
     }
 
-    private fun getCompanies(forceUpdate: Boolean = false) {
+    private fun getCompanies() {
         viewModelScope.launch {
-            isLoading = true
+            stateMediator.setLoadingState(true)
             try {
-                companies = companyRepository.getCompanies(forceUpdate)
+                companies = companyRepository.getCompanies()
             } catch (e: IOException) {
-                errorUIState = ErrorUIState.Error(R.string.error_network)
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_get_companies)
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_get_companies))
             } finally {
-                isLoading = false
+                stateMediator.setLoadingState(false)
             }
         }
     }
 
     fun createUser(onSuccess: () -> Unit) {
-        if (isLoading) return
-        isLoading = true
+        if (stateMediator.isLoading) return
+        stateMediator.setLoadingState(true)
         viewModelScope.launch {
             try {
                 val companyId = companies.find { it.name == company }!!.id
-                val response: Response<CreateUserResponse> =
+                val response: Response<User> =
                     usersRepository.createUser(companyId, name, email, password)
-
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        errorUIState = ErrorUIState.NoError
-                        successUIState = SuccessUIState.Success(R.string.success_create_user)
+                        stateMediator.setErrorState(ErrorUIState.NoError)
+                        stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_create_user))
                         onSuccess()
                     }
                 } else {
-                    errorUIState = if (response.code() == 409) {
-                        ErrorUIState.Error(R.string.error_email_exist)
+                    if (response.code() == 409) {
+                        stateMediator.setErrorState(ErrorUIState.Error(R.string.error_email_exist))
+
                     } else {
                         val errorBody = response.errorBody()!!.string()
                         val jsonObject = JSONObject(errorBody)
                         val message = jsonObject.getString("message")
 
-                        ErrorUIState.Error(message = message)
+                        stateMediator.setErrorState(ErrorUIState.Error(message = message))
                     }
                 }
             } catch (e: IOException) {
-                errorUIState = ErrorUIState.Error(R.string.error_network)
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_network))
             } catch (e: Exception) {
-                errorUIState = ErrorUIState.Error(R.string.error_create_user)
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.error_create_user))
             } finally {
-                isLoading = false
+                stateMediator.setLoadingState(false)
             }
         }
     }
-
-    fun clearErrorUIState() {
-        errorUIState = ErrorUIState.NoError
-    }
-
-
 }

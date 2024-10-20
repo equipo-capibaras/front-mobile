@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jacoco)
 }
 
 android {
@@ -14,8 +15,8 @@ android {
         applicationId = "io.capibaras.abcall"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,6 +42,7 @@ android {
     kotlinOptions {
         jvmTarget = "21"
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -56,6 +58,13 @@ android {
     }
 }
 
+tasks.withType(Test::class) {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
 task<JacocoReport>("codeCoverageReportDebug") {
     group = "Verification"
     description = "Generate Jacoco coverage report for the debug build."
@@ -68,10 +77,15 @@ task<JacocoReport>("codeCoverageReportDebug") {
 
     sourceDirectories.setFrom("${project.projectDir}/src/main/java")
     classDirectories.setFrom(fileTree("${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude("**/ui/**")
+        exclude("**/App.class")
+        exclude("**/data/database/ABCallDB*")
         exclude("**/di/**")
         exclude("**/navigation/**")
-        include("**/viewmodels/**")
+        exclude("**/ui/*MainActivity*")
+        exclude("**/ui/components/**")
+        exclude("**/ui/navigation/**")
+        exclude("**/ui/theme/**")
+        exclude("**/ui/views/**")
     })
     executionData.setFrom("${project.layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
 }
@@ -95,14 +109,19 @@ dependencies {
     implementation(libs.core.splashscreen)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    
+    implementation(libs.androidx.material.icons.extended)
+    testImplementation(project(":app"))
+
     ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.roboelectric)
+    testImplementation(libs.androidx.test.core.ktx)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlin.faker)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -118,16 +137,20 @@ dependencies {
 sonar {
     properties {
         property("sonar.projectName", "front-mobile")
-        property("sonar.projectVersion", "1.0")
+        property("sonar.projectVersion", "1.1.0")
 
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.organization", "equipo-capibaras")
         property("sonar.projectKey", "equipo-capibaras_front-mobile")
-        property("sonar.gradle.skipCompile", "equipo-capibaras_front-mobile")
+        property("sonar.sources", "src/main/")
+        property("sonar.gradle.skipCompile", "true")
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "build/reports/jacoco/codeCoverageReportDebug/codeCoverageReportDebug.xml"
         )
-        property("sonar.coverage.exclusions", "**/di/**, **/navigation/**, **/ui/**, **/data/**")
+        property(
+            "sonar.coverage.exclusions",
+            "**/App.kt, **/di/**, **/navigation/**, **/data/database/ABCallDB.kt, **/ui/components/**, **/ui/navigation/**, **/ui/theme/**, **/ui/views/**, **/ui/MainActivity.kt"
+        )
     }
 }

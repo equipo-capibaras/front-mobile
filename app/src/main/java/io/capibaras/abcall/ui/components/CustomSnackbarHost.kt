@@ -6,6 +6,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 
@@ -22,14 +24,15 @@ fun CustomSnackbarHost(snackbarHostState: SnackbarHostState) {
                 else -> SnackbarState.SUCCESS
             }
             val (backgroundColor, contentColor) = getSnackbarColors(snackbarState)
-
             Snackbar(
                 snackbarData = snackbarData,
                 containerColor = backgroundColor,
                 contentColor = contentColor,
                 dismissActionContentColor = contentColor,
-
-                )
+                modifier = Modifier.clearAndSetSemantics {
+                    contentDescription = snackbarData.visuals.message
+                }
+            )
         }
     )
 }

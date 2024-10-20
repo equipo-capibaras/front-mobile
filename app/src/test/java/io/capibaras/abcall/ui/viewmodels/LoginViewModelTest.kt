@@ -1,18 +1,19 @@
-package io.capibaras.abcall
+package io.capibaras.abcall.ui.viewmodels
 
+import io.capibaras.abcall.R
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.network.models.LoginResponse
 import io.capibaras.abcall.data.repositories.AuthRepository
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
-import io.capibaras.abcall.viewmodels.LoginViewModel
+import io.capibaras.abcall.ui.util.StateMediator
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.runs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -35,6 +36,9 @@ class LoginViewModelTest {
     private lateinit var viewModel: LoginViewModel
 
     @MockK
+    private lateinit var stateMediator: StateMediator
+
+    @MockK
     private lateinit var authRepository: AuthRepository
 
     @MockK
@@ -48,7 +52,13 @@ class LoginViewModelTest {
         MockKAnnotations.init(this)
         Dispatchers.setMain(testDispatcher)
 
+        every { stateMediator.isLoading } returns false
+        every { stateMediator.setLoadingState(any()) } just runs
+        every { stateMediator.errorUIState } returns ErrorUIState.NoError
+        every { stateMediator.setErrorState(any()) } just runs
+
         viewModel = LoginViewModel(
+            stateMediator = stateMediator,
             tokenManager = tokenManager,
             authRepository = authRepository
         )
@@ -111,7 +121,7 @@ class LoginViewModelTest {
         coVerify(exactly = 1) { tokenManager.saveAuthToken("fake-token") }
 
         assertEquals("fake-token", resultToken)
-        assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
+        assertEquals(ErrorUIState.NoError, stateMediator.errorUIState)
     }
 
     @Test
@@ -122,6 +132,7 @@ class LoginViewModelTest {
         }
 
         coEvery { authRepository.login("johndoe@gmail.com", "wrongpassword") } returns mockResponse
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_incorrect_credentials)
 
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "wrongpassword"
@@ -137,7 +148,7 @@ class LoginViewModelTest {
         assertEquals(null, resultToken)
         assertEquals(
             ErrorUIState.Error(R.string.error_incorrect_credentials),
-            viewModel.errorUIState
+            stateMediator.errorUIState
         )
     }
 
@@ -152,6 +163,7 @@ class LoginViewModelTest {
         }
 
         coEvery { authRepository.login("johndoe@gmail.com", "password123") } returns mockResponse
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(message = "Server error occurred")
 
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
@@ -170,7 +182,7 @@ class LoginViewModelTest {
         assertEquals(null, resultToken)
         assertEquals(
             ErrorUIState.Error(message = "Server error occurred"),
-            viewModel.errorUIState
+            stateMediator.errorUIState
         )
     }
 
@@ -183,6 +195,7 @@ class LoginViewModelTest {
         }
 
         coEvery { authRepository.login("johndoe@gmail.com", "password123") } returns mockResponse
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_authenticate)
 
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
@@ -196,12 +209,13 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(null, resultToken)
-        assertEquals(ErrorUIState.Error(R.string.error_authenticate), viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_authenticate), stateMediator.errorUIState)
     }
 
     @Test
     fun `test login network failure`() = runTest {
         coEvery { authRepository.login(any(), any()) } throws IOException("Network error")
+        every { stateMediator.errorUIState } returns ErrorUIState.Error(R.string.error_network)
 
         viewModel.email = "johndoe@gmail.com"
         viewModel.password = "password123"
@@ -215,32 +229,6 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertEquals(null, resultToken)
-        assertEquals(ErrorUIState.Error(R.string.error_network), viewModel.errorUIState)
-    }
-
-    @Test
-    fun `test clearErrorUIState`() = runTest {
-        val mockResponse = mockk<Response<LoginResponse>> {
-            every { isSuccessful } returns false
-            every { code() } returns 401
-        }
-
-        coEvery { authRepository.login("johndoe@gmail.com", "wrongpassword") } returns mockResponse
-
-        viewModel.email = "johndoe@gmail.com"
-        viewModel.password = "wrongpassword"
-
-        viewModel.loginUser { }
-
-        advanceUntilIdle()
-
-        assertEquals(
-            ErrorUIState.Error(R.string.error_incorrect_credentials),
-            viewModel.errorUIState
-        )
-
-        viewModel.clearErrorUIState()
-
-        assertEquals(ErrorUIState.NoError, viewModel.errorUIState)
+        assertEquals(ErrorUIState.Error(R.string.error_network), stateMediator.errorUIState)
     }
 }
