@@ -40,6 +40,7 @@ fun InitialPagesTitle(pageTitle: String) {
             text = pageTitle,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onTertiary,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(top = 10.dp, bottom = 40.dp)
