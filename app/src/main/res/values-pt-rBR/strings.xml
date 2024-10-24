@@ -46,4 +46,7 @@
     <string name="escalated">Escalado</string>
     <string name="open">Aberto</string>
     <string name="updated">Atualizado</string>
+    <string name="error_getting_incidents">Erro ao obter a lista de incidentes</string>
+    <string name="error_server">Estamos enfrentando problemas técnicos. Por favor, tente novamente mais tarde.</string>
+
 </resources>
