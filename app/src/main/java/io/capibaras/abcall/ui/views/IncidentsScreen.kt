@@ -9,9 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.capibaras.abcall.ui.components.IncidentCard
 import io.capibaras.abcall.ui.components.IncidentStatus
+import io.capibaras.abcall.ui.viewmodels.IncidentViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun IncidentsScreen() {
+fun IncidentsScreen(viewModel: IncidentViewModel = koinViewModel()) {
     val scrollState = rememberScrollState()
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),

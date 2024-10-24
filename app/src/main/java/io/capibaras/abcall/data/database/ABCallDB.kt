@@ -5,14 +5,21 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import io.capibaras.abcall.data.database.dao.CompanyDAO
+import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.dao.UserDAO
 import io.capibaras.abcall.data.database.models.Company
+import io.capibaras.abcall.data.database.models.Incident
 import io.capibaras.abcall.data.database.models.User
 
-@Database(entities = [Company::class, User::class], version = 2, exportSchema = false)
+@Database(
+    entities = [Company::class, User::class, Incident::class],
+    version = 3,
+    exportSchema = false
+)
 abstract class ABCallDB : RoomDatabase() {
     abstract fun companyDAO(): CompanyDAO
     abstract fun userDAO(): UserDAO
+    abstract fun incidentDAO(): IncidentDAO
 
     companion object {
         @Volatile
