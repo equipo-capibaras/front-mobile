@@ -41,4 +41,9 @@
     <string name="confirm_logout_question">¿Estás seguro de que deseas cerrar sesión?</string>
     <string name="success_logout">Sesión cerrada exitosamente</string>
     <string name="company">Empresa</string>
+    <string name="filed">Radicado</string>
+    <string name="closed">Cerrado</string>
+    <string name="escalated">Escalado</string>
+    <string name="open">Abierto</string>
+    <string name="updated">Actualizado</string>
 </resources>
