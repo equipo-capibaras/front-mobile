@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +72,7 @@ fun chipAttributes(chipType: ChipType): ChipAttributes {
 fun CustomChip(
     icon: ImageVector? = null,
     text: String,
-    chipType: ChipType
+    chipType: ChipType,
 ) {
     val attributes = chipAttributes(chipType)
 
@@ -78,7 +80,10 @@ fun CustomChip(
         modifier = Modifier
             .background(attributes.backgroundColor, shape = RoundedCornerShape(8.dp))
             .height(32.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = text
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon?.let {

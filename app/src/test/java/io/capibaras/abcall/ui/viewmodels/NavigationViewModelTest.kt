@@ -120,7 +120,6 @@ class NavigationViewModelTest {
         viewModel =
             NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
 
-        // Emit a logout event
         logoutStateFlow.emit(
             LogoutState(
                 isLoggedOut = true,
@@ -160,4 +159,23 @@ class NavigationViewModelTest {
             stateMediator.successUIState
         )
     }
+
+    @Test
+    fun `test expired token triggers error state`() = runTest {
+        viewModel =
+            NavigationViewModel(stateMediator, usersRepository, tokenManager, logoutManager)
+
+        logoutStateFlow.emit(
+            LogoutState(
+                isLoggedOut = true,
+                isExpiredToken = true,
+                isManualLogout = false
+            )
+        )
+
+        advanceUntilIdle()
+
+        verify { stateMediator.setErrorState(ErrorUIState.Error(R.string.expired_token)) }
+    }
+
 }

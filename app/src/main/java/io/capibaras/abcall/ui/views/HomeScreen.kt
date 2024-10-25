@@ -13,7 +13,6 @@ import io.capibaras.abcall.ui.theme.ABCallTheme
 
 @Composable
 fun HomeScreen() {
-    ABCallTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -23,7 +22,7 @@ fun HomeScreen() {
         ) {
             IncidentsScreen()
         }
-    }
+
 }
 
 @Preview(showBackground = true)

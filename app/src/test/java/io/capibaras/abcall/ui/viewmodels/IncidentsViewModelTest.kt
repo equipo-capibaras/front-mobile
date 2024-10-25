@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class IncidentViewModelTest {
+class IncidentsViewModelTest {
     private lateinit var viewModel: IncidentViewModel
 
     @MockK
@@ -54,43 +54,11 @@ class IncidentViewModelTest {
 
     @Test
     fun `test getIncidents success`() = runTest {
-        val mockHistory = listOf(
-            History(
-                seq = 1,
-                date = "2024-01-01",
-                action = "filed",
-                description = "Filed the incident"
-            ),
-            History(
-                seq = 2,
-                date = "2024-01-02",
-                action = "escalated",
-                description = "Escalated the incident"
-            ),
-            History(
-                seq = 3,
-                date = "2024-01-03",
-                action = "closed",
-                description = "Closed the incident"
-            )
-        )
-        val mockIncidentList = listOf(
-            Incident(
-                id = "1",
-                name = "Incident Test",
-                channel = "email",
-                history = mockHistory,
-                filedDate = "2024-01-01",
-                escalatedDate = "2024-01-02",
-                closedDate = "2024-01-03",
-                recentlyUpdated = true
-            )
-        )
+        val mockIncidentList = createMockIncidentList()
 
         coEvery { incidentsRepository.getIncidents() } returns Result.success(mockIncidentList)
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
-
         advanceUntilIdle()
 
         assertEquals(mockIncidentList, viewModel.incidents)
@@ -103,7 +71,6 @@ class IncidentViewModelTest {
         coEvery { incidentsRepository.getIncidents() } returns Result.failure(Exception("Error"))
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
-
         advanceUntilIdle()
 
         coVerify { stateMediator.setErrorState(any()) }
@@ -118,7 +85,6 @@ class IncidentViewModelTest {
         coEvery { incidentsRepository.getIncidents() } returns Result.failure(customError)
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
-
         advanceUntilIdle()
 
         coVerify {
@@ -128,17 +94,85 @@ class IncidentViewModelTest {
         }
     }
 
-
     @Test
     fun `test getIncidents loading state`() = runTest {
         every { stateMediator.isLoading } returns true
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
-
         advanceUntilIdle()
 
         coVerify(exactly = 0) { incidentsRepository.getIncidents() }
         coVerify(exactly = 0) { stateMediator.setLoadingState(true) }
     }
-}
 
+    @Test
+    fun `test onRefresh with success`() = runTest {
+        val mockIncidentList = createMockIncidentList()
+
+        coEvery { incidentsRepository.getIncidents() } returns Result.success(mockIncidentList)
+        viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+
+        viewModel.onRefresh()
+        advanceUntilIdle()
+
+        assertEquals(mockIncidentList, viewModel.incidents)
+        assertEquals(false, viewModel.isRefreshing)
+        coVerify { stateMediator.clearErrorUIState() }
+    }
+
+    @Test
+    fun `test onRefresh with failure`() = runTest {
+        val customErrorMessage = "Custom error message"
+        val customError = RepositoryError.CustomError(customErrorMessage)
+
+        coEvery { incidentsRepository.getIncidents() } returns Result.failure(customError)
+        viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+
+        viewModel.onRefresh()
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.isRefreshing)
+        coVerify { stateMediator.setErrorState(ErrorUIState.Error(message = customErrorMessage)) }
+    }
+
+    @Test
+    fun `test init calls getIncidents`() = runTest {
+        val mockIncidentList = createMockIncidentList()
+        coEvery { incidentsRepository.getIncidents() } returns Result.success(mockIncidentList)
+
+        viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+        advanceUntilIdle()
+
+        assertEquals(mockIncidentList, viewModel.incidents)
+        coVerify { incidentsRepository.getIncidents() }
+    }
+
+    private fun createMockIncidentList(): List<Incident> {
+        val mockHistory = listOf(
+            History(
+                seq = 1,
+                date = "2024-01-01",
+                action = "filed",
+                description = "Filed the incident"
+            ),
+            History(
+                seq = 2,
+                date = "2024-01-02",
+                action = "escalated",
+                description = "Escalated the incident"
+            )
+        )
+        return listOf(
+            Incident(
+                id = "1",
+                name = "Incident Test",
+                channel = "email",
+                history = mockHistory,
+                filedDate = "2024-01-01",
+                escalatedDate = "2024-01-02",
+                closedDate = null,
+                recentlyUpdated = true
+            )
+        )
+    }
+}

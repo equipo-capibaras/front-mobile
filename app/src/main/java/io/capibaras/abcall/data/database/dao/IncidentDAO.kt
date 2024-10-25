@@ -26,7 +26,11 @@ interface IncidentDAO {
 
     @Transaction
     suspend fun refreshIncidents(incidents: List<Incident>) {
-        deleteAllIncidents()
-        insertIncidents(incidents)
+        try {
+            deleteAllIncidents()
+            insertIncidents(incidents)
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }

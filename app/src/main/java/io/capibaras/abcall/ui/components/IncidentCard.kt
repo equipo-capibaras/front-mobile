@@ -104,8 +104,8 @@ fun IncidentCard(
     filedDate: String,
     closedDate: String? = null,
     onClick: () -> Unit,
-    locale: Locale = Locale.getDefault(),
 ) {
+    val locale: Locale = Locale.getDefault()
     val interactionSource = remember { MutableInteractionSource() }
     Card(
         shape = RoundedCornerShape(12.dp),

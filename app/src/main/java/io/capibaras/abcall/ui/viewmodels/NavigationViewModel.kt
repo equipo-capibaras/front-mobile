@@ -42,13 +42,19 @@ class NavigationViewModel(
     }
 
     private fun checkLogoutStatus(state: LogoutState) {
-        if (state.isExpiredToken) {
-            stateMediator.setErrorState(ErrorUIState.Error(R.string.expired_token))
-        } else if (!isUserLoggedIn && isManualLogout) {
-            stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_logout))
-        } else {
-            stateMediator.setErrorState(ErrorUIState.NoError)
-            stateMediator.setSuccessState(SuccessUIState.NoSuccess)
+        when {
+            state.isExpiredToken -> {
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.expired_token))
+            }
+
+            !isUserLoggedIn && isManualLogout -> {
+                stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_logout))
+            }
+
+            else -> {
+                stateMediator.setErrorState(ErrorUIState.NoError)
+                stateMediator.setSuccessState(SuccessUIState.NoSuccess)
+            }
         }
     }
 

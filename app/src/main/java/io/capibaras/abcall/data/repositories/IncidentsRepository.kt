@@ -4,7 +4,6 @@ import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.models.History
 import io.capibaras.abcall.data.database.models.Incident
 import io.capibaras.abcall.data.network.services.IncidentsService
-import org.json.JSONObject
 import java.io.IOException
 
 sealed class IncidentsRepositoryError : Exception() {
@@ -27,11 +26,7 @@ class IncidentsRepository(
     }
 
     private fun getClosedDate(history: List<History>): String? {
-        return if (history.size >= 2 && history.last().action == "closed") {
-            history.last().date
-        } else {
-            null
-        }
+        return history.lastOrNull { it.action == "closed" }?.date
     }
 
     private suspend fun setRecentlyUpdated(incident: Incident): Boolean {
@@ -44,6 +39,7 @@ class IncidentsRepository(
     }
 
     suspend fun getIncidents(): Result<List<Incident>> {
+        val localData = incidentDAO.getAllIncidents()
         return try {
             val response = incidentsService.getIncidents()
             if (response.isSuccessful) {
@@ -60,24 +56,13 @@ class IncidentsRepository(
 
                 Result.success(incidents)
             } else {
-                val localData = incidentDAO.getAllIncidents()
-                if (localData.isNotEmpty()) {
-                    Result.success(localData)
-                } else {
-                    val errorBody = response.errorBody()!!.string()
-                    val jsonObject = JSONObject(errorBody)
-                    val message = jsonObject.getString("message")
-                    Result.failure(RepositoryError.CustomError(message))
-                }
+                handleErrorResponse(localData, response.errorBody()?.string())
             }
         } catch (e: IOException) {
-            Result.failure(IncidentsRepositoryError.GetIncidentsError)
+            handleNetworkAndLocalDBFailure(localData, IncidentsRepositoryError.GetIncidentsError)
         } catch (e: Exception) {
-            if (e.message != null) {
-                Result.failure(RepositoryError.CustomError(e.message!!))
-            } else {
-                Result.failure(RepositoryError.UnknownError)
-            }
+            Result.failure(e.message?.let { RepositoryError.CustomError(it) }
+                ?: RepositoryError.UnknownError)
         }
     }
 }

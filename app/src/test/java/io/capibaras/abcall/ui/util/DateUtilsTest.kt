@@ -2,7 +2,6 @@ package io.capibaras.abcall.ui.util
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.time.format.DateTimeParseException
 import java.util.Locale
 
 class DateUtilTest {
@@ -39,11 +38,37 @@ class DateUtilTest {
         assertEquals("25 de octubre de 2024", formattedDate)
     }
 
-    @Test(expected = DateTimeParseException::class)
+    @Test(expected = IllegalArgumentException::class)
     fun `should throw exception for invalid date format`() {
         val invalidDateString = "invalid-date-string"
         val locale = Locale("es", "ES")
 
         formatDateToLocale(invalidDateString, locale)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `should throw IllegalArgumentException for invalid date format`() {
+        val invalidDateString = "invalid-date-string"
+        val locale = Locale("es", "AR")
+
+        try {
+            formatDateToLocale(invalidDateString, locale)
+        } catch (e: IllegalArgumentException) {
+            assertEquals("Invalid date format: invalid-date-string", e.message)
+            throw e
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `should throw IllegalArgumentException for blank date string`() {
+        val blankDateString = ""
+        val locale = Locale("es", "CO")
+
+        try {
+            formatDateToLocale(blankDateString, locale)
+        } catch (e: IllegalArgumentException) {
+            assertEquals("Date string cannot be empty", e.message)
+            throw e
+        }
     }
 }
