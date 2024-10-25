@@ -83,7 +83,6 @@ val appModule = module {
             .addConverterFactory(GsonConverterFactory.create(get()))
             .client(get<OkHttpClient>())
             .build()
-
     }
 
     single { get<Retrofit>().create(AuthService::class.java) }

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import io.capibaras.abcall.data.database.converters.Converters
 import io.capibaras.abcall.data.database.dao.CompanyDAO
 import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.dao.UserDAO
@@ -13,9 +15,10 @@ import io.capibaras.abcall.data.database.models.User
 
 @Database(
     entities = [Company::class, User::class, Incident::class],
-    version = 3,
+    version = 6,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class ABCallDB : RoomDatabase() {
     abstract fun companyDAO(): CompanyDAO
     abstract fun userDAO(): UserDAO

@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface IncidentsService {
-    @GET("incidents")
+    @GET("users/me/incidents")
     suspend fun getIncidents(): Response<List<Incident>>
 }

@@ -7,9 +7,17 @@ import androidx.room.PrimaryKey
 data class Incident(
     @PrimaryKey val id: String,
     val name: String,
-    val status: String,
+    val channel: String,
+    val history: List<History>,
     val filedDate: String,
     val escalatedDate: String?,
     val closedDate: String?,
-    val updated: Boolean?,
+    val recentlyUpdated: Boolean
+)
+
+data class History(
+    val seq: Int,
+    val date: String,
+    val action: String,
+    val description: String,
 )

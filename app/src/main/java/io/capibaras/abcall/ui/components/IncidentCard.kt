@@ -40,7 +40,7 @@ enum class IncidentStatus {
     companion object {
         fun fromString(status: String): IncidentStatus? {
             return when (status.lowercase()) {
-                "open" -> OPEN
+                "created" -> OPEN
                 "escalated" -> ESCALATED
                 "closed" -> CLOSED
                 "updated" -> UPDATED

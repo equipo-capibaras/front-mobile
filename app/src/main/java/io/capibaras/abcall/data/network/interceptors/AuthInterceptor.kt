@@ -19,7 +19,7 @@ class AuthInterceptor(
         val requestPath = request.url().encodedPath().removePrefix("/api/v1")
         val excludedPaths = listOf("/users", "/auth/user", "/clients")
         val token = tokenManager.getAuthToken()
-
+        
         if (token.isNullOrEmpty() && !excludedPaths.any { requestPath == it }) {
             CoroutineScope(dispatcher).launch {
                 logoutManager.logout(isExpiredToken = true)

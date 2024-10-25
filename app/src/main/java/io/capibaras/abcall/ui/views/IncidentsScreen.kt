@@ -19,41 +19,16 @@ fun IncidentsScreen(viewModel: IncidentViewModel = koinViewModel()) {
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = Modifier.verticalScroll(scrollState)
     ) {
-        IncidentCard(
-            title = "Cobro incorrecto",
-            status = IncidentStatus.fromString("open"),
-            escalatedDate = "2024-09-10T12:34:56Z",
-            filedDate = "2024-09-10T12:34:56Z",
-            closedDate = null,
-            recentlyUpdated = false,
-            onClick = {}
-        )
-
-        IncidentCard(
-            title = "Internet no funciona",
-            status = IncidentStatus.fromString("escalated"),
-            escalatedDate = "2024-09-10T12:34:56Z",
-            filedDate = "2024-09-15T12:34:56Z",
-            recentlyUpdated = true,
-            onClick = {}
-        )
-
-        IncidentCard(
-            title = "Retorno pago",
-            status = IncidentStatus.fromString("closed"),
-            filedDate = "2024-09-10T12:34:56Z",
-            closedDate = "2024-10-01T12:34:56Z",
-            recentlyUpdated = false,
-            onClick = {}
-        )
-
-        IncidentCard(
-            title = "Fallo servicios",
-            status = IncidentStatus.fromString("closed"),
-            filedDate = "2024-09-10T12:34:56Z",
-            closedDate = "2024-10-01T12:34:56Z",
-            recentlyUpdated = false,
-            onClick = {}
-        )
+        viewModel.incidents.forEach { incident ->
+            IncidentCard(
+                title = incident.name,
+                status = IncidentStatus.fromString(incident.history.last().action),
+                escalatedDate = incident.escalatedDate,
+                filedDate = incident.filedDate,
+                closedDate = incident.closedDate,
+                recentlyUpdated = incident.recentlyUpdated,
+                onClick = {}
+            )
+        }
     }
 }
