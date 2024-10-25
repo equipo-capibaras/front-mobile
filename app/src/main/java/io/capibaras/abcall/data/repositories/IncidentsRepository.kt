@@ -55,6 +55,9 @@ class IncidentsRepository(
                         recentlyUpdated = setRecentlyUpdated(incident)
                     )
                 } ?: emptyList()
+
+                incidentDAO.refreshIncidents(incidents)
+
                 Result.success(incidents)
             } else {
                 val localData = incidentDAO.getAllIncidents()
