@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.capibaras.abcall.R
 import io.capibaras.abcall.data.LogoutManager
+import io.capibaras.abcall.data.LogoutState
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.util.StateMediator
@@ -29,26 +30,31 @@ class NavigationViewModel(
         checkUserSession()
         viewModelScope.launch {
             logoutManager.logoutState.collect { state ->
-                if (state.isExpiredToken) {
-                    stateMediator.setErrorState(ErrorUIState.Error(R.string.expired_token))
-                } else {
-                    stateMediator.setErrorState(ErrorUIState.NoError)
-                }
-
                 isManualLogout = state.isManualLogout
 
                 if (state.isLoggedOut) {
                     deleteUserData()
                     redirectToLogin = true
-                    checkLogoutStatus()
+                    checkLogoutStatus(state)
                 }
             }
         }
     }
 
-    private fun checkLogoutStatus() {
-        if (!isUserLoggedIn && isManualLogout) {
-            stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_logout))
+    private fun checkLogoutStatus(state: LogoutState) {
+        when {
+            state.isExpiredToken -> {
+                stateMediator.setErrorState(ErrorUIState.Error(R.string.expired_token))
+            }
+
+            !isUserLoggedIn && isManualLogout -> {
+                stateMediator.setSuccessState(SuccessUIState.Success(R.string.success_logout))
+            }
+
+            else -> {
+                stateMediator.setErrorState(ErrorUIState.NoError)
+                stateMediator.setSuccessState(SuccessUIState.NoSuccess)
+            }
         }
     }
 

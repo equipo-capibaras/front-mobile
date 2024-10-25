@@ -28,6 +28,7 @@ val Typography = Typography(
         fontFamily = FiraSans,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
+        color = Blue700,
         letterSpacing = 0.4.sp,
     ),
     titleMedium = TextStyle(

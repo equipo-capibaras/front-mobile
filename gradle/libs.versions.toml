@@ -58,7 +58,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 roboelectric = { group = "org.robolectric", name = "robolectric", version.ref = "roboelectric" }
-kotlin-faker = { group = "io.github.serpro69", name="kotlin-faker", version.ref = "faker" }
+kotlin-faker = { group = "io.github.serpro69", name = "kotlin-faker", version.ref = "faker" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

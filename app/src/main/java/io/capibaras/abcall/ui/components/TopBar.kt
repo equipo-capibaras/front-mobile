@@ -18,7 +18,8 @@ fun TopBar(title: String) {
                 text = title,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Normal,
-                letterSpacing = 0.sp
+                letterSpacing = 0.sp,
+                color = MaterialTheme.colorScheme.onBackground
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
