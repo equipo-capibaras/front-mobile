@@ -50,5 +50,6 @@
     <string name="error_server">Estamos enfrentando problemas técnicos. Por favor, tente novamente mais tarde.</string>
     <string name="status">Status</string>
     <string name="recently_updated">Atualizado recentemente</string>
+    <string name="empty_incidents_list">No há petições criadas</string>
 
 </resources>
