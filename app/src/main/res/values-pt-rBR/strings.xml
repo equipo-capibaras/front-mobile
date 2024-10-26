@@ -48,5 +48,7 @@
     <string name="updated">Atualizado</string>
     <string name="error_getting_incidents">Erro ao obter a lista de incidentes</string>
     <string name="error_server">Estamos enfrentando problemas técnicos. Por favor, tente novamente mais tarde.</string>
+    <string name="status">Status</string>
+    <string name="recently_updated">Atualizado recentemente</string>
 
 </resources>
