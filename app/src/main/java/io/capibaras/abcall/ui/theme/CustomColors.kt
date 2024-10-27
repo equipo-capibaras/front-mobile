@@ -18,7 +18,7 @@ val LightCustomColors = CustomColors(
     onSuccess = Color.White,
     pill = Blue400,
     outlineButtonContent = Blue500,
-    warning = Color(0xFFD45D00),
+    warning = Color(0xFFCC4D00),
     onWarning = Color.White,
     neutral = Color(0xFF637984)
 )
@@ -26,10 +26,10 @@ val LightCustomColors = CustomColors(
 val DarkCustomColors = CustomColors(
     success = Color(0xFFADD5AD),
     onSuccess = Color(0xFF0A500C),
-    pill = Blue500,
+    pill = Blue700,
     outlineButtonContent = Color.White,
     warning = Color(0xFFEEB289),
-    onWarning = Color(0xFFA24101),
+    onWarning = Color(0xFF7A3300),
     neutral = Color(0xFF637984)
 )
 
