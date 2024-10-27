@@ -41,4 +41,14 @@
     <string name="confirm_logout_question">¿Estás seguro de que deseas cerrar sesión?</string>
     <string name="success_logout">Sesión cerrada exitosamente</string>
     <string name="company">Empresa</string>
+    <string name="filed">Radicado</string>
+    <string name="closed">Cerrado</string>
+    <string name="escalated">Escalado</string>
+    <string name="open">Abierto</string>
+    <string name="updated">Actualizado</string>
+    <string name="error_getting_incidents">Error al obtener la lista de incidentes</string>
+    <string name="error_server">Estamos experimentando problemas técnicos. Por favor, inténtalo de nuevo más tarde.</string>
+    <string name="status">Estado</string>
+    <string name="recently_updated">Actualizado recientemente</string>
+    <string name="empty_incidents_list">No tienes peticiones creadas</string>
 </resources>

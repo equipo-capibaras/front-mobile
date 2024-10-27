@@ -19,7 +19,7 @@ security-crypto = "1.0.0"
 kotlinx-coroutines = "1.9.0"
 core-splashscreen = "1.0.1"
 room = "2.6.1"
-ksp = "2.0.21-1.0.25"
+ksp = "2.0.21-1.0.26"
 roboelectric = "4.13"
 faker = "1.16.0"
 
@@ -58,7 +58,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 roboelectric = { group = "org.robolectric", name = "robolectric", version.ref = "roboelectric" }
-kotlin-faker = { group = "io.github.serpro69", name="kotlin-faker", version.ref = "faker" }
+kotlin-faker = { group = "io.github.serpro69", name = "kotlin-faker", version.ref = "faker" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

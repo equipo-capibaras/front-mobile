@@ -9,16 +9,20 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.database.ABCallDB
 import io.capibaras.abcall.data.database.dao.CompanyDAO
+import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.dao.UserDAO
 import io.capibaras.abcall.data.network.interceptors.AuthInterceptor
 import io.capibaras.abcall.data.network.services.AuthService
 import io.capibaras.abcall.data.network.services.CompanyService
+import io.capibaras.abcall.data.network.services.IncidentsService
 import io.capibaras.abcall.data.network.services.UsersService
 import io.capibaras.abcall.data.repositories.AuthRepository
 import io.capibaras.abcall.data.repositories.CompanyRepository
+import io.capibaras.abcall.data.repositories.IncidentsRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.viewmodels.AccountViewModel
+import io.capibaras.abcall.ui.viewmodels.IncidentViewModel
 import io.capibaras.abcall.ui.viewmodels.LoginViewModel
 import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
@@ -52,6 +56,7 @@ val appModule = module {
 
     single { get<ABCallDB>().companyDAO() }
     single { get<ABCallDB>().userDAO() }
+    single { get<ABCallDB>().incidentDAO() }
 
     single { TokenManager(get()) }
     single { LogoutManager() }
@@ -78,16 +83,17 @@ val appModule = module {
             .addConverterFactory(GsonConverterFactory.create(get()))
             .client(get<OkHttpClient>())
             .build()
-
     }
 
     single { get<Retrofit>().create(AuthService::class.java) }
     single { get<Retrofit>().create(CompanyService::class.java) }
     single { get<Retrofit>().create(UsersService::class.java) }
+    single { get<Retrofit>().create(IncidentsService::class.java) }
 
     single { AuthRepository(get<AuthService>()) }
     single { CompanyRepository(get<CompanyDAO>(), get<CompanyService>()) }
     single { UsersRepository(get<UsersService>(), get<UserDAO>(), get<CompanyRepository>()) }
+    single { IncidentsRepository(get<IncidentDAO>(), get<IncidentsService>()) }
 
     single { StateMediator() }
 
@@ -114,4 +120,11 @@ val appModule = module {
             get<UsersRepository>()
         )
     }
+    viewModel {
+        IncidentViewModel(
+            get<IncidentsRepository>(),
+            get<StateMediator>(),
+        )
+    }
+
 }
