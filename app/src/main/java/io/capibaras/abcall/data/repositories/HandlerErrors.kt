@@ -2,8 +2,8 @@ package io.capibaras.abcall.data.repositories
 
 import org.json.JSONObject
 
-fun <T> handleErrorResponse(localData: List<T>, errorBody: String?): Result<List<T>> {
-    return if (localData.isNotEmpty()) {
+fun <T> handleErrorResponse(localData: T?, errorBody: String?): Result<T> {
+    return if ((localData is List<*> && localData.isNotEmpty()) || localData != null) {
         Result.success(localData)
     } else {
         val message = errorBody?.let {
@@ -14,10 +14,10 @@ fun <T> handleErrorResponse(localData: List<T>, errorBody: String?): Result<List
 }
 
 fun <T> handleNetworkAndLocalDBFailure(
-    localData: List<T>,
+    localData: T?,
     defaultError: Throwable
-): Result<List<T>> {
-    return if (localData.isNotEmpty()) {
+): Result<T> {
+    return if ((localData is List<*> && localData.isNotEmpty()) || localData != null)  {
         Result.success(localData)
     } else {
         Result.failure(defaultError)
