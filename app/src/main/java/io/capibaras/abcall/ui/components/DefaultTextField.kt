@@ -24,7 +24,9 @@ fun DefaultTextField(
     validationState: ValidationUIState,
     @androidx.annotation.StringRes labelRes: Int,
     type: TextFieldType = TextFieldType.TEXT,
-    testTag: String
+    testTag: String,
+    minLines: Int = 1,
+    maxLines: Int = 1,
 ) {
     CustomOutlinedTextField(
         value = value,
@@ -54,7 +56,9 @@ fun DefaultTextField(
                 capitalization = KeyboardCapitalization.None
             )
             TextFieldType.TEXT -> KeyboardOptions.Default
-        }
+        },
+        minLines = minLines,
+        maxLines = maxLines,
     )
 }
 

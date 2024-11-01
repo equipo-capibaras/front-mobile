@@ -28,6 +28,7 @@ import io.capibaras.abcall.ui.components.TopBar
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import io.capibaras.abcall.ui.views.AccountScreen
+import io.capibaras.abcall.ui.views.CreateIncidentScreen
 import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
 import io.capibaras.abcall.ui.views.LoginScreen
@@ -88,8 +89,10 @@ fun CustomScaffold(
     val topBarTitle = when (currentRoute) {
         "home" -> stringResource(R.string.requests_title)
         "account" -> stringResource(R.string.account_title)
+        "create-incident" -> stringResource(R.string.create_incident)
         else -> ""
     }
+    val showBackButton = currentRoute == "create-incident"
     Scaffold(
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
@@ -99,7 +102,11 @@ fun CustomScaffold(
                     "signup"
                 )
             ) {
-                TopBar(topBarTitle)
+                TopBar(
+                    title = topBarTitle,
+                    showBackButton = showBackButton,
+                    onBackClick = { navController.popBackStack() }
+                )
             }
         },
         bottomBar = {
@@ -130,10 +137,13 @@ fun CustomScaffold(
                     SignUpScreen(navController)
                 }
                 composable("home") {
-                    HomeScreen()
+                    HomeScreen(navController)
                 }
                 composable("account") {
                     AccountScreen()
+                }
+                composable("create-incident") {
+                    CreateIncidentScreen()
                 }
             }
 
