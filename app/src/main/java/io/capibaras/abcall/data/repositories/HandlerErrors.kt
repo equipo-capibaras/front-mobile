@@ -18,10 +18,8 @@ fun <T> handleNetworkAndLocalDBFailure(
     defaultError: Throwable
 ): Result<T> {
     return if ((localData is List<*> && localData.isNotEmpty()) || (localData !is List<*> && localData != null)) {
-        println("entra a handleNetworkAndLocalDBFailure if $localData")
         Result.success(localData)
     } else {
-        println("entra a handleNetworkAndLocalDBFailure else")
         Result.failure(defaultError)
     }
 }

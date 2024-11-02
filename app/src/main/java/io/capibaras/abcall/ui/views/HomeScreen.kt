@@ -24,15 +24,15 @@ fun HomeScreen(navController: NavController) {
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
-        IncidentsScreen()
-        FloatingActionButton (
-            onClick = {navController.navigate("create-incident")},
+        IncidentsScreen(navController)
+        FloatingActionButton(
+            onClick = { navController.navigate("create-incident") },
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
         ) {
-            Icon(Icons.Filled.Add,  stringResource(R.string.create_incident))
+            Icon(Icons.Filled.Add, stringResource(R.string.create_incident))
         }
     }
 }

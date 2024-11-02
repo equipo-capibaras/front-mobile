@@ -74,7 +74,8 @@ class IncidentsRepository(
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
-                handleErrorResponse(null, response.errorBody()?.string())
+                val errorBodyString = response.errorBody()?.string()
+                handleErrorResponse(null, errorBodyString)
             }
         } catch (e: IOException) {
             handleNetworkAndLocalDBFailure(null, RepositoryError.NetworkError)
