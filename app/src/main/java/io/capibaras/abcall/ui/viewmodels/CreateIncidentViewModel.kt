@@ -70,7 +70,7 @@ class CreateIncidentViewModel(
 
     fun createIncident(onSuccess: (String) -> Unit) {
         if (stateMediator.isLoading) return
-
+        stateMediator.setLoadingState(true)
         viewModelScope.launch {
             val result = incidentRepository.createIncident(name, description)
 

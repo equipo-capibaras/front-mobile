@@ -12,6 +12,6 @@ interface IncidentsService {
     @GET("users/me/incidents")
     suspend fun getIncidents(): Response<List<Incident>>
 
-    @POST("incidents")
+    @POST("incidents/mobile")
     suspend fun createIncident(@Body createIncidentRequest: CreateIncidentRequest): Response<CreateIncidentResponse>
 }
