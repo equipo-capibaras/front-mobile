@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.DefaultTextField
+import io.capibaras.abcall.ui.components.TextFieldConfig
 import io.capibaras.abcall.ui.components.TextFieldType
 import io.capibaras.abcall.ui.viewmodels.CreateIncidentViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -47,8 +48,10 @@ fun CreateIncidentScreen(
             onValueChange = { viewModel.name = it },
             validationState = nameValidationState,
             labelRes = R.string.form_name,
-            type = TextFieldType.TEXT,
-            testTag = "form-name"
+            config = TextFieldConfig(
+                type = TextFieldType.TEXT,
+                testTag = "form-name"
+            )
         )
 
         DefaultTextField(
@@ -56,10 +59,12 @@ fun CreateIncidentScreen(
             onValueChange = { viewModel.description = it },
             validationState = descriptionValidationState,
             labelRes = R.string.form_description,
-            type = TextFieldType.TEXT,
-            testTag = "form-description",
-            minLines = 6,
-            maxLines = 6
+            config = TextFieldConfig(
+                type = TextFieldType.TEXT,
+                testTag = "form-description",
+                minLines = 6,
+                maxLines = 6
+            )
         )
 
         Row(

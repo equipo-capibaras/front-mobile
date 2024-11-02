@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.InitialPagesTitle
+import io.capibaras.abcall.ui.components.TextFieldConfig
 import io.capibaras.abcall.ui.components.TextFieldType
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
@@ -57,8 +58,10 @@ fun LoginScreen(
             onValueChange = { viewModel.email = it },
             validationState = emailValidationState,
             labelRes = R.string.form_email,
-            type = TextFieldType.EMAIL,
-            testTag = "form-email"
+            config = TextFieldConfig(
+                type = TextFieldType.EMAIL,
+                testTag = "form-email"
+            )
         )
 
         DefaultTextField(
@@ -66,8 +69,10 @@ fun LoginScreen(
             onValueChange = { viewModel.password = it },
             validationState = passwordValidationState,
             labelRes = R.string.form_password,
-            type = TextFieldType.PASSWORD,
-            testTag = "form-password"
+            config = TextFieldConfig(
+                type = TextFieldType.PASSWORD,
+                testTag = "form-password"
+            )
         )
 
         Button(

@@ -17,16 +17,20 @@ import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 
 enum class TextFieldType { TEXT, PASSWORD, EMAIL }
 
+data class TextFieldConfig(
+    val type: TextFieldType = TextFieldType.TEXT,
+    val testTag: String,
+    val minLines: Int = 1,
+    val maxLines: Int = 1
+)
+
 @Composable
 fun DefaultTextField(
     value: String,
     onValueChange: (String) -> Unit,
     validationState: ValidationUIState,
     @androidx.annotation.StringRes labelRes: Int,
-    type: TextFieldType = TextFieldType.TEXT,
-    testTag: String,
-    minLines: Int = 1,
-    maxLines: Int = 1,
+    config: TextFieldConfig
 ) {
     CustomOutlinedTextField(
         value = value,
@@ -35,18 +39,18 @@ fun DefaultTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .testTag(testTag),
+            .testTag(config.testTag),
         isError = validationState is ValidationUIState.Error,
         supportingText = {
             if (validationState is ValidationUIState.Error) {
                 Text(stringResource(validationState.resourceId))
             }
         },
-        visualTransformation = when (type) {
+        visualTransformation = when (config.type) {
             TextFieldType.PASSWORD -> PasswordVisualTransformation()
             else -> VisualTransformation.None
         },
-        keyboardOptions = when (type) {
+        keyboardOptions = when (config.type) {
             TextFieldType.PASSWORD -> KeyboardOptions(
                 autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Password
@@ -59,8 +63,8 @@ fun DefaultTextField(
 
             TextFieldType.TEXT -> KeyboardOptions.Default
         },
-        minLines = minLines,
-        maxLines = maxLines,
+        minLines = config.minLines,
+        maxLines = config.maxLines,
     )
 }
 

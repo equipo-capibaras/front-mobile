@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun IncidentDetailScreen(id: String) {
+fun IncidentDetailScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
