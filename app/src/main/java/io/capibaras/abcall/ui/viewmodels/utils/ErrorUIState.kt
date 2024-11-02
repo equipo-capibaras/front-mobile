@@ -1,4 +1,4 @@
-package io.capibaras.abcall.ui.viewmodels
+package io.capibaras.abcall.ui.viewmodels.utils
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable

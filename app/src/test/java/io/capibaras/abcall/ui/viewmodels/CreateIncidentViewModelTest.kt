@@ -6,6 +6,9 @@ import io.capibaras.abcall.data.network.models.CreateIncidentResponse
 import io.capibaras.abcall.data.repositories.IncidentsRepository
 import io.capibaras.abcall.data.repositories.RepositoryError
 import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.utils.SuccessUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -15,7 +18,6 @@ import io.mockk.just
 import io.mockk.runs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -141,5 +143,5 @@ class CreateIncidentViewModelTest {
             )
         }
     }
-    
+
 }

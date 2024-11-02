@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import io.capibaras.abcall.R
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.SuccessUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.utils.SuccessUIState
 
 @Composable
 fun HandleErrorState(

@@ -10,6 +10,10 @@ import io.capibaras.abcall.data.repositories.IncidentsRepository
 import io.capibaras.abcall.ui.util.ErrorMessage
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.util.mapErrorToMessage
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.utils.FieldValidator
+import io.capibaras.abcall.ui.viewmodels.utils.SuccessUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 import kotlinx.coroutines.launch
 
 class CreateIncidentViewModel(
@@ -24,31 +28,10 @@ class CreateIncidentViewModel(
     var descriptionValidationState by mutableStateOf<ValidationUIState>(ValidationUIState.NoError)
         private set
 
-    private fun validateField(
-        value: String,
-        setValidationState: (ValidationUIState) -> Unit,
-        checks: List<Pair<() -> Boolean, Int>> = emptyList()
-    ): Boolean {
-        if (value.isBlank()) {
-            setValidationState(ValidationUIState.Error(R.string.form_required))
-            return false
-        }
-
-        checks.forEach { (check, errorMessageId) ->
-            if (!check()) {
-                setValidationState(ValidationUIState.Error(errorMessageId))
-                return false
-            }
-        }
-
-        setValidationState(ValidationUIState.NoError)
-        return true
-    }
-
     fun validateFields(): Boolean {
         var isValid = true
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             name,
             { nameValidationState = it },
             checks = listOf(
@@ -56,7 +39,7 @@ class CreateIncidentViewModel(
             )
         ) && isValid
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             description,
             { descriptionValidationState = it },
             checks = listOf(

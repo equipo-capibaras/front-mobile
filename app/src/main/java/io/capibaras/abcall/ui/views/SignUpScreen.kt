@@ -49,7 +49,7 @@ import io.capibaras.abcall.ui.components.TextFieldType
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
@@ -125,7 +125,8 @@ fun SignUpScreen(
 
                 if (isValid) {
                     viewModel.createUser(
-                        onSuccess = { navController.navigate("login") {
+                        onSuccess = {
+                            navController.navigate("login") {
                                 popUpTo("login") { inclusive = true }
                             }
                         }

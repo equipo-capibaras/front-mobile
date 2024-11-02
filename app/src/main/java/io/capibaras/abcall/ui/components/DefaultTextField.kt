@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 
 enum class TextFieldType { TEXT, PASSWORD, EMAIL }
 
@@ -51,10 +51,12 @@ fun DefaultTextField(
                 autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Password
             )
+
             TextFieldType.EMAIL -> KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 capitalization = KeyboardCapitalization.None
             )
+
             TextFieldType.TEXT -> KeyboardOptions.Default
         },
         minLines = minLines,
