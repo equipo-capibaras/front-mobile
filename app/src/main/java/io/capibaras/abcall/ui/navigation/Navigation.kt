@@ -31,6 +31,7 @@ import io.capibaras.abcall.ui.views.AccountScreen
 import io.capibaras.abcall.ui.views.CreateIncidentScreen
 import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
+import io.capibaras.abcall.ui.views.IncidentDetailScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
 import org.koin.androidx.compose.koinViewModel
@@ -143,7 +144,13 @@ fun CustomScaffold(
                     AccountScreen()
                 }
                 composable("create-incident") {
-                    CreateIncidentScreen()
+                    CreateIncidentScreen(navController)
+                }
+                composable("create-incident/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id")
+                    if (id != null) {
+                        IncidentDetailScreen(id)
+                    }
                 }
             }
 

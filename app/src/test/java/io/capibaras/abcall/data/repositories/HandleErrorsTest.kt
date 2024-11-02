@@ -8,19 +8,30 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HandleErrorsTest {
+
     @Test
     fun `handleErrorResponse should return success with local data when local data is not empty`() {
         val localData = listOf("Local Data")
 
         val result = handleErrorResponse(localData, null)
 
-        assert(result.isSuccess)
+        assertTrue(result.isSuccess)
+        assertEquals(localData, result.getOrNull())
+    }
+
+    @Test
+    fun `handleErrorResponse should return success with local data when local data is not null`() {
+        val localData = "Non-empty Data" // Now localData can be any type, not necessarily a list
+
+        val result = handleErrorResponse(localData, null)
+
+        assertTrue(result.isSuccess)
         assertEquals(localData, result.getOrNull())
     }
 
     @Test
     fun `handleErrorResponse should return failure with custom error message when errorBody contains message`() {
-        val localData = emptyList<String>()
+        val localData: String? = null
         val errorMessage = "Custom error message"
 
         mockkConstructor(JSONObject::class)
@@ -44,11 +55,11 @@ class HandleErrorsTest {
 
     @Test
     fun `handleErrorResponse should return failure with default error message when errorBody is null`() {
-        val localData = emptyList<String>()
+        val localData: String? = null
 
         val result = handleErrorResponse(localData, null)
 
-        assert(result.isFailure)
+        assertTrue(result.isFailure)
         assertEquals(
             "Unknown error",
             (result.exceptionOrNull() as RepositoryError.CustomError).message
@@ -57,6 +68,7 @@ class HandleErrorsTest {
 
     @Test
     fun `handleErrorResponse should return failure with default error message when errorBody does not contain message`() {
+        val localData: String? = null
         val errorMsg = "Custom error message"
         mockkConstructor(JSONObject::class)
         every {
@@ -66,7 +78,7 @@ class HandleErrorsTest {
             )
         } returns errorMsg
 
-        val result = handleErrorResponse(emptyList<String>(), """{"message": "$errorMsg"}""")
+        val result = handleErrorResponse(localData, """{"message": "$errorMsg"}""")
 
         assertTrue(result.isFailure)
         assertEquals(errorMsg, (result.exceptionOrNull() as RepositoryError.CustomError).message)
@@ -79,18 +91,29 @@ class HandleErrorsTest {
 
         val result = handleNetworkAndLocalDBFailure(localData, defaultError)
 
-        assert(result.isSuccess)
+        assertTrue(result.isSuccess)
         assertEquals(localData, result.getOrNull())
     }
 
     @Test
-    fun `handleNetworkAndLocalDBFailure should return failure with default error when local data is empty`() {
-        val localData = emptyList<String>()
+    fun `handleNetworkAndLocalDBFailure should return success with local data when local data is not null`() {
+        val localData = "Non-empty Data" // Now localData can be any type, not necessarily a list
         val defaultError = Throwable("Default error")
 
         val result = handleNetworkAndLocalDBFailure(localData, defaultError)
 
-        assert(result.isFailure)
+        assertTrue(result.isSuccess)
+        assertEquals(localData, result.getOrNull())
+    }
+
+    @Test
+    fun `handleNetworkAndLocalDBFailure should return failure with default error when local data is null`() {
+        val localData: String? = null
+        val defaultError = Throwable("Default error")
+
+        val result = handleNetworkAndLocalDBFailure(localData, defaultError)
+
+        assertTrue(result.isFailure)
         assertEquals(defaultError, result.exceptionOrNull())
     }
 }

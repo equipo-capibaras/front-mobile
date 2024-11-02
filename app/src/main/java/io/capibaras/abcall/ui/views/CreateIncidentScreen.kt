@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.TextFieldType
@@ -23,6 +24,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateIncidentScreen(
+    navController: NavController,
     viewModel: CreateIncidentViewModel = koinViewModel(),
 ) {
     val nameValidationState = viewModel.nameValidationState
@@ -72,8 +74,8 @@ fun CreateIncidentScreen(
 
                     if (isValid) {
                         viewModel.createIncident(
-                            onSuccess = {
-                                // TODO: OnSuccess action
+                            onSuccess = { incidentId ->
+                                navController.navigate("create-incident/${incidentId}")
                             }
                         )
                     }
