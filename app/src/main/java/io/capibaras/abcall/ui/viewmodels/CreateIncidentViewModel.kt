@@ -68,17 +68,17 @@ class CreateIncidentViewModel(
     }
 
 
-    fun createIncident(onSuccess: () -> Unit) {
+    fun createIncident(onSuccess: (String) -> Unit) {
         if (stateMediator.isLoading) return
 
         viewModelScope.launch {
             val result = incidentRepository.createIncident(name, description)
 
             result.fold(
-                onSuccess = { _ ->
+                onSuccess = { createIncidentResponse ->
                     stateMediator.clearErrorUIState()
                     stateMediator.setSuccessState(SuccessUIState.Success(R.string.create_incident_success))
-                    onSuccess()
+                    onSuccess(createIncidentResponse.id)
                 },
                 onFailure = { error ->
                     when (val errorMessage = mapErrorToMessage(error)) {
