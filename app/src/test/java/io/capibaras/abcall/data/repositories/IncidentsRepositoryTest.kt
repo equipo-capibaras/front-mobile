@@ -239,18 +239,15 @@ class IncidentsRepositoryTest {
         }
 
     @Test
-    fun `should set recentlyUpdated to true when incident history size differs from local data`(): Unit =
+    fun `should set recentlyUpdated to true when incident history size differs from local data`() =
         runBlocking {
             val mockLocalIncident = createMockIncident().copy(
                 history = listOf(
-                    History(
-                        1,
-                        "2024-01-01",
-                        "filed",
-                        "Filed the incident"
-                    )
-                )
+                    History(1, "2024-01-01", "filed", "Filed the incident")
+                ),
+                isViewed = true
             )
+
             val mockIncidentList = listOf(createMockIncident())
 
             val mockResponse = mockk<Response<List<Incident>>> {
@@ -260,12 +257,37 @@ class IncidentsRepositoryTest {
 
             coEvery { incidentsService.getIncidents() } returns mockResponse
             coEvery { incidentDAO.getIncident("1") } returns mockLocalIncident
-            coEvery { incidentDAO.getAllIncidents() } returns mockIncidentList
+            coEvery { incidentDAO.getAllIncidents() } returns emptyList()
             coEvery { incidentDAO.refreshIncidents(any()) } just Runs
+            coEvery {
+                incidentDAO.updateIncidentViewedStatus(
+                    "1",
+                    false
+                )
+            } just Runs
 
             val result = incidentsRepository.getIncidents()
 
             Assert.assertTrue(result.isSuccess)
             Assert.assertTrue(result.getOrNull()?.first()?.recentlyUpdated == true)
+            coVerify {
+                incidentDAO.updateIncidentViewedStatus(
+                    "1",
+                    false
+                )
+            }
         }
+
+    @Test
+    fun `should mark incident as viewed`() = runBlocking {
+        val incidentId = "1"
+
+        coEvery { incidentDAO.updateIncidentViewedStatus(incidentId, true) } just Runs
+
+        incidentsRepository.markAsViewed(incidentId)
+
+        coVerify { incidentDAO.updateIncidentViewedStatus(incidentId, true) }
+    }
+
+
 }

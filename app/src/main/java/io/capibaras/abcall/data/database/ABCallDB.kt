@@ -15,7 +15,7 @@ import io.capibaras.abcall.data.database.models.User
 
 @Database(
     entities = [Company::class, User::class, Incident::class],
-    version = 6,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

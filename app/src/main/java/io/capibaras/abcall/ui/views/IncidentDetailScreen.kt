@@ -6,13 +6,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import io.capibaras.abcall.ui.viewmodels.IncidentDetailViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun IncidentDetailScreen() {
+fun IncidentDetailScreen(viewModel: IncidentDetailViewModel = koinViewModel(), incidentId: String) {
+    LaunchedEffect(Unit) {
+        viewModel.markIncidentAsViewed(incidentId)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

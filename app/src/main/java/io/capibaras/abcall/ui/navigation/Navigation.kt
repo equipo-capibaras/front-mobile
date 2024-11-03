@@ -189,6 +189,10 @@ fun ScaffoldNavHost(
         composable(Routes.HOME) { HomeScreen(navController) }
         composable(Routes.ACCOUNT) { AccountScreen() }
         composable(Routes.CREATE_INCIDENT) { CreateIncidentScreen(navController) }
-        composable("${Routes.CREATE_INCIDENT}/{id}") { IncidentDetailScreen() }
+        composable("${Routes.CREATE_INCIDENT}/{id}") { backStackEntry ->
+            val incidentId = backStackEntry.arguments?.getString("id")
+            if (incidentId != null)
+                IncidentDetailScreen(incidentId = incidentId)
+        }
     }
 }
