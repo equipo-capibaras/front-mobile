@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,7 +21,9 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.TextFieldConfig
 import io.capibaras.abcall.ui.components.TextFieldType
+import io.capibaras.abcall.ui.util.navigateWithAccessibilityCheck
 import io.capibaras.abcall.ui.viewmodels.CreateIncidentViewModel
+import kotlinx.coroutines.Dispatchers
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -30,7 +33,7 @@ fun CreateIncidentScreen(
 ) {
     val nameValidationState = viewModel.nameValidationState
     val descriptionValidationState = viewModel.descriptionValidationState
-
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +83,12 @@ fun CreateIncidentScreen(
                     if (isValid) {
                         viewModel.createIncident(
                             onSuccess = { incidentId ->
-                                navController.navigate("create-incident/${incidentId}")
+                                navigateWithAccessibilityCheck(
+                                    navController = navController,
+                                    destination = "create-incident/$incidentId",
+                                    context = context,
+                                    dispatcher = Dispatchers.IO
+                                )
                             }
                         )
                     }

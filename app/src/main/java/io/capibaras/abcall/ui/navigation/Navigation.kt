@@ -120,7 +120,8 @@ fun CustomScaffold(
             .systemBarsPadding()
     ) { paddingValues ->
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             ScaffoldNavHost(
                 navController = navController,
@@ -180,7 +181,8 @@ fun ScaffoldNavHost(
     NavHost(
         navController = navController,
         startDestination = if (isUserLoggedIn) Routes.HOME else Routes.LOGIN,
-        modifier = Modifier.padding(paddingValues)
+        modifier = Modifier
+            .padding(paddingValues)
     ) {
         composable(Routes.LOGIN) { LoginScreen(navController) }
         composable(Routes.SIGN_UP) { SignUpScreen(navController) }

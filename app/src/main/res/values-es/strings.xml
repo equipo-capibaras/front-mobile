@@ -56,4 +56,5 @@
     <string name="create_incident_description">Proporciona una descripción clara del problema</string>
     <string name="create_incident_success">La petición se creó exitosamente</string>
     <string name="form_1000_length">Debe tener máximo 1000 caracteres</string>
+    <string name="back">Atrás</string>
 </resources>
