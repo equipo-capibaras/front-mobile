@@ -21,13 +21,14 @@ fun navigateWithAccessibilityCheck(
     destination: String,
     context: Context,
     dispatcher: CoroutineDispatcher,
+    mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
     delayMillis: Long = 1500
 ) {
     CoroutineScope(dispatcher).launch {
         if (isAccessibilityEnabled(context)) {
             delay(delayMillis)
         }
-        withContext(Dispatchers.Main) {
+        withContext(mainDispatcher) {
             navController.navigate(destination)
         }
     }
