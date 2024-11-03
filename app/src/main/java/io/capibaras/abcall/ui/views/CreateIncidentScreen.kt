@@ -43,6 +43,7 @@ fun CreateIncidentScreen(
         Text(
             text = stringResource(R.string.create_incident_description),
             modifier = Modifier
+                .testTag("create-incident-form-description")
                 .padding(bottom = 24.dp)
         )
 
@@ -94,8 +95,8 @@ fun CreateIncidentScreen(
                     }
                 },
                 modifier = Modifier
-                    .padding(vertical = 40.dp)
-                    .testTag("create-incident-button"),
+                    .testTag("create-incident-button")
+                    .padding(vertical = 40.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(text = stringResource(R.string.create_incident))

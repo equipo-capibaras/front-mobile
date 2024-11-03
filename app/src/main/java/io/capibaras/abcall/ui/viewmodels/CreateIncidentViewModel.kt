@@ -52,6 +52,7 @@ class CreateIncidentViewModel(
 
 
     fun createIncident(onSuccess: (String) -> Unit) {
+        println("createIncident ${stateMediator.isLoading}")
         if (stateMediator.isLoading) return
         stateMediator.setLoadingState(true)
         viewModelScope.launch {

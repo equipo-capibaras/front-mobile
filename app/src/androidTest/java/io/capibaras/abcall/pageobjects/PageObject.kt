@@ -34,8 +34,15 @@ abstract class PageObject(private val composeTestRule: AndroidComposeTestRule<Ac
     }
 
     fun clickElementByTestTag(testTag: String) {
-        findExactlyOne(
-            hasTestTag(testTag)
-        ).performClick()
+        findExactlyOne(hasTestTag(testTag)).performClick()
+    }
+
+    fun waitUntilLoadingAndSnackbarDisappear() {
+        composeTestRule.waitUntil(timeoutMillis = 7000) {
+            composeTestRule.onAllNodes(hasTestTag("full-loading")).fetchSemanticsNodes()
+                .isEmpty() &&
+                    composeTestRule.onAllNodes(hasTestTag("snackbar")).fetchSemanticsNodes()
+                        .isEmpty()
+        }
     }
 }
