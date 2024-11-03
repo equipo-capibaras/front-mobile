@@ -51,5 +51,11 @@
     <string name="status">Status</string>
     <string name="recently_updated">Atualizado recentemente</string>
     <string name="empty_incidents_list">No há petições criadas</string>
+    <string name="create_incident">Criar solicitação</string>
+    <string name="form_description">Descrição</string>
+    <string name="create_incident_description">Forneça uma descrição clara do problema</string>
+    <string name="create_incident_success">A solicitação foi criada com sucesso</string>
+    <string name="form_1000_length">Deve ter no máximo 1000 caracteres</string>
+    <string name="back">Voltar</string>
 
 </resources>

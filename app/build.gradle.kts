@@ -15,8 +15,8 @@ android {
         applicationId = "io.capibaras.abcall"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.2.0"
+        versionCode = 3
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -110,6 +110,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.navigation.testing)
     testImplementation(project(":app"))
 
     ksp(libs.room.compiler)
@@ -137,7 +138,7 @@ dependencies {
 sonar {
     properties {
         property("sonar.projectName", "front-mobile")
-        property("sonar.projectVersion", "1.2.0")
+        property("sonar.projectVersion", "1.3.0")
 
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.organization", "equipo-capibaras")

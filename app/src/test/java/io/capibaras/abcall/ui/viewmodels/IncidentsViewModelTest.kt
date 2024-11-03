@@ -5,6 +5,7 @@ import io.capibaras.abcall.data.database.models.Incident
 import io.capibaras.abcall.data.repositories.IncidentsRepository
 import io.capibaras.abcall.data.repositories.RepositoryError
 import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

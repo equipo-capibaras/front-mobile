@@ -3,6 +3,8 @@ package io.capibaras.abcall.data.repositories
 import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.models.History
 import io.capibaras.abcall.data.database.models.Incident
+import io.capibaras.abcall.data.network.models.CreateIncidentRequest
+import io.capibaras.abcall.data.network.models.CreateIncidentResponse
 import io.capibaras.abcall.data.network.services.IncidentsService
 import java.io.IOException
 
@@ -30,11 +32,16 @@ class IncidentsRepository(
     }
 
     private suspend fun setRecentlyUpdated(incident: Incident): Boolean {
-        val localIncident = incidentDAO.getIncident(incident.id)
-        return if (localIncident != null) {
-            incident.history.size != localIncident.history.size
-        } else {
-            false
+        val localIncident = incidentDAO.getIncident(incident.id) ?: return false
+
+        return when {
+            incident.history.size != localIncident.history.size && localIncident.isViewed -> {
+                incidentDAO.updateIncidentViewedStatus(incident.id, false)
+                true
+            }
+
+            !localIncident.isViewed -> true
+            else -> false
         }
     }
 
@@ -65,4 +72,27 @@ class IncidentsRepository(
                 ?: RepositoryError.UnknownError)
         }
     }
+
+    suspend fun createIncident(name: String, description: String): Result<CreateIncidentResponse> {
+        return try {
+            val response = incidentsService.createIncident(CreateIncidentRequest(name, description))
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                val errorBodyString = response.errorBody()?.string()
+                handleErrorResponse(null, errorBodyString)
+            }
+        } catch (e: IOException) {
+            handleNetworkAndLocalDBFailure(null, RepositoryError.NetworkError)
+        } catch (e: Exception) {
+            Result.failure(e.message?.let { RepositoryError.CustomError(it) }
+                ?: RepositoryError.UnknownError)
+        }
+    }
+
+    suspend fun markAsViewed(incidentId: String) {
+        incidentDAO.updateIncidentViewedStatus(incidentId, true)
+    }
+
+
 }

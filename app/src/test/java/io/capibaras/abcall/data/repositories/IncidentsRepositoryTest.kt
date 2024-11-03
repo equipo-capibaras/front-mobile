@@ -3,6 +3,8 @@ package io.capibaras.abcall.data.repositories
 import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.models.History
 import io.capibaras.abcall.data.database.models.Incident
+import io.capibaras.abcall.data.network.models.Channel
+import io.capibaras.abcall.data.network.models.CreateIncidentResponse
 import io.capibaras.abcall.data.network.services.IncidentsService
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -13,6 +15,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.runs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -22,6 +25,7 @@ import kotlinx.coroutines.test.setMain
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -53,25 +57,42 @@ class IncidentsRepositoryTest {
         Dispatchers.resetMain()
     }
 
+    private fun createMockIncidentDetailResponse(): CreateIncidentResponse {
+        return CreateIncidentResponse(
+            "1",
+            "clientId",
+            "name",
+            Channel.MOBILE,
+            "reportedBy",
+            "createdBy",
+            "assignedTo"
+        )
+    }
+
+    private fun createMockIncidentHistory(): List<History> {
+        return listOf(
+            History(1, "2024-01-01", "filed", "Filed the incident"),
+            History(2, "2024-02-01", "escalated", "Escalated the incident"),
+            History(3, "2024-03-01", "closed", "Closed the incident")
+        )
+    }
+
+    private fun createMockIncident(): Incident {
+        return Incident(
+            "1",
+            "Incident Test",
+            "email",
+            createMockIncidentHistory(),
+            "2024-01-01",
+            "2024-02-01",
+            "2024-03-01",
+            false
+        )
+    }
+
     @Test
     fun `should return incidents from API and update local database`() = runBlocking {
-        val mockHistory = listOf(
-            History(1, "2024-01-01", "filed", "Filed the incident"),
-            History(2, "2024-01-02", "escalated", "Escalated the incident")
-        )
-
-        val mockIncidentList = listOf(
-            Incident(
-                "1",
-                "Incident Test",
-                "email",
-                mockHistory,
-                "2024-01-01",
-                "2024-01-02",
-                null,
-                false
-            )
-        )
+        val mockIncidentList = listOf(createMockIncident())
 
         val mockResponse = mockk<Response<List<Incident>>> {
             every { isSuccessful } returns true
@@ -81,7 +102,7 @@ class IncidentsRepositoryTest {
         coEvery { incidentsService.getIncidents() } returns mockResponse
         coEvery { incidentDAO.getIncident("1") } returns null
         coEvery { incidentDAO.getAllIncidents() } returns emptyList()
-        coEvery { incidentDAO.refreshIncidents(mockIncidentList) } just Runs
+        coEvery { incidentDAO.refreshIncidents(any()) } just Runs
 
         val result = incidentsRepository.getIncidents()
 
@@ -91,18 +112,7 @@ class IncidentsRepositoryTest {
 
     @Test
     fun `should return local incidents if API fails with error response`() = runBlocking {
-        val mockLocalIncidentList = listOf(
-            Incident(
-                id = "1",
-                name = "Local Incident",
-                channel = "email",
-                history = emptyList(),
-                filedDate = "2024-01-01",
-                escalatedDate = null,
-                closedDate = null,
-                recentlyUpdated = false
-            )
-        )
+        val mockLocalIncidentList = listOf(createMockIncident())
 
         val errorMessage = "Custom error message"
         val errorBody = ResponseBody.create(null, """{"message": "$errorMessage"}""")
@@ -130,18 +140,7 @@ class IncidentsRepositoryTest {
 
     @Test
     fun `should return local data if network exception occurs`() = runBlocking {
-        val mockLocalIncidentList = listOf(
-            Incident(
-                id = "1",
-                name = "Local Incident",
-                channel = "email",
-                history = emptyList(),
-                filedDate = "2024-01-01",
-                escalatedDate = null,
-                closedDate = null,
-                recentlyUpdated = false
-            )
-        )
+        val mockLocalIncidentList = listOf(createMockIncident())
 
         coEvery { incidentsService.getIncidents() } throws IOException()
         coEvery { incidentDAO.getAllIncidents() } returns mockLocalIncidentList
@@ -162,4 +161,133 @@ class IncidentsRepositoryTest {
         assertTrue(result.isFailure)
         assertEquals(IncidentsRepositoryError.GetIncidentsError, result.exceptionOrNull())
     }
+
+    @Test
+    fun `should assign correct dates based on incident history`() = runBlocking {
+        val incident = createMockIncident()
+
+        coEvery { incidentsService.getIncidents() } returns Response.success(listOf(incident))
+        coEvery { incidentDAO.getAllIncidents() } returns emptyList()
+        coEvery { incidentDAO.refreshIncidents(any()) } just runs
+        coEvery { incidentDAO.getIncident(any()) } returns null
+
+        val result = incidentsRepository.getIncidents()
+
+        assertTrue(result.isSuccess)
+        val resultIncident = result.getOrNull()?.first()
+        assertEquals("2024-01-01", resultIncident?.filedDate)
+        assertEquals("2024-02-01", resultIncident?.escalatedDate)
+        assertEquals("2024-03-01", resultIncident?.closedDate)
+    }
+
+    @Test
+    fun `should return failure with custom error when an unexpected exception occurs in getIncidents`() =
+        runBlocking {
+            val unexpectedError = Exception("Unexpected error")
+
+            coEvery { incidentsService.getIncidents() } throws unexpectedError
+            coEvery { incidentDAO.getAllIncidents() } returns emptyList()
+
+            val result = incidentsRepository.getIncidents()
+
+            assertTrue(result.isFailure)
+            assertEquals(
+                "Unexpected error",
+                (result.exceptionOrNull() as RepositoryError.CustomError).message
+            )
+        }
+
+
+    @Test
+    fun `should return success when incident is successfully created`() = runBlocking {
+        val createIncidentResponse = createMockIncidentDetailResponse()
+        coEvery { incidentsService.createIncident(any()) } returns Response.success(
+            createIncidentResponse
+        )
+
+        val result = incidentsRepository.createIncident("Test Name", "Test Description")
+
+        assertTrue(result.isSuccess)
+        assertEquals(createIncidentResponse, result.getOrNull())
+    }
+
+    @Test
+    fun `should return network error when exception occurs during incident creation`() =
+        runBlocking {
+            coEvery { incidentsService.createIncident(any()) } throws IOException()
+
+            val result = incidentsRepository.createIncident("Test Name", "Test Description")
+
+            assertTrue(result.isFailure)
+            assertEquals(RepositoryError.NetworkError, result.exceptionOrNull())
+        }
+
+    @Test
+    fun `should return failure with custom error when an unexpected exception occurs in createIncident`() =
+        runBlocking {
+            val unexpectedError = Exception("Unexpected error in createIncident")
+
+            coEvery { incidentsService.createIncident(any()) } throws unexpectedError
+
+            val result = incidentsRepository.createIncident("Test Name", "Test Description")
+
+            assertTrue(result.isFailure)
+            assertEquals(
+                "Unexpected error in createIncident",
+                (result.exceptionOrNull() as RepositoryError.CustomError).message
+            )
+        }
+
+    @Test
+    fun `should set recentlyUpdated to true when incident history size differs from local data`() =
+        runBlocking {
+            val mockLocalIncident = createMockIncident().copy(
+                history = listOf(
+                    History(1, "2024-01-01", "filed", "Filed the incident")
+                ),
+                isViewed = true
+            )
+
+            val mockIncidentList = listOf(createMockIncident())
+
+            val mockResponse = mockk<Response<List<Incident>>> {
+                every { isSuccessful } returns true
+                every { body() } returns mockIncidentList
+            }
+
+            coEvery { incidentsService.getIncidents() } returns mockResponse
+            coEvery { incidentDAO.getIncident("1") } returns mockLocalIncident
+            coEvery { incidentDAO.getAllIncidents() } returns emptyList()
+            coEvery { incidentDAO.refreshIncidents(any()) } just Runs
+            coEvery {
+                incidentDAO.updateIncidentViewedStatus(
+                    "1",
+                    false
+                )
+            } just Runs
+
+            val result = incidentsRepository.getIncidents()
+
+            Assert.assertTrue(result.isSuccess)
+            Assert.assertTrue(result.getOrNull()?.first()?.recentlyUpdated == true)
+            coVerify {
+                incidentDAO.updateIncidentViewedStatus(
+                    "1",
+                    false
+                )
+            }
+        }
+
+    @Test
+    fun `should mark incident as viewed`() = runBlocking {
+        val incidentId = "1"
+
+        coEvery { incidentDAO.updateIncidentViewedStatus(incidentId, true) } just Runs
+
+        incidentsRepository.markAsViewed(incidentId)
+
+        coVerify { incidentDAO.updateIncidentViewedStatus(incidentId, true) }
+    }
+
+
 }

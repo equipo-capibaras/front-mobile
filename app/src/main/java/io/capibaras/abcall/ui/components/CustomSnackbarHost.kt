@@ -5,6 +5,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -29,9 +30,11 @@ fun CustomSnackbarHost(snackbarHostState: SnackbarHostState) {
                 containerColor = backgroundColor,
                 contentColor = contentColor,
                 dismissActionContentColor = contentColor,
-                modifier = Modifier.clearAndSetSemantics {
-                    contentDescription = snackbarData.visuals.message
-                }
+                modifier = Modifier
+                    .testTag("snackbar")
+                    .clearAndSetSemantics {
+                        contentDescription = snackbarData.visuals.message
+                    }
             )
         }
     )

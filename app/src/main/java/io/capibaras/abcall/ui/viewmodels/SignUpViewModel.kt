@@ -12,6 +12,10 @@ import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.CompanyRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.utils.FieldValidator
+import io.capibaras.abcall.ui.viewmodels.utils.SuccessUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
@@ -45,31 +49,10 @@ class SignUpViewModel(
         getCompanies()
     }
 
-    private fun validateField(
-        value: String,
-        setValidationState: (ValidationUIState) -> Unit,
-        checks: List<Pair<() -> Boolean, Int>> = emptyList()
-    ): Boolean {
-        if (value.isBlank()) {
-            setValidationState(ValidationUIState.Error(R.string.form_required))
-            return false
-        }
-
-        checks.forEach { (check, errorMessageId) ->
-            if (!check()) {
-                setValidationState(ValidationUIState.Error(errorMessageId))
-                return false
-            }
-        }
-
-        setValidationState(ValidationUIState.NoError)
-        return true
-    }
-
     fun validateFields(): Boolean {
         var isValid = true
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             name,
             { nameValidationState = it },
             checks = listOf(
@@ -77,7 +60,7 @@ class SignUpViewModel(
             )
         ) && isValid
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             email,
             { emailValidationState = it },
             checks = listOf(
@@ -86,7 +69,7 @@ class SignUpViewModel(
             )
         ) && isValid
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             company,
             { companyValidationState = it },
             checks = listOf(
@@ -94,7 +77,7 @@ class SignUpViewModel(
             )
         ) && isValid
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             password,
             { passwordValidationState = it },
             checks = listOf(
@@ -102,7 +85,7 @@ class SignUpViewModel(
             )
         ) && isValid
 
-        isValid = validateField(
+        isValid = FieldValidator.validateField(
             confirmPassword,
             { confirmPasswordValidationState = it },
             checks = listOf(

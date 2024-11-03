@@ -159,4 +159,29 @@ class IncidentDAOTest {
         val allIncidents = incidentDAO.getAllIncidents()
         assertEquals(newIncidents, allIncidents)
     }
+
+    @Test
+    fun `test update incident viewed status`() = runBlocking {
+        val incident = Incident(
+            id = faker.random.nextUUID(),
+            name = "Incident for Viewed Status Test",
+            channel = "email",
+            history = listOf(
+                History(1, "2024-01-01", "filed", "Incident filed")
+            ),
+            filedDate = "2024-01-01",
+            escalatedDate = null,
+            closedDate = null,
+            recentlyUpdated = false,
+            isViewed = true
+        )
+
+        incidentDAO.insertIncident(incident)
+
+        incidentDAO.updateIncidentViewedStatus(incident.id, false)
+
+        val updatedIncident = incidentDAO.getIncident(incident.id)
+
+        assertEquals(false, updatedIncident?.isViewed)
+    }
 }

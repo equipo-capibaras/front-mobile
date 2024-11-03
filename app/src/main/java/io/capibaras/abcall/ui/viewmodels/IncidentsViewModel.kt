@@ -10,6 +10,7 @@ import io.capibaras.abcall.data.repositories.IncidentsRepository
 import io.capibaras.abcall.ui.util.ErrorMessage
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.util.mapErrorToMessage
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

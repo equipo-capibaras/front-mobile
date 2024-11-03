@@ -59,6 +59,7 @@ fun AccountScreen(
         if (userInfo != null) {
             Box(
                 modifier = Modifier
+                    .testTag("account-avatar")
                     .size(80.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)

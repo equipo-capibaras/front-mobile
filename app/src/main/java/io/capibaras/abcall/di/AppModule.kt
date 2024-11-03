@@ -22,6 +22,8 @@ import io.capibaras.abcall.data.repositories.IncidentsRepository
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.viewmodels.AccountViewModel
+import io.capibaras.abcall.ui.viewmodels.CreateIncidentViewModel
+import io.capibaras.abcall.ui.viewmodels.IncidentDetailViewModel
 import io.capibaras.abcall.ui.viewmodels.IncidentViewModel
 import io.capibaras.abcall.ui.viewmodels.LoginViewModel
 import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
@@ -126,5 +128,16 @@ val appModule = module {
             get<StateMediator>(),
         )
     }
+    viewModel {
+        CreateIncidentViewModel(
+            get<StateMediator>(),
+            get<IncidentsRepository>()
+        )
+    }
 
+    viewModel {
+        IncidentDetailViewModel(
+            get<IncidentsRepository>()
+        )
+    }
 }
