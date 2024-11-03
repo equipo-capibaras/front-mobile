@@ -32,11 +32,16 @@ class IncidentsRepository(
     }
 
     private suspend fun setRecentlyUpdated(incident: Incident): Boolean {
-        val localIncident = incidentDAO.getIncident(incident.id)
-        return if (localIncident != null) {
-            incident.history.size != localIncident.history.size
-        } else {
-            false
+        val localIncident = incidentDAO.getIncident(incident.id) ?: return false
+
+        return when {
+            incident.history.size != localIncident.history.size && localIncident.isViewed -> {
+                incidentDAO.updateIncidentViewedStatus(incident.id, false)
+                true
+            }
+
+            !localIncident.isViewed -> true
+            else -> false
         }
     }
 
@@ -84,4 +89,10 @@ class IncidentsRepository(
                 ?: RepositoryError.UnknownError)
         }
     }
+
+    suspend fun markAsViewed(incidentId: String) {
+        incidentDAO.updateIncidentViewedStatus(incidentId, true)
+    }
+
+
 }

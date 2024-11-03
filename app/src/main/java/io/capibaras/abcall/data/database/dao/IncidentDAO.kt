@@ -24,11 +24,23 @@ interface IncidentDAO {
     @Query("DELETE FROM incidents")
     suspend fun deleteAllIncidents()
 
+    @Query("UPDATE incidents SET isViewed = :isViewed WHERE id = :id")
+    suspend fun updateIncidentViewedStatus(id: String, isViewed: Boolean)
+
     @Transaction
     suspend fun refreshIncidents(incidents: List<Incident>) {
         try {
+            val currentIncidents = getAllIncidents().associateBy { it.id }
+
+            val updatedIncidents = incidents.map { newIncident ->
+                val localIncident = currentIncidents[newIncident.id]
+                newIncident.copy(
+                    isViewed = localIncident?.isViewed ?: true
+                )
+            }
+
             deleteAllIncidents()
-            insertIncidents(incidents)
+            insertIncidents(updatedIncidents)
         } catch (e: Exception) {
             throw e
         }

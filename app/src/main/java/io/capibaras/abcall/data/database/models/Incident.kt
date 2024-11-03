@@ -12,7 +12,8 @@ data class Incident(
     val filedDate: String,
     val escalatedDate: String?,
     val closedDate: String?,
-    val recentlyUpdated: Boolean
+    val recentlyUpdated: Boolean,
+    val isViewed: Boolean = true
 )
 
 data class History(
