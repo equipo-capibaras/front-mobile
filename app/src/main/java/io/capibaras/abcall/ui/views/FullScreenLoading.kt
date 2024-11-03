@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 
@@ -20,13 +21,15 @@ fun FullScreenLoading(isLoading: Boolean) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White.copy(alpha = 0.8f))
-                .zIndex(1f),
+                .zIndex(1f)
+                .testTag("full-loading"),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.primary,
                 strokeWidth = 4.dp,
-                modifier = Modifier.size(60.dp)
+                modifier = Modifier
+                    .size(60.dp)
             )
         }
     }

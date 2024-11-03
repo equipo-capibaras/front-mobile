@@ -26,6 +26,7 @@ class LoginPO(private val composeTestRule: AndroidComposeTestRule<ActivityScenar
     }
 
     fun assertLoginScreenVisible() {
+        waitUntilLoadingAndSnackbarDisappear()
         findExactlyOne(hasTestTag("form-email")).assertIsDisplayed()
     }
 }

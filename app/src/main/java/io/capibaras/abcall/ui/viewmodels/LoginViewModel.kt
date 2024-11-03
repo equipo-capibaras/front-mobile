@@ -69,7 +69,6 @@ class LoginViewModel(
         viewModelScope.launch {
             try {
                 val response: Response<LoginResponse> = authRepository.login(email, password)
-
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
                         tokenManager.saveAuthToken(loginResponse.token)

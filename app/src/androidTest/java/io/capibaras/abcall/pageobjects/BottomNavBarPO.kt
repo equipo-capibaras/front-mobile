@@ -13,4 +13,8 @@ class BottomNavBarPO(private val composeTestRule: AndroidComposeTestRule<Activit
     fun navigateToAccount() {
         findExactlyOne(hasTestTag("navbar-account")).performClick()
     }
+
+    fun navigateToHome() {
+        findExactlyOne(hasTestTag("navbar-requests")).performClick()
+    }
 }

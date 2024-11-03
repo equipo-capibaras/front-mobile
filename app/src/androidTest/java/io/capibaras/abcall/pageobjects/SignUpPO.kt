@@ -1,11 +1,18 @@
 package io.capibaras.abcall.pageobjects
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import io.capibaras.abcall.ui.MainActivity
 
 class SignUpPO(composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>) :
     PageObject(composeTestRule) {
+
+    fun assertSignUpScreenVisible() {
+        waitUntilLoadingAndSnackbarDisappear()
+        findExactlyOne(hasTestTag("signup-button")).assertIsDisplayed()
+    }
 
     fun fillName(name: String) {
         fillInputField("form-name", name)
