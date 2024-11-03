@@ -6,6 +6,8 @@ import io.capibaras.abcall.data.LogoutState
 import io.capibaras.abcall.data.TokenManager
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.utils.SuccessUIState
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery

@@ -20,7 +20,9 @@ fun CustomOutlinedTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    keyboardOptions: KeyboardOptions? = null
+    keyboardOptions: KeyboardOptions? = null,
+    minLines: Int = 1,
+    maxLines: Int = 1,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val focusedInput = if (isDarkTheme) Color.White else MaterialTheme.colorScheme.primary
@@ -41,6 +43,8 @@ fun CustomOutlinedTextField(
         trailingIcon = trailingIcon,
         isError = isError,
         supportingText = supportingText,
-        keyboardOptions = keyboardOptions ?: KeyboardOptions.Default
+        keyboardOptions = keyboardOptions ?: KeyboardOptions.Default,
+        minLines = minLines,
+        maxLines = maxLines,
     )
 }

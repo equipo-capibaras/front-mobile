@@ -3,6 +3,8 @@ package io.capibaras.abcall.data.repositories
 import io.capibaras.abcall.data.database.dao.IncidentDAO
 import io.capibaras.abcall.data.database.models.History
 import io.capibaras.abcall.data.database.models.Incident
+import io.capibaras.abcall.data.network.models.CreateIncidentRequest
+import io.capibaras.abcall.data.network.models.CreateIncidentResponse
 import io.capibaras.abcall.data.network.services.IncidentsService
 import java.io.IOException
 
@@ -60,6 +62,23 @@ class IncidentsRepository(
             }
         } catch (e: IOException) {
             handleNetworkAndLocalDBFailure(localData, IncidentsRepositoryError.GetIncidentsError)
+        } catch (e: Exception) {
+            Result.failure(e.message?.let { RepositoryError.CustomError(it) }
+                ?: RepositoryError.UnknownError)
+        }
+    }
+
+    suspend fun createIncident(name: String, description: String): Result<CreateIncidentResponse> {
+        return try {
+            val response = incidentsService.createIncident(CreateIncidentRequest(name, description))
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                val errorBodyString = response.errorBody()?.string()
+                handleErrorResponse(null, errorBodyString)
+            }
+        } catch (e: IOException) {
+            handleNetworkAndLocalDBFailure(null, RepositoryError.NetworkError)
         } catch (e: Exception) {
             Result.failure(e.message?.let { RepositoryError.CustomError(it) }
                 ?: RepositoryError.UnknownError)

@@ -2,9 +2,15 @@ package io.capibaras.abcall.data.repositories
 
 import org.json.JSONObject
 
-fun <T> handleErrorResponse(localData: List<T>, errorBody: String?): Result<List<T>> {
-    return if (localData.isNotEmpty()) {
-        Result.success(localData)
+private fun <T> isValidData(data: T?): Boolean =
+    when (data) {
+        is List<*> -> data.isNotEmpty()
+        else -> data != null
+    }
+
+fun <T> handleErrorResponse(localData: T?, errorBody: String?): Result<T> {
+    return if (isValidData(localData)) {
+        Result.success(localData!!)
     } else {
         val message = errorBody?.let {
             JSONObject(it).optString("message", "Unknown error")
@@ -14,11 +20,11 @@ fun <T> handleErrorResponse(localData: List<T>, errorBody: String?): Result<List
 }
 
 fun <T> handleNetworkAndLocalDBFailure(
-    localData: List<T>,
+    localData: T?,
     defaultError: Throwable
-): Result<List<T>> {
-    return if (localData.isNotEmpty()) {
-        Result.success(localData)
+): Result<T> {
+    return if (isValidData(localData)) {
+        Result.success(localData!!)
     } else {
         Result.failure(defaultError)
     }

@@ -1,6 +1,7 @@
 package io.capibaras.abcall.ui.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -28,8 +29,10 @@ import io.capibaras.abcall.ui.components.TopBar
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import io.capibaras.abcall.ui.views.AccountScreen
+import io.capibaras.abcall.ui.views.CreateIncidentScreen
 import io.capibaras.abcall.ui.views.FullScreenLoading
 import io.capibaras.abcall.ui.views.HomeScreen
+import io.capibaras.abcall.ui.views.IncidentDetailScreen
 import io.capibaras.abcall.ui.views.LoginScreen
 import io.capibaras.abcall.ui.views.SignUpScreen
 import org.koin.androidx.compose.koinViewModel
@@ -75,7 +78,26 @@ fun Navigation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+object Routes {
+    const val HOME = "home"
+    const val SIGN_UP = "signup"
+    const val LOGIN = "login"
+    const val ACCOUNT = "account"
+    const val CREATE_INCIDENT = "create-incident"
+}
+
+object TopBarTitles {
+    private val titlesMap = mapOf(
+        Routes.HOME to R.string.requests_title,
+        Routes.ACCOUNT to R.string.account_title,
+        Routes.CREATE_INCIDENT to R.string.create_incident
+    )
+
+    fun getTitleForRoute(route: String?): Int? {
+        return titlesMap[route]
+    }
+}
+
 @Composable
 fun CustomScaffold(
     viewModel: NavigationViewModel,
@@ -85,32 +107,14 @@ fun CustomScaffold(
     navController: NavHostController,
     isUserLoggedIn: Boolean
 ) {
-    val topBarTitle = when (currentRoute) {
-        "home" -> stringResource(R.string.requests_title)
-        "account" -> stringResource(R.string.account_title)
-        else -> ""
-    }
+    val titleResId = TopBarTitles.getTitleForRoute(currentRoute)
+    val topBarTitle = titleResId?.let { stringResource(it) } ?: ""
+    val showBackButton = currentRoute == Routes.CREATE_INCIDENT
     Scaffold(
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            if (navBackStackEntry.value?.destination?.route !in listOf(
-                    "login",
-                    "signup"
-                )
-            ) {
-                TopBar(topBarTitle)
-            }
-        },
-        bottomBar = {
-            if (navBackStackEntry.value?.destination?.route !in listOf(
-                    "login",
-                    "signup"
-                )
-            ) {
-                BottomNavBar(navController)
-            }
-        },
+        topBar = { ScaffoldTopBar(navBackStackEntry, topBarTitle, showBackButton, navController) },
+        bottomBar = { ScaffoldBottomBar(navBackStackEntry, navController) },
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
@@ -118,32 +122,71 @@ fun CustomScaffold(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            NavHost(
+            ScaffoldNavHost(
                 navController = navController,
-                startDestination = if (isUserLoggedIn) "home" else "login",
-                modifier = Modifier.padding(paddingValues)
-            ) {
-                composable("login") {
-                    LoginScreen(navController)
-                }
-                composable("signup") {
-                    SignUpScreen(navController)
-                }
-                composable("home") {
-                    HomeScreen()
-                }
-                composable("account") {
-                    AccountScreen()
-                }
-            }
+                isUserLoggedIn = isUserLoggedIn,
+                paddingValues = paddingValues
+            )
 
             if (viewModel.redirectToLogin) {
-                navController.navigate("login") {
-                    popUpTo("home") { inclusive = true }
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(Routes.HOME) { inclusive = true }
                 }
                 viewModel.redirectToLogin = false
             }
 
         }
+    }
+}
+
+fun shouldShowBar(navBackStackEntry: State<NavBackStackEntry?>): Boolean {
+    val currentRoute = navBackStackEntry.value?.destination?.route
+    return currentRoute !in listOf(Routes.LOGIN, Routes.SIGN_UP)
+}
+
+@Composable
+fun ScaffoldTopBar(
+    navBackStackEntry: State<NavBackStackEntry?>,
+    topBarTitle: String,
+    showBackButton: Boolean,
+    navController: NavHostController
+) {
+    if (shouldShowBar(navBackStackEntry)) {
+        TopBar(
+            title = topBarTitle,
+            showBackButton = showBackButton,
+            onBackClick = { navController.popBackStack() }
+        )
+    }
+}
+
+@Composable
+fun ScaffoldBottomBar(
+    navBackStackEntry: State<NavBackStackEntry?>,
+    navController: NavHostController
+) {
+    if (shouldShowBar(navBackStackEntry)) {
+        BottomNavBar(navController)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScaffoldNavHost(
+    navController: NavHostController,
+    isUserLoggedIn: Boolean,
+    paddingValues: PaddingValues
+) {
+    NavHost(
+        navController = navController,
+        startDestination = if (isUserLoggedIn) Routes.HOME else Routes.LOGIN,
+        modifier = Modifier.padding(paddingValues)
+    ) {
+        composable(Routes.LOGIN) { LoginScreen(navController) }
+        composable(Routes.SIGN_UP) { SignUpScreen(navController) }
+        composable(Routes.HOME) { HomeScreen(navController) }
+        composable(Routes.ACCOUNT) { AccountScreen() }
+        composable(Routes.CREATE_INCIDENT) { CreateIncidentScreen(navController) }
+        composable("${Routes.CREATE_INCIDENT}/{id}") { IncidentDetailScreen() }
     }
 }

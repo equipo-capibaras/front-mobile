@@ -45,11 +45,12 @@ import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.CustomOutlinedTextField
 import io.capibaras.abcall.ui.components.DefaultTextField
 import io.capibaras.abcall.ui.components.InitialPagesTitle
+import io.capibaras.abcall.ui.components.TextFieldConfig
 import io.capibaras.abcall.ui.components.TextFieldType
 import io.capibaras.abcall.ui.theme.ABCallTheme
 import io.capibaras.abcall.ui.theme.linkText
 import io.capibaras.abcall.ui.viewmodels.SignUpViewModel
-import io.capibaras.abcall.ui.viewmodels.ValidationUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ValidationUIState
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
@@ -82,7 +83,9 @@ fun SignUpScreen(
             onValueChange = { viewModel.name = it },
             validationState = nameValidationState,
             labelRes = R.string.form_name,
-            testTag = "form-name"
+            config = TextFieldConfig(
+                testTag = "form-name"
+            )
         )
 
         DefaultTextField(
@@ -90,8 +93,10 @@ fun SignUpScreen(
             onValueChange = { viewModel.email = it },
             validationState = emailValidationState,
             labelRes = R.string.form_email,
-            type = TextFieldType.EMAIL,
-            testTag = "form-email"
+            config = TextFieldConfig(
+                type = TextFieldType.EMAIL,
+                testTag = "form-email"
+            )
         )
 
         CompanyDropdown(
@@ -106,8 +111,10 @@ fun SignUpScreen(
             onValueChange = { viewModel.password = it },
             validationState = passwordValidationState,
             labelRes = R.string.form_password,
-            type = TextFieldType.PASSWORD,
-            testTag = "form-password"
+            config = TextFieldConfig(
+                type = TextFieldType.PASSWORD,
+                testTag = "form-password"
+            )
         )
 
         DefaultTextField(
@@ -115,8 +122,10 @@ fun SignUpScreen(
             onValueChange = { viewModel.confirmPassword = it },
             validationState = confirmPasswordValidationState,
             labelRes = R.string.form_confirm_password,
-            type = TextFieldType.PASSWORD,
-            testTag = "form-confirm-password"
+            config = TextFieldConfig(
+                type = TextFieldType.PASSWORD,
+                testTag = "form-confirm-password"
+            )
         )
 
         Button(
@@ -125,7 +134,8 @@ fun SignUpScreen(
 
                 if (isValid) {
                     viewModel.createUser(
-                        onSuccess = { navController.navigate("login") {
+                        onSuccess = {
+                            navController.navigate("login") {
                                 popUpTo("login") { inclusive = true }
                             }
                         }

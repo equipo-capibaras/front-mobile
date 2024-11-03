@@ -3,8 +3,8 @@ package io.capibaras.abcall.ui.util
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import io.capibaras.abcall.ui.viewmodels.ErrorUIState
-import io.capibaras.abcall.ui.viewmodels.SuccessUIState
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import io.capibaras.abcall.ui.viewmodels.utils.SuccessUIState
 
 class StateMediator {
     var isLoading by mutableStateOf(false)

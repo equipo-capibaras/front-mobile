@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.IncidentCard
 import io.capibaras.abcall.ui.components.IncidentStatus
@@ -23,6 +24,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncidentsScreen(
+    navController: NavController,
     viewModel: IncidentViewModel = koinViewModel()
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
@@ -55,7 +57,7 @@ fun IncidentsScreen(
                         filedDate = incident.filedDate,
                         closedDate = incident.closedDate,
                         recentlyUpdated = incident.recentlyUpdated,
-                        onClick = {}
+                        onClick = { navController.navigate("create-incident/${incident.id}") }
                     )
                 }
             }

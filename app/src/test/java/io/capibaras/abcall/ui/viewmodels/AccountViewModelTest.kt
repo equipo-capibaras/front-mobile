@@ -4,6 +4,7 @@ import io.capibaras.abcall.data.LogoutManager
 import io.capibaras.abcall.data.database.models.User
 import io.capibaras.abcall.data.repositories.UsersRepository
 import io.capibaras.abcall.ui.util.StateMediator
+import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
