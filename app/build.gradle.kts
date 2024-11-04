@@ -15,8 +15,8 @@ android {
         applicationId = "io.capibaras.abcall"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.3.0"
+        versionCode = 4
+        versionName = "1.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -138,7 +138,7 @@ dependencies {
 sonar {
     properties {
         property("sonar.projectName", "front-mobile")
-        property("sonar.projectVersion", "1.3.0")
+        property("sonar.projectVersion", "1.4.0")
 
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.organization", "equipo-capibaras")
