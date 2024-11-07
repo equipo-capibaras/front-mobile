@@ -9,6 +9,8 @@ import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.util.IncidentStatus
@@ -43,10 +45,30 @@ fun getChipAttributesFromStatus(status: IncidentStatus): Chip {
 }
 
 @Composable
+fun incidentChipsContentDescription(
+    status: IncidentStatus?,
+    recentlyUpdated: Boolean,
+): String {
+    val statusText = stringResource(R.string.status)
+    val recentlyUpdatedText = stringResource(R.string.recently_updated)
+
+    return buildString {
+        append(
+            "$statusText: ${getChipAttributesFromStatus(status!!).text}"
+        )
+
+        if (recentlyUpdated) append(", $recentlyUpdatedText")
+    }
+}
+
+@Composable
 fun IncidentChips(modifier: Modifier, status: IncidentStatus, recentlyUpdated: Boolean) {
+    val contentDescriptionText = incidentChipsContentDescription(status, recentlyUpdated)
     Row(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = modifier
+        modifier = modifier.semantics {
+            contentDescription = contentDescriptionText
+        },
     ) {
         val chipAttributes = getChipAttributesFromStatus(status)
         CustomChip(

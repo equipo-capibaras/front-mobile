@@ -15,53 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.util.IncidentStatus
-import io.capibaras.abcall.ui.util.formatDateToLocale
 import java.util.Locale
-
-
-@Composable
-fun incidentCardContentDescription(
-    title: String,
-    status: IncidentStatus?,
-    recentlyUpdated: Boolean,
-    escalatedDate: String? = null,
-    filedDate: String,
-    closedDate: String? = null,
-    locale: Locale
-): String {
-    val statusText = stringResource(R.string.status)
-    val filedText = stringResource(R.string.filed)
-    val escalatedText = stringResource(R.string.escalated)
-    val closedText = stringResource(R.string.closed)
-    val recentlyUpdatedText = stringResource(R.string.recently_updated)
-
-    return buildString {
-        append(
-            "$title, $statusText: ${getChipAttributesFromStatus(status!!).text}, $filedText: ${
-                formatDateToLocale(
-                    filedDate,
-                    locale
-                )
-            }"
-        )
-
-        if (recentlyUpdated) append(", $recentlyUpdatedText")
-
-        escalatedDate?.let {
-            append(", $escalatedText: ${formatDateToLocale(it, locale)}.")
-        } ?: closedDate?.let {
-            append(", $closedText: ${formatDateToLocale(it, locale)}.")
-        }
-    }
-}
 
 
 @Composable
@@ -76,22 +34,10 @@ fun IncidentCard(
 ) {
     val locale: Locale = Locale.getDefault()
     val interactionSource = remember { MutableInteractionSource() }
-    val contentDescriptionText = incidentCardContentDescription(
-        title,
-        status,
-        recentlyUpdated,
-        escalatedDate,
-        filedDate,
-        closedDate,
-        locale
-    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("incident-card")
-            .clearAndSetSemantics {
-                contentDescription = contentDescriptionText
-            }
     ) {
         Column(
             modifier = Modifier
