@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.IncidentCard
-import io.capibaras.abcall.ui.components.IncidentStatus
+import io.capibaras.abcall.ui.util.IncidentStatus
 import io.capibaras.abcall.ui.viewmodels.IncidentViewModel
 import org.koin.androidx.compose.koinViewModel
 

@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface IncidentsService {
     @GET("users/me/incidents")
@@ -14,4 +15,7 @@ interface IncidentsService {
 
     @POST("incidents/mobile")
     suspend fun createIncident(@Body createIncidentRequest: CreateIncidentRequest): Response<CreateIncidentResponse>
+
+    @GET("incidents/{id}")
+    suspend fun getIncident(@Path("id") id: String): Response<Incident>
 }
