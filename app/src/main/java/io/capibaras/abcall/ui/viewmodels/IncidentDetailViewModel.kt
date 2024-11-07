@@ -11,17 +11,22 @@ import io.capibaras.abcall.ui.util.ErrorMessage
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.util.mapErrorToMessage
 import io.capibaras.abcall.ui.viewmodels.utils.ErrorUIState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class IncidentDetailViewModel(
     private val incidentsRepository: IncidentsRepository,
     private val stateMediator: StateMediator
 ) : ViewModel() {
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     var incident by mutableStateOf<Incident?>(null)
         private set
 
     fun getIncident(incidentId: String) {
         if (stateMediator.isLoading) return
+        if (!isRefreshing) stateMediator.setLoadingState(true)
 
         viewModelScope.launch {
             val result = incidentsRepository.getIncident(incidentId)
@@ -41,10 +46,8 @@ class IncidentDetailViewModel(
                             stateMediator.setErrorState(ErrorUIState.Error(message = errorMessage.message))
                         }
                     }
-
                 }
             )
-
             stateMediator.setLoadingState(false)
         }
     }
@@ -52,6 +55,15 @@ class IncidentDetailViewModel(
     fun markIncidentAsViewed(incidentId: String) {
         viewModelScope.launch {
             incidentsRepository.markAsViewed(incidentId)
+        }
+    }
+
+    fun onRefresh(incidentId: String) {
+        isRefreshing = true
+        viewModelScope.launch {
+            delay(500)
+            getIncident(incidentId)
+            isRefreshing = false
         }
     }
 }

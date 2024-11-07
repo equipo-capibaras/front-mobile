@@ -53,6 +53,35 @@ class IncidentsViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun createMockIncidentList(): List<Incident> {
+        val mockHistory = listOf(
+            History(
+                seq = 1,
+                date = "2024-01-01",
+                action = "filed",
+                description = "Filed the incident"
+            ),
+            History(
+                seq = 2,
+                date = "2024-01-02",
+                action = "escalated",
+                description = "Escalated the incident"
+            )
+        )
+        return listOf(
+            Incident(
+                id = "1",
+                name = "Incident Test",
+                channel = "email",
+                history = mockHistory,
+                filedDate = "2024-01-01",
+                escalatedDate = "2024-01-02",
+                closedDate = null,
+                recentlyUpdated = true
+            )
+        )
+    }
+
     @Test
     fun `test getIncidents success`() = runTest {
         val mockIncidentList = createMockIncidentList()
@@ -148,32 +177,5 @@ class IncidentsViewModelTest {
         coVerify { incidentsRepository.getIncidents() }
     }
 
-    private fun createMockIncidentList(): List<Incident> {
-        val mockHistory = listOf(
-            History(
-                seq = 1,
-                date = "2024-01-01",
-                action = "filed",
-                description = "Filed the incident"
-            ),
-            History(
-                seq = 2,
-                date = "2024-01-02",
-                action = "escalated",
-                description = "Escalated the incident"
-            )
-        )
-        return listOf(
-            Incident(
-                id = "1",
-                name = "Incident Test",
-                channel = "email",
-                history = mockHistory,
-                filedDate = "2024-01-01",
-                escalatedDate = "2024-01-02",
-                closedDate = null,
-                recentlyUpdated = true
-            )
-        )
-    }
+
 }

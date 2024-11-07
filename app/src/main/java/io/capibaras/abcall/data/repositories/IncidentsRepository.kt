@@ -99,6 +99,7 @@ class IncidentsRepository(
         val localData = incidentDAO.getIncident(incidentId)
         return try {
             val response = incidentsService.getIncident(incidentId)
+
             if (response.isSuccessful) {
                 var incident = response.body()!!
                 incident = incident.copy(
@@ -125,5 +126,5 @@ class IncidentsRepository(
     suspend fun markAsViewed(incidentId: String) {
         incidentDAO.updateIncidentViewedStatus(incidentId, true)
     }
-    
+
 }
