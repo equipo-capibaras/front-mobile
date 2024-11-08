@@ -122,13 +122,16 @@ class UserFlowTest {
         // Given: I am on the Create Incident screen
         // And: I fill in the incident details
         val incidentTitle = "Test Incident ${System.currentTimeMillis()}"
+        val incidentDescription = "Description for test incident"
         createIncidentScreenPO.fillIncidentName(incidentTitle)
-        createIncidentScreenPO.fillIncidentDescription("Description for test incident")
+        createIncidentScreenPO.fillIncidentDescription(incidentDescription)
         createIncidentScreenPO.submitIncident()
 
 
         // Then: I should be redirected to the Incident Detail screen
         detailIncidentPO.assertIncidentDetailScreenVisible()
+        detailIncidentPO.incidentTitle(incidentTitle)
+        detailIncidentPO.incidentDescription(incidentDescription)
 
         // When: I navigate back to the Home screen
         bottomNavBarPO.navigateToHome()
@@ -137,4 +140,5 @@ class UserFlowTest {
         homeScreenPO.assertHomeScreenVisible()
         incidentsScreenPO.findIncidentCard(incidentTitle)
     }
+
 }

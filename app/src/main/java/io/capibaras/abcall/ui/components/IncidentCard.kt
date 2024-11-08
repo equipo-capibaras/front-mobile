@@ -53,12 +53,12 @@ fun IncidentCard(
         ) {
             Text(
                 text = title,
+                modifier = Modifier
+                    .padding(bottom = 12.dp),
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp,
                 lineHeight = 32.sp,
-                modifier = Modifier
-                    .padding(bottom = 12.dp),
-                color = MaterialTheme.colorScheme.onTertiary
+                color = MaterialTheme.colorScheme.onTertiary,
             )
             if (status != null) {
                 IncidentChips(modifier = Modifier.padding(bottom = 12.dp), status, recentlyUpdated)

@@ -71,7 +71,7 @@ fun IncidentDetailScreen(viewModel: IncidentDetailViewModel = koinViewModel(), i
                     escalatedDate = incidentInfo.escalatedDate,
                     filedDate = incidentInfo.filedDate,
                     closedDate = incidentInfo.closedDate,
-                    locale = Locale.getDefault()
+                    locale = Locale.getDefault(),
                 )
                 IncidentChips(
                     modifier = Modifier.padding(vertical = 29.dp),
@@ -81,6 +81,8 @@ fun IncidentDetailScreen(viewModel: IncidentDetailViewModel = koinViewModel(), i
 
                 Text(
                     text = incidentInfo.history.first().description,
+                    modifier = Modifier
+                        .testTag("incident-detail-description")
                 )
 
                 if (incidentInfo.history.size > 1) {
