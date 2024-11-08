@@ -14,7 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -35,9 +35,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncidentDetailScreen(viewModel: IncidentDetailViewModel = koinViewModel(), incidentId: String) {
-    LaunchedEffect(Unit) {
-        viewModel.getIncident(incidentId)
-        viewModel.markIncidentAsViewed(incidentId)
+    DisposableEffect(Unit) {
+        viewModel.loadIncidentAndMarkAsViewed(incidentId)
+        onDispose {}
     }
 
     val incidentInfo = viewModel.incident

@@ -24,45 +24,50 @@ class IncidentDetailViewModel(
     var incident by mutableStateOf<Incident?>(null)
         private set
 
-    fun getIncident(incidentId: String) {
-        if (stateMediator.isLoading) return
-        if (!isRefreshing) stateMediator.setLoadingState(true)
-
+    fun loadIncidentAndMarkAsViewed(incidentId: String) {
         viewModelScope.launch {
-            val result = incidentsRepository.getIncident(incidentId)
-
-            result.fold(
-                onSuccess = { incidentDetail ->
-                    incident = incidentDetail
-                    stateMediator.clearErrorUIState()
-                },
-                onFailure = { error ->
-                    when (val errorMessage = mapErrorToMessage(error)) {
-                        is ErrorMessage.Res -> {
-                            stateMediator.setErrorState(ErrorUIState.Error(errorMessage.resId))
-                        }
-
-                        is ErrorMessage.Text -> {
-                            stateMediator.setErrorState(ErrorUIState.Error(message = errorMessage.message))
-                        }
-                    }
-                }
-            )
-            stateMediator.setLoadingState(false)
+            getIncident(incidentId)
+            markIncidentAsViewed(incidentId)
         }
     }
 
-    fun markIncidentAsViewed(incidentId: String) {
-        viewModelScope.launch {
-            incidentsRepository.markAsViewed(incidentId)
-        }
+    private suspend fun getIncident(incidentId: String) {
+        if (stateMediator.isLoading) return
+        if (!isRefreshing) stateMediator.setLoadingState(true)
+
+        val result = incidentsRepository.getIncident(incidentId)
+
+        result.fold(
+            onSuccess = { incidentDetail ->
+                incident = incidentDetail
+                stateMediator.clearErrorUIState()
+            },
+            onFailure = { error ->
+                when (val errorMessage = mapErrorToMessage(error)) {
+                    is ErrorMessage.Res -> {
+                        stateMediator.setErrorState(ErrorUIState.Error(errorMessage.resId))
+                    }
+
+                    is ErrorMessage.Text -> {
+                        stateMediator.setErrorState(ErrorUIState.Error(message = errorMessage.message))
+                    }
+                }
+            }
+        )
+        stateMediator.setLoadingState(false)
+
+    }
+
+    private suspend fun markIncidentAsViewed(incidentId: String) {
+        incidentsRepository.markAsViewed(incidentId)
+
     }
 
     fun onRefresh(incidentId: String) {
         isRefreshing = true
         viewModelScope.launch {
             delay(500)
-            getIncident(incidentId)
+            loadIncidentAndMarkAsViewed(incidentId)
             isRefreshing = false
         }
     }

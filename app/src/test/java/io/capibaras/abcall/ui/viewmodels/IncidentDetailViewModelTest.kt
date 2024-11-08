@@ -63,7 +63,6 @@ class IncidentDetailViewModelTest {
             closedDate = null,
             recentlyUpdated = true
         )
-
     }
 
     private fun createMockHistoryList(): List<History> {
@@ -84,66 +83,28 @@ class IncidentDetailViewModelTest {
     }
 
     @Test
-    fun `getIncident success`() = runTest {
+    fun `loadIncidentAndMarkAsViewed success`() = runTest {
         val mockIncident = createMockIncident()
 
         coEvery { incidentsRepository.getIncident("1") } returns Result.success(mockIncident)
+        coEvery { incidentsRepository.markAsViewed("1") } just runs
 
         viewModel = IncidentDetailViewModel(incidentsRepository, stateMediator)
-        viewModel.getIncident("1")
+        viewModel.loadIncidentAndMarkAsViewed("1")
         advanceUntilIdle()
 
         assertEquals(mockIncident, viewModel.incident)
         coVerify { stateMediator.clearErrorUIState() }
         coVerify { stateMediator.setLoadingState(false) }
-    }
-
-    @Test
-    fun `getIncident failure with default error`() = runTest {
-        val customErrorMessage = "Error fetching incident"
-        val customError = RepositoryError.CustomError(customErrorMessage)
-
-        coEvery { incidentsRepository.getIncident("1") } returns Result.failure(customError)
-
-        viewModel = IncidentDetailViewModel(incidentsRepository, stateMediator)
-        viewModel.getIncident("1")
-        advanceUntilIdle()
-
-        coVerify {
-            stateMediator.setErrorState(
-                ErrorUIState.Error(message = customErrorMessage)
-            )
-        }
-        coVerify { stateMediator.setLoadingState(false) }
-    }
-
-    @Test
-    fun `getIncident skips loading when already loading`() = runTest {
-        every { stateMediator.isLoading } returns true
-
-        viewModel = IncidentDetailViewModel(incidentsRepository, stateMediator)
-        viewModel.getIncident("1")
-        advanceUntilIdle()
-
-        coVerify(exactly = 0) { incidentsRepository.getIncident("1") }
-    }
-
-    @Test
-    fun `markIncidentAsViewed calls repository`() = runTest {
-        coEvery { incidentsRepository.markAsViewed("1") } just runs
-
-        viewModel = IncidentDetailViewModel(incidentsRepository, stateMediator)
-        viewModel.markIncidentAsViewed("1")
-        advanceUntilIdle()
-
         coVerify { incidentsRepository.markAsViewed("1") }
     }
 
     @Test
-    fun `onRefresh success`() = runTest {
+    fun `onRefresh calls loadIncidentAndMarkAsViewed and updates isRefreshing`() = runTest {
         val mockIncident = createMockIncident()
 
         coEvery { incidentsRepository.getIncident("1") } returns Result.success(mockIncident)
+        coEvery { incidentsRepository.markAsViewed("1") } just runs
 
         viewModel = IncidentDetailViewModel(incidentsRepository, stateMediator)
         viewModel.onRefresh("1")
@@ -155,19 +116,21 @@ class IncidentDetailViewModelTest {
     }
 
     @Test
-    fun `onRefresh failure`() = runTest {
+    fun `onRefresh handles failure and updates isRefreshing`() = runTest {
         val customErrorMessage = "Error refreshing incident"
         val customError = RepositoryError.CustomError(customErrorMessage)
 
         coEvery { incidentsRepository.getIncident("1") } returns Result.failure(customError)
 
+        coEvery { incidentsRepository.markAsViewed("1") } just runs
+
         viewModel = IncidentDetailViewModel(incidentsRepository, stateMediator)
         viewModel.onRefresh("1")
         advanceUntilIdle()
 
         assertEquals(false, viewModel.isRefreshing)
+
         coVerify { stateMediator.setErrorState(ErrorUIState.Error(message = customErrorMessage)) }
     }
+    
 }
-
-

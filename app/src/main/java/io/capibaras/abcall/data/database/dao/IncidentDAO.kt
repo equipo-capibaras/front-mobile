@@ -34,6 +34,7 @@ interface IncidentDAO {
 
             val updatedIncidents = incidents.map { newIncident ->
                 val localIncident = currentIncidents[newIncident.id]
+
                 newIncident.copy(
                     isViewed = localIncident?.isViewed ?: true
                 )

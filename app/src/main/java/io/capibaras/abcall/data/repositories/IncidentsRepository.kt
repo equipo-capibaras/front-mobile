@@ -37,14 +37,13 @@ class IncidentsRepository(
 
     private suspend fun setRecentlyUpdated(incident: Incident): Boolean {
         val localIncident = incidentDAO.getIncident(incident.id) ?: return false
-
         return when {
+            !localIncident.isViewed -> true
             incident.history.size != localIncident.history.size && localIncident.isViewed -> {
                 incidentDAO.updateIncidentViewedStatus(incident.id, false)
                 true
             }
 
-            !localIncident.isViewed -> true
             else -> false
         }
     }
