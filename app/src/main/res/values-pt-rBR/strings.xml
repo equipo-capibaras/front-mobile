@@ -46,7 +46,7 @@
     <string name="escalated">Escalado</string>
     <string name="open">Aberto</string>
     <string name="updated">Atualizado</string>
-    <string name="error_getting_incidents">Erro ao obter a lista de incidentes</string>
+    <string name="error_getting_incidents">Erro ao obter a lista de solicitaçãos</string>
     <string name="error_server">Estamos enfrentando problemas técnicos. Por favor, tente novamente mais tarde.</string>
     <string name="status">Status</string>
     <string name="recently_updated">Atualizado recentemente</string>
@@ -57,5 +57,8 @@
     <string name="create_incident_success">A solicitação foi criada com sucesso</string>
     <string name="form_1000_length">Deve ter no máximo 1000 caracteres</string>
     <string name="back">Voltar</string>
+    <string name="error_getting_incident">Erro ao obter as informações da solicitação</string>
+    <string name="incident_detail">Detalhe da solicitação</string>
+    <string name="incident_history">RESPOSTAS</string>
 
 </resources>

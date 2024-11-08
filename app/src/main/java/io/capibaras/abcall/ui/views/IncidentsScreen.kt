@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.IncidentCard
-import io.capibaras.abcall.ui.components.IncidentStatus
+import io.capibaras.abcall.ui.util.IncidentStatus
 import io.capibaras.abcall.ui.viewmodels.IncidentViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,6 +29,11 @@ fun IncidentsScreen(
     viewModel: IncidentViewModel = koinViewModel()
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
+
+    DisposableEffect(Unit) {
+        viewModel.getIncidents()
+        onDispose {}
+    }
 
     PullToRefreshBox(
         state = pullToRefreshState,

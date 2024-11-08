@@ -137,7 +137,8 @@ val appModule = module {
 
     viewModel {
         IncidentDetailViewModel(
-            get<IncidentsRepository>()
+            get<IncidentsRepository>(),
+            get<StateMediator>()
         )
     }
 }

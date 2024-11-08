@@ -26,7 +26,8 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class IncidentsViewModelTest {
+class IncidentViewModelTest {
+
     private lateinit var viewModel: IncidentViewModel
 
     @MockK
@@ -53,6 +54,35 @@ class IncidentsViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun createMockIncidentList(): List<Incident> {
+        val mockHistory = listOf(
+            History(
+                seq = 1,
+                date = "2024-01-01",
+                action = "filed",
+                description = "Filed the incident"
+            ),
+            History(
+                seq = 2,
+                date = "2024-01-02",
+                action = "escalated",
+                description = "Escalated the incident"
+            )
+        )
+        return listOf(
+            Incident(
+                id = "1",
+                name = "Incident Test",
+                channel = "email",
+                history = mockHistory,
+                filedDate = "2024-01-01",
+                escalatedDate = "2024-01-02",
+                closedDate = null,
+                recentlyUpdated = true
+            )
+        )
+    }
+
     @Test
     fun `test getIncidents success`() = runTest {
         val mockIncidentList = createMockIncidentList()
@@ -60,6 +90,7 @@ class IncidentsViewModelTest {
         coEvery { incidentsRepository.getIncidents() } returns Result.success(mockIncidentList)
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+        viewModel.getIncidents()
         advanceUntilIdle()
 
         assertEquals(mockIncidentList, viewModel.incidents)
@@ -72,6 +103,7 @@ class IncidentsViewModelTest {
         coEvery { incidentsRepository.getIncidents() } returns Result.failure(Exception("Error"))
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+        viewModel.getIncidents()
         advanceUntilIdle()
 
         coVerify { stateMediator.setErrorState(any()) }
@@ -86,6 +118,7 @@ class IncidentsViewModelTest {
         coEvery { incidentsRepository.getIncidents() } returns Result.failure(customError)
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+        viewModel.getIncidents()
         advanceUntilIdle()
 
         coVerify {
@@ -100,6 +133,7 @@ class IncidentsViewModelTest {
         every { stateMediator.isLoading } returns true
 
         viewModel = IncidentViewModel(incidentsRepository, stateMediator)
+        viewModel.getIncidents()
         advanceUntilIdle()
 
         coVerify(exactly = 0) { incidentsRepository.getIncidents() }
@@ -134,46 +168,5 @@ class IncidentsViewModelTest {
 
         assertEquals(false, viewModel.isRefreshing)
         coVerify { stateMediator.setErrorState(ErrorUIState.Error(message = customErrorMessage)) }
-    }
-
-    @Test
-    fun `test init calls getIncidents`() = runTest {
-        val mockIncidentList = createMockIncidentList()
-        coEvery { incidentsRepository.getIncidents() } returns Result.success(mockIncidentList)
-
-        viewModel = IncidentViewModel(incidentsRepository, stateMediator)
-        advanceUntilIdle()
-
-        assertEquals(mockIncidentList, viewModel.incidents)
-        coVerify { incidentsRepository.getIncidents() }
-    }
-
-    private fun createMockIncidentList(): List<Incident> {
-        val mockHistory = listOf(
-            History(
-                seq = 1,
-                date = "2024-01-01",
-                action = "filed",
-                description = "Filed the incident"
-            ),
-            History(
-                seq = 2,
-                date = "2024-01-02",
-                action = "escalated",
-                description = "Escalated the incident"
-            )
-        )
-        return listOf(
-            Incident(
-                id = "1",
-                name = "Incident Test",
-                channel = "email",
-                history = mockHistory,
-                filedDate = "2024-01-01",
-                escalatedDate = "2024-01-02",
-                closedDate = null,
-                recentlyUpdated = true
-            )
-        )
     }
 }

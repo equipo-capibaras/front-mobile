@@ -12,5 +12,5 @@ val Blue600 = Color(0xFC375695)
 val Blue700 = Color(0xFC294170)
 val Blue800 = Color(0xFC1C2B4A)
 val Blue900 = Color(0xFC0E1625)
-val Blue950 = Color(0xFF070B13)
+val Blue950 = Color(0xFC070B13)
 

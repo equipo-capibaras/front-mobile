@@ -16,6 +16,7 @@ fun mapErrorToMessage(error: Throwable): ErrorMessage {
         is RepositoryError.ServerError -> ErrorMessage.Res(R.string.error_server)
         is RepositoryError.CustomError -> ErrorMessage.Text(error.message)
         is IncidentsRepositoryError.GetIncidentsError -> ErrorMessage.Res(R.string.error_getting_incidents)
+        is IncidentsRepositoryError.GetIncidentError -> ErrorMessage.Res(R.string.error_getting_incident)
         else -> ErrorMessage.Res(R.string.unknown_error)
     }
 }

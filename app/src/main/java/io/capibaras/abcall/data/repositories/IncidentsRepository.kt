@@ -12,6 +12,10 @@ sealed class IncidentsRepositoryError : Exception() {
     data object GetIncidentsError : RepositoryError() {
         private fun readResolve(): Any = GetIncidentsError
     }
+
+    data object GetIncidentError : RepositoryError() {
+        private fun readResolve(): Any = GetIncidentError
+    }
 }
 
 class IncidentsRepository(
@@ -33,14 +37,13 @@ class IncidentsRepository(
 
     private suspend fun setRecentlyUpdated(incident: Incident): Boolean {
         val localIncident = incidentDAO.getIncident(incident.id) ?: return false
-
         return when {
+            !localIncident.isViewed -> true
             incident.history.size != localIncident.history.size && localIncident.isViewed -> {
                 incidentDAO.updateIncidentViewedStatus(incident.id, false)
                 true
             }
 
-            !localIncident.isViewed -> true
             else -> false
         }
     }
@@ -90,9 +93,37 @@ class IncidentsRepository(
         }
     }
 
+
+    suspend fun getIncident(incidentId: String): Result<Incident> {
+        val localData = incidentDAO.getIncident(incidentId)
+        return try {
+            val response = incidentsService.getIncident(incidentId)
+
+            if (response.isSuccessful) {
+                var incident = response.body()!!
+                incident = incident.copy(
+                    filedDate = getFiledDate(incident.history),
+                    escalatedDate = getEscalatedDate(incident.history),
+                    closedDate = getClosedDate(incident.history),
+                    recentlyUpdated = setRecentlyUpdated(incident)
+                )
+
+                incidentDAO.insertIncident(incident)
+
+                Result.success(incident)
+            } else {
+                handleErrorResponse(localData, response.errorBody()?.string())
+            }
+        } catch (e: IOException) {
+            handleNetworkAndLocalDBFailure(localData, IncidentsRepositoryError.GetIncidentError)
+        } catch (e: Exception) {
+            Result.failure(e.message?.let { RepositoryError.CustomError(it) }
+                ?: RepositoryError.UnknownError)
+        }
+    }
+
     suspend fun markAsViewed(incidentId: String) {
         incidentDAO.updateIncidentViewedStatus(incidentId, true)
     }
-
 
 }

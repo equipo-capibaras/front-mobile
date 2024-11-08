@@ -289,5 +289,89 @@ class IncidentsRepositoryTest {
         coVerify { incidentDAO.updateIncidentViewedStatus(incidentId, true) }
     }
 
+    @Test
+    fun `should return incident from API and update local database`() = runBlocking {
+        val mockIncident = createMockIncident()
+        val mockResponse = mockk<Response<Incident>> {
+            every { isSuccessful } returns true
+            every { body() } returns mockIncident
+        }
 
+        coEvery { incidentsService.getIncident("1") } returns mockResponse
+        coEvery { incidentDAO.getIncident("1") } returns null
+        coEvery { incidentDAO.insertIncident(any()) } just Runs
+
+        val result = incidentsRepository.getIncident("1")
+
+        assertEquals(Result.success(mockIncident), result)
+        coVerify { incidentDAO.insertIncident(mockIncident) }
+    }
+
+    @Test
+    fun `should return local incident if API fails with error response`() = runBlocking {
+        val mockLocalIncident = createMockIncident()
+        val errorMessage = "Error message"
+        val errorBody = ResponseBody.create(null, """{"message": "$errorMessage"}""")
+        val mockResponse = mockk<Response<Incident>> {
+            every { isSuccessful } returns false
+            every { errorBody() } returns errorBody
+        }
+
+        mockkConstructor(JSONObject::class)
+        every {
+            anyConstructed<JSONObject>().optString(
+                "message",
+                "Unknown error"
+            )
+        } returns errorMessage
+
+        coEvery { incidentsService.getIncident("1") } returns mockResponse
+        coEvery { incidentDAO.getIncident("1") } returns mockLocalIncident
+
+        val result = incidentsRepository.getIncident("1")
+
+        assertTrue(result.isSuccess)
+        assertEquals(Result.success(mockLocalIncident), result)
+    }
+
+    @Test
+    fun `should return local incident if network exception occurs`() = runBlocking {
+        val mockLocalIncident = createMockIncident()
+
+        coEvery { incidentsService.getIncident("1") } throws IOException()
+        coEvery { incidentDAO.getIncident("1") } returns mockLocalIncident
+
+        val result = incidentsRepository.getIncident("1")
+
+        assertEquals(Result.success(mockLocalIncident), result)
+    }
+
+    @Test
+    fun `should return failure when no local data and network exception occurs in getIncident`() =
+        runBlocking {
+            coEvery { incidentsService.getIncident("1") } throws IOException()
+            coEvery { incidentDAO.getIncident("1") } returns null
+
+            val result = incidentsRepository.getIncident("1")
+
+            assertTrue(result.isFailure)
+            assertEquals(IncidentsRepositoryError.GetIncidentError, result.exceptionOrNull())
+        }
+
+    @Test
+    fun `should return failure with custom error when an unexpected exception occurs in getIncident`() =
+        runBlocking {
+            val unexpectedError = Exception("Unexpected error in getIncident")
+
+            coEvery { incidentsService.getIncident("1") } throws unexpectedError
+            coEvery { incidentDAO.getIncident("1") } returns null
+
+            val result = incidentsRepository.getIncident("1")
+
+            assertTrue(result.isFailure)
+            assertEquals(
+                "Unexpected error in getIncident",
+                (result.exceptionOrNull() as RepositoryError.CustomError).message
+            )
+        }
 }
