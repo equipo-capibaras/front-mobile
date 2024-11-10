@@ -24,11 +24,7 @@ class IncidentViewModel(
     var isRefreshing by mutableStateOf(false)
         private set
 
-    init {
-        getIncidents()
-    }
-
-    private fun getIncidents() {
+    fun getIncidents() {
         if (stateMediator.isLoading) return
         if (!isRefreshing) stateMediator.setLoadingState(true)
 

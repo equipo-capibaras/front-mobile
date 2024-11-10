@@ -20,12 +20,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import io.capibaras.abcall.R
 import io.capibaras.abcall.ui.components.BottomNavBar
 import io.capibaras.abcall.ui.components.CustomSnackbarHost
 import io.capibaras.abcall.ui.components.HandleErrorState
 import io.capibaras.abcall.ui.components.HandleSuccessState
 import io.capibaras.abcall.ui.components.TopBar
+import io.capibaras.abcall.ui.util.Routes
 import io.capibaras.abcall.ui.util.StateMediator
 import io.capibaras.abcall.ui.viewmodels.NavigationViewModel
 import io.capibaras.abcall.ui.views.AccountScreen
@@ -78,26 +78,6 @@ fun Navigation(
     }
 }
 
-object Routes {
-    const val HOME = "home"
-    const val SIGN_UP = "signup"
-    const val LOGIN = "login"
-    const val ACCOUNT = "account"
-    const val CREATE_INCIDENT = "create-incident"
-}
-
-object TopBarTitles {
-    private val titlesMap = mapOf(
-        Routes.HOME to R.string.requests_title,
-        Routes.ACCOUNT to R.string.account_title,
-        Routes.CREATE_INCIDENT to R.string.create_incident
-    )
-
-    fun getTitleForRoute(route: String?): Int? {
-        return titlesMap[route]
-    }
-}
-
 @Composable
 fun CustomScaffold(
     viewModel: NavigationViewModel,
@@ -107,13 +87,22 @@ fun CustomScaffold(
     navController: NavHostController,
     isUserLoggedIn: Boolean
 ) {
-    val titleResId = TopBarTitles.getTitleForRoute(currentRoute)
+    val titleResId = Routes.getTitleForRoute(currentRoute)
     val topBarTitle = titleResId?.let { stringResource(it) } ?: ""
-    val showBackButton = currentRoute == Routes.CREATE_INCIDENT
+    val showBackButton = Routes.shouldShowBackButton(currentRoute)
+
     Scaffold(
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { ScaffoldTopBar(navBackStackEntry, topBarTitle, showBackButton, navController) },
+        topBar = {
+            ScaffoldTopBar(
+                navBackStackEntry,
+                topBarTitle,
+                showBackButton,
+                navController,
+                currentRoute
+            )
+        },
         bottomBar = { ScaffoldBottomBar(navBackStackEntry, navController) },
         modifier = Modifier
             .fillMaxSize()
@@ -150,13 +139,14 @@ fun ScaffoldTopBar(
     navBackStackEntry: State<NavBackStackEntry?>,
     topBarTitle: String,
     showBackButton: Boolean,
-    navController: NavHostController
+    navController: NavHostController,
+    currentRoute: String?,
 ) {
     if (shouldShowBar(navBackStackEntry)) {
         TopBar(
             title = topBarTitle,
             showBackButton = showBackButton,
-            onBackClick = { navController.popBackStack() }
+            onBackClick = Routes.getBackNavigationAction(currentRoute, navController)
         )
     }
 }
@@ -189,7 +179,7 @@ fun ScaffoldNavHost(
         composable(Routes.HOME) { HomeScreen(navController) }
         composable(Routes.ACCOUNT) { AccountScreen() }
         composable(Routes.CREATE_INCIDENT) { CreateIncidentScreen(navController) }
-        composable("${Routes.CREATE_INCIDENT}/{id}") { backStackEntry ->
+        composable(Routes.INCIDENT_DETAIL) { backStackEntry ->
             val incidentId = backStackEntry.arguments?.getString("id")
             if (incidentId != null)
                 IncidentDetailScreen(incidentId = incidentId)

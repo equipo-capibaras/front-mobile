@@ -4,7 +4,12 @@
     <string name="login_signup_question">¿Todavía no tenés cuenta?</string>
     <string name="signup_title">Creá tu cuenta</string>
     <string name="form_company">¿De qué empresa sos cliente?</string>
-    <string name="signup_login_question">¿Ya tenés cuenta?</string>
+    <string name="signup_login_question">¿Tenés cuenta?</string>
     <string name="signup_login_action">Ingresá</string>
     <string name="error_server">Estamos experimentando problemas técnicos. Por favor, intentá de nuevo más tarde.</string>
+    <string name="confirm_logout_question">¿Estás seguro de que deseás cerrar sesión?</string>
+    <string name="expired_token">Sesión expirada. Por favor, iniciá sesión nuevamente</string>
+    <string name="empty_incidents_list">No tenés peticiones creadas</string>
+    <string name="create_incident_description">Proporcioná una descripción clara del problema</string>
+    <string name="incident_history">RESPUESTAS</string>
 </resources>

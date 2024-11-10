@@ -14,23 +14,23 @@ data class CustomColors(
 )
 
 val LightCustomColors = CustomColors(
-    success = Color(0xFF218838),
+    success = Color(0xFC218838),
     onSuccess = Color.White,
     pill = Blue400,
     outlineButtonContent = Blue500,
-    warning = Color(0xFFCC4D00),
+    warning = Color(0xFCCC4D00),
     onWarning = Color.White,
-    neutral = Color(0xFF637984)
+    neutral = Color(0xFC637984)
 )
 
 val DarkCustomColors = CustomColors(
-    success = Color(0xFFADD5AD),
-    onSuccess = Color(0xFF0A500C),
+    success = Color(0xFCADD5AD),
+    onSuccess = Color(0xFC0A500C),
     pill = Blue700,
     outlineButtonContent = Color.White,
     warning = Color(0xFFEEB289),
-    onWarning = Color(0xFF7A3300),
-    neutral = Color(0xFF637984)
+    onWarning = Color(0xFC7A3300),
+    neutral = Color(0xFC637984)
 )
 
 val LocalCustomColors = compositionLocalOf { LightCustomColors }
