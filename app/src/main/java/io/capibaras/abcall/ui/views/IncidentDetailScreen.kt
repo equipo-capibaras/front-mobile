@@ -2,13 +2,17 @@ package io.capibaras.abcall.ui.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -19,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.capibaras.abcall.R
@@ -57,7 +62,13 @@ fun IncidentDetailScreen(viewModel: IncidentDetailViewModel = koinViewModel(), i
             horizontalAlignment = Alignment.Start
         ) {
             if (incidentInfo != null) {
-                val incidentStatus = IncidentStatus.fromString(incidentInfo.history.last().action)!!
+                val historySize = incidentInfo.history.size
+                val lastAction = incidentInfo.history.last().action
+                val incidentStatus = if (lastAction == "AI_response" && historySize >= 2) {
+                    IncidentStatus.fromString(incidentInfo.history[historySize - 2].action)!!
+                } else {
+                    IncidentStatus.fromString(lastAction)!!
+                }
                 Text(
                     text = incidentInfo.name,
                     modifier = Modifier
@@ -113,7 +124,25 @@ fun IncidentHistory(incidentInfo: Incident) {
 @Composable
 fun IncidentComment(history: History) {
     Column(modifier = Modifier.padding(top = 21.dp)) {
+
         IncidentDateString(date = history.date, locale = Locale.getDefault())
+        if (history.action == "AI_response") {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 5.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.SmartToy,
+                    contentDescription = stringResource(R.string.ia_icon),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = stringResource(R.string.ia_response),
+                    modifier = Modifier.padding(start = 8.dp),
+                    fontStyle = FontStyle.Italic,
+                )
+            }
+        }
         Text(text = history.description, modifier = Modifier.padding(top = 10.dp))
     }
 }

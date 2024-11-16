@@ -60,5 +60,7 @@
     <string name="error_getting_incident">Erro ao obter as informações da solicitação</string>
     <string name="incident_detail">Detalhe da solicitação</string>
     <string name="incident_history">RESPOSTAS</string>
+    <string name="ia_response">Gerado por IA</string>
+    <string name="ia_icon">Ícone IA</string>
 
 </resources>
