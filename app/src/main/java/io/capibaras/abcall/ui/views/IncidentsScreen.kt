@@ -59,9 +59,16 @@ fun IncidentsScreen(
             ) {
                 items(viewModel.incidents.size) { index ->
                     val incident = viewModel.incidents[index]
+                    val historySize = incident.history.size
+                    val lastAction = incident.history.last().action
+                    val status = if (lastAction == "AI_response" && historySize >= 2) {
+                        IncidentStatus.fromString(incident.history[historySize - 2].action)
+                    } else {
+                        IncidentStatus.fromString(lastAction)
+                    }
                     IncidentCard(
                         title = incident.name,
-                        status = IncidentStatus.fromString(incident.history.last().action),
+                        status = status,
                         escalatedDate = incident.escalatedDate,
                         filedDate = incident.filedDate,
                         closedDate = incident.closedDate,
