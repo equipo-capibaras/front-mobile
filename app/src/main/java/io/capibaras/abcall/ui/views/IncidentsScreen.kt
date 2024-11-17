@@ -1,7 +1,6 @@
 package io.capibaras.abcall.ui.views
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,15 +39,19 @@ fun IncidentsScreen(
         isRefreshing = viewModel.isRefreshing,
         onRefresh = { viewModel.onRefresh() },
     ) {
+
         if (viewModel.incidents.isEmpty()) {
-            Box(
+            LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = stringResource(R.string.empty_incidents_list),
-                    fontSize = 18.sp
-                )
+                item {
+                    Text(
+                        text = stringResource(R.string.empty_incidents_list),
+                        fontSize = 18.sp
+                    )
+                }
             }
         } else {
             LazyColumn(
@@ -56,9 +59,16 @@ fun IncidentsScreen(
             ) {
                 items(viewModel.incidents.size) { index ->
                     val incident = viewModel.incidents[index]
+                    val historySize = incident.history.size
+                    val lastAction = incident.history.last().action
+                    val status = if (lastAction == "AI_response" && historySize >= 2) {
+                        IncidentStatus.fromString(incident.history[historySize - 2].action)
+                    } else {
+                        IncidentStatus.fromString(lastAction)
+                    }
                     IncidentCard(
                         title = incident.name,
-                        status = IncidentStatus.fromString(incident.history.last().action),
+                        status = status,
                         escalatedDate = incident.escalatedDate,
                         filedDate = incident.filedDate,
                         closedDate = incident.closedDate,
@@ -69,5 +79,4 @@ fun IncidentsScreen(
             }
         }
     }
-
 }
