@@ -1,5 +1,5 @@
 [versions]
-sonarqube = "5.1.0.4882"
+sonarqube = "6.0.0.5145"
 agp = "8.7.2"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
