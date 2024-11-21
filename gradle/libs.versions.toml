@@ -20,7 +20,7 @@ kotlinx-coroutines = "1.9.0"
 core-splashscreen = "1.0.1"
 room = "2.6.1"
 ksp = "2.0.21-1.0.28"
-roboelectric = "4.14"
+roboelectric = "4.14.1"
 faker = "1.16.0"
 navigationTesting = "2.8.4"
 
